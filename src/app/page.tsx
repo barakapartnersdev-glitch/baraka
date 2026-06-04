@@ -1,33 +1,11 @@
 import Link from "next/link";
-import PublicHeader from "@/components/PublicHeader";
-import Footer from "@/components/Footer";
-import OpportunityCard, { type OpportunityCardData } from "@/components/OpportunityCard";
 import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
-import { t } from "@/lib/i18n";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
+import Faq from "@/components/Faq";
 
 export const dynamic = "force-dynamic";
-
-const icons = {
-  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-  doc: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z",
-  check: "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3",
-  arrow: "M5 12h14M13 6l6 6-6 6",
-  spark: "M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8",
-  lock: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4",
-  users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
-  eye: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
-  quote: "M3 21c3-2 5-5 5-9V5H4v6h3M14 21c3-2 5-5 5-9V5h-4v6h3",
-};
-
-function Icon({ d, size = 22 }: { d: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {d.split("M").filter(Boolean).map((seg, i) => <path key={i} d={"M" + seg} />)}
-    </svg>
-  );
-}
 
 function fmtRange(min: bigint | null, max: bigint | null, cur: string) {
   if (!min && !max) return null;
@@ -35,24 +13,150 @@ function fmtRange(min: bigint | null, max: bigint | null, cur: string) {
   return `${min ? f(min) : "?"} – ${max ? f(max) : "?"} ${cur}`;
 }
 
+// ===== محتوى الصفحة ثنائي اللغة =====
+const C = {
+  ar: {
+    brandSub: "BARAKA PARTNERS",
+    nav: { home: "الرئيسية", opps: "الفرص الاستثمارية", inv: "للمستثمرين", own: "لأصحاب الفرص", how: "كيف نعمل", contact: "اتصل بنا" },
+    login: "تسجيل الدخول", signup: "إنشاء حساب",
+    heroTag: "منصة استثمارية تديرها شركة عهد البركة",
+    heroH1a: "نربط", heroH1gold: "رأس المال الدولي", heroH1b: "بالفرص الحقيقية المدروسة",
+    heroLead: "منصة وسيطة موثوقة تجمع بين المستثمرين الجادين من مختلف الدول وأصحاب المشاريع والأصول الواعدة — ضمن إطار من الشفافية والحوكمة والسرية، لتحقيق المنفعة المشتركة لجميع الشركاء.",
+    heroBtn1: "أنا مستثمر — استعرض الفرص", heroBtn2: "لديّ فرصة أو أصل استثماري",
+    trust: [
+      { n: "+8", l: "قطاعات استثمارية" },
+      { n: "عالمي", l: "نطاق دولي للفرص" },
+      { n: "100%", l: "سرية وحوكمة" },
+      { n: "USD", l: "عملة موحدة للتقييم" },
+    ],
+    pathsKicker: "مساران واضحان",
+    pathsTitle: "أينما كان موقعك في الصفقة، نحن نمهّد الطريق",
+    pathsSub: "سواء كنت تبحث عن فرصة استثمارية مدروسة أو تملك مشروعاً واعداً يحتاج إلى شريك، تبدأ رحلتك من هنا.",
+    invTitle: "للمستثمرين",
+    invDesc: "فرص مؤهّلة ومصنّفة بعناية، معروضة بطريقة مختصرة وآمنة. تستعرض ما يناسب اهتماماتك وتتقدم بطلب الاطلاع على التفاصيل الكاملة.",
+    invList: ["فرص مدروسة ومراجَعة قبل العرض", "فلترة حسب القطاع والدولة وحجم الاستثمار", "تفاصيل كاملة بعد اعتماد طلبك", "تواصل وإدارة العلاقة عبر فريق متخصص"],
+    invBtn: "سجّل كمستثمر",
+    ownTitle: "لأصحاب الفرص والمشاريع",
+    ownDesc: "تملك أرضاً أو مصنعاً أو شركة قائمة أو مشروع توسع؟ نساعدك على تحويل فرصتك إلى ملف استثماري احترافي وعرضها على المستثمرين المناسبين.",
+    ownList: ["تأهيل الفرصة وإعداد ملفها الاستثماري", "وصول إلى شبكة مستثمرين دوليين", "حماية كاملة لبياناتك وهويتك", "متابعة الصفقة حتى مرحلة التفاوض"],
+    ownBtn: "قدّم فرصتك",
+    howKicker: "رحلة بسيطة وموثوقة", howTitle: "كيف تعمل المنصة", howSub: "من الفكرة إلى الشراكة، خطوات واضحة تحفظ حقوق الجميع.",
+    steps: [
+      { h: "التسجيل والتأهيل", p: "سجّل حسابك كمستثمر أو صاحب فرصة، وقدّم بياناتك ليبدأ فريقنا بمراجعتها." },
+      { h: "الإعداد والتصنيف", p: "نراجع الفرص ونصنّف جاهزيتها، ونعدّ لها ملفاً استثمارياً مختصراً وآمناً." },
+      { h: "الربط والاهتمام", p: "نعرض الفرص على المستثمرين المناسبين، وتُبدي اهتمامك بما يلائم استراتيجيتك." },
+      { h: "التفاوض والإغلاق", p: "بعد اعتماد الطلب تُكشف التفاصيل، ونرافقك حتى مرحلة التفاوض وإتمام الصفقة." },
+    ],
+    oppsKicker: "مختارات من الفرص", oppsTitle: "فرص استثمارية متاحة الآن", oppsSub: "عرض مختصر للفرص المؤهلة. سجّل دخولك للاطلاع على المزيد من التفاصيل.",
+    oppStatus: "منشورة", oppRangeLabel: "نطاق الاستثمار المطلوب", oppInterest: "إبداء اهتمام ←", oppsAll: "استعرض جميع الفرص", oppsEmpty: "فرص جديدة قيد الإعداد — سجّل لتكون أول من يطّلع عليها.",
+    secKicker: "قطاعات متنوعة", secTitle: "نستقبل الفرص في أبرز القطاعات الاستثمارية",
+    sectors: [
+      { e: "🏢", h: "العقار والتطوير" }, { e: "🏭", h: "الصناعة والمصانع" }, { e: "🌾", h: "الزراعة والأراضي" }, { e: "🍲", h: "الصناعات الغذائية" },
+      { e: "⚡", h: "الطاقة المتجددة" }, { e: "🏨", h: "السياحة والفنادق" }, { e: "🚚", h: "اللوجستيات" }, { e: "💻", h: "التكنولوجيا والفنتك" },
+    ],
+    confTitleA: "السرية والحوكمة", confTitleGold: "في صميم عملنا",
+    confP: "نحن لا نعرض فرصاً فقط، بل ندير علاقة قائمة على الثقة. تبقى التفاصيل الحساسة محمية حتى تكتمل شروط الجدية والاعتماد، حمايةً لحقوق أصحاب المشاريع والمستثمرين معاً.",
+    confBtn: "تعرّف على نهجنا",
+    conf: [
+      { e: "🔒", h: "عرض مختصر آمن", p: "تظهر الفرصة بشكل مجهّل دون كشف الهوية أو الموقع الدقيق." },
+      { e: "📝", h: "اتفاقية لكل فرصة", p: "تُكشف التفاصيل الكاملة بعد توقيع اتفاقية السرية الخاصة بالفرصة." },
+      { e: "👁️", h: "عرض داخل المنصة", p: "الملفات الحساسة تُشاهَد داخل المنصة فقط لحماية المحتوى." },
+      { e: "✅", h: "مراجعة بشرية", p: "كل فرصة تُراجَع وتُؤهَّل من فريقنا قبل عرضها على المستثمرين." },
+    ],
+    ctaTitle: "ابدأ رحلتك مع شركاء البركة", ctaSub: "انضم إلى منصة تجمع بين الجدية والاحترافية والثقة.", ctaBtn1: "سجّل كمستثمر", ctaBtn2: "قدّم فرصتك الاستثمارية",
+    faqKicker: "أسئلة شائعة", faqTitle: "إجابات على أكثر ما يُسأل",
+    faq: [
+      { q: "هل عرض فرصتي يعني كشف بياناتي للجميع؟", a: "لا. تبقى بياناتك وهويتك محمية، ولا يظهر للعامة سوى عرض مختصر ومجهّل. التفاصيل تُكشف فقط ضمن إطار محكوم وبعد استيفاء شروط السرية." },
+      { q: "من أي الدول تقبلون الفرص والمستثمرين؟", a: "نستقبل الفرص الاستثمارية والمستثمرين من مختلف الدول، ضمن القطاعات المعتمدة لدينا، مع تقييم موحّد بالدولار الأمريكي." },
+      { q: "كيف أبدأ كمستثمر؟", a: "أنشئ حسابك، استعرض الفرص المختصرة المتاحة، وأبدِ اهتمامك بما يناسبك. بعد مراجعة طلبك تُفتح لك التفاصيل الكاملة." },
+      { q: "هل تشمل المنصة قطاعات محددة؟", a: "نعم، نركّز على قطاعات العقار والصناعة والزراعة والصناعات الغذائية والطاقة والسياحة واللوجستيات والتكنولوجيا." },
+    ],
+    foot: { about: "منصة استثمارية تديرها شركة عهد البركة، تربط رأس المال الدولي بالفرص المدروسة ضمن إطار من الشفافية والحوكمة.", platform: "المنصة", users: "للمستخدمين", legal: "قانوني" },
+    footPlatform: [["عن BarakaPartners", "/about"], ["الفرص الاستثمارية", "/opportunities"], ["كيف نعمل", "/how-it-works"], ["اتصل بنا", "/contact"]],
+    footUsers: [["للمستثمرين", "/register"], ["لأصحاب الفرص", "/register/owner"], ["إنشاء حساب", "/register"], ["تسجيل الدخول", "/login"]],
+    footLegal: [["الشروط والأحكام", "/about"], ["سياسة الخصوصية", "/about"], ["اتصل بنا", "/contact"]],
+    rights: "© 2026 شركاء البركة — جميع الحقوق محفوظة لشركة عهد البركة",
+  },
+  en: {
+    brandSub: "BARAKA PARTNERS",
+    nav: { home: "Home", opps: "Opportunities", inv: "For investors", own: "For owners", how: "How it works", contact: "Contact" },
+    login: "Log in", signup: "Sign up",
+    heroTag: "An investment platform managed by Ahd Al-Baraka",
+    heroH1a: "Connecting", heroH1gold: "global capital", heroH1b: "to vetted, real opportunities",
+    heroLead: "A trusted intermediary platform bringing together serious investors from many countries with promising project owners and assets — within a framework of transparency, governance, and confidentiality, for the shared benefit of all partners.",
+    heroBtn1: "I'm an investor — browse opportunities", heroBtn2: "I have an opportunity or asset",
+    trust: [
+      { n: "8+", l: "Investment sectors" },
+      { n: "Global", l: "International deal reach" },
+      { n: "100%", l: "Confidentiality & governance" },
+      { n: "USD", l: "Unified valuation currency" },
+    ],
+    pathsKicker: "Two clear paths",
+    pathsTitle: "Wherever you stand in the deal, we pave the way",
+    pathsSub: "Whether you seek a vetted opportunity or own a promising project that needs a partner, your journey starts here.",
+    invTitle: "For investors",
+    invDesc: "Carefully qualified and classified opportunities, presented in a concise, secure way. Review what fits your interests and request full details.",
+    invList: ["Opportunities vetted before listing", "Filter by sector, country, and deal size", "Full details after your request is approved", "Relationship managed by a dedicated team"],
+    invBtn: "Sign up as an investor",
+    ownTitle: "For owners & projects",
+    ownDesc: "Own land, a factory, an operating company, or an expansion project? We help turn your opportunity into a professional investment dossier and present it to the right investors.",
+    ownList: ["Qualify the opportunity and prepare its dossier", "Reach a network of international investors", "Full protection of your data and identity", "Deal follow-up through the negotiation stage"],
+    ownBtn: "Submit your opportunity",
+    howKicker: "A simple, trusted journey", howTitle: "How the platform works", howSub: "From idea to partnership — clear steps that protect everyone's rights.",
+    steps: [
+      { h: "Register & qualify", p: "Create your account as an investor or owner and submit your details for our team to review." },
+      { h: "Prepare & classify", p: "We review opportunities, classify their readiness, and prepare a concise, secure dossier." },
+      { h: "Match & interest", p: "We present opportunities to the right investors, and you express interest in what fits your strategy." },
+      { h: "Negotiate & close", p: "After approval the details are revealed, and we accompany you through negotiation and closing." },
+    ],
+    oppsKicker: "Selected opportunities", oppsTitle: "Opportunities available now", oppsSub: "A concise view of qualified opportunities. Log in for more details.",
+    oppStatus: "Published", oppRangeLabel: "Investment range", oppInterest: "Express interest →", oppsAll: "Browse all opportunities", oppsEmpty: "New opportunities are being prepared — sign up to be first to see them.",
+    secKicker: "Diverse sectors", secTitle: "We accept opportunities across leading sectors",
+    sectors: [
+      { e: "🏢", h: "Real estate" }, { e: "🏭", h: "Industry & factories" }, { e: "🌾", h: "Agriculture & land" }, { e: "🍲", h: "Food industries" },
+      { e: "⚡", h: "Renewable energy" }, { e: "🏨", h: "Tourism & hotels" }, { e: "🚚", h: "Logistics" }, { e: "💻", h: "Technology & fintech" },
+    ],
+    confTitleA: "Confidentiality & governance", confTitleGold: "at the core of what we do",
+    confP: "We don't just list opportunities — we manage a relationship built on trust. Sensitive details stay protected until seriousness and approval are confirmed, safeguarding the rights of owners and investors alike.",
+    confBtn: "Learn about our approach",
+    conf: [
+      { e: "🔒", h: "Secure concise view", p: "The opportunity appears anonymized, without revealing identity or exact location." },
+      { e: "📝", h: "An agreement per opportunity", p: "Full details are revealed after signing the opportunity's confidentiality agreement." },
+      { e: "👁️", h: "In-platform viewing", p: "Sensitive files are viewed only inside the platform to protect the content." },
+      { e: "✅", h: "Human review", p: "Every opportunity is reviewed and qualified by our team before it reaches investors." },
+    ],
+    ctaTitle: "Start your journey with Baraka Partners", ctaSub: "Join a platform that combines seriousness, professionalism, and trust.", ctaBtn1: "Sign up as an investor", ctaBtn2: "Submit your opportunity",
+    faqKicker: "FAQ", faqTitle: "Answers to the most asked questions",
+    faq: [
+      { q: "Does listing my opportunity mean exposing my data to everyone?", a: "No. Your data and identity stay protected, and the public sees only a concise, anonymized view. Details are revealed only within a governed framework after confidentiality terms are met." },
+      { q: "Which countries do you accept opportunities and investors from?", a: "We welcome opportunities and investors from many countries, within our approved sectors, with a unified valuation in US dollars." },
+      { q: "How do I start as an investor?", a: "Create your account, browse the concise opportunities available, and express interest in what suits you. After review, full details open up to you." },
+      { q: "Does the platform focus on specific sectors?", a: "Yes — real estate, industry, agriculture, food, energy, tourism, logistics, and technology." },
+    ],
+    foot: { about: "An investment platform managed by Ahd Al-Baraka, connecting global capital to vetted opportunities within a framework of transparency and governance.", platform: "Platform", users: "For users", legal: "Legal" },
+    footPlatform: [["About BarakaPartners", "/about"], ["Opportunities", "/opportunities"], ["How it works", "/how-it-works"], ["Contact", "/contact"]],
+    footUsers: [["For investors", "/register"], ["For owners", "/register/owner"], ["Sign up", "/register"], ["Log in", "/login"]],
+    footLegal: [["Terms & conditions", "/about"], ["Privacy policy", "/about"], ["Contact", "/contact"]],
+    rights: "© 2026 Baraka Partners — All rights reserved to Ahd Al-Baraka",
+  },
+} as const;
+
 export default async function Home() {
   const locale = await getLocale();
-  const isRtl = locale === "ar";
+  const c = C[locale === "en" ? "en" : "ar"];
 
-  // فرص منشورة للعرض المميّز (نسخة عامة فقط)
   const opps = await prisma.opportunity.findMany({
     where: { state: "PUBLISHED" },
     orderBy: { publishedAt: "desc" },
     take: 3,
     select: { id: true, sector: true, country: true, currency: true, investmentMin: true, investmentMax: true, publicVersion: true },
   });
-  const featured: OpportunityCardData[] = opps.map((o) => {
+  const featured = opps.map((o) => {
     const pv = toVersion(o.publicVersion);
     return {
       id: o.id,
-      href: `/opportunities/${o.id}`,
-      title: pv?.displayTitle || `${t(locale, "opp.inSector")} ${o.sector}`,
-      summary: pv?.summary,
+      title: pv?.displayTitle || o.sector,
+      summary: pv?.summary || "",
       sector: o.sector,
       country: o.country,
       range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
@@ -60,318 +164,269 @@ export default async function Home() {
     };
   });
 
-  const trust = [
-    { icon: icons.shield, title: "home.trust1Title", desc: "home.trust1Desc" },
-    { icon: icons.doc, title: "home.trust2Title", desc: "home.trust2Desc" },
-    { icon: icons.check, title: "home.trust3Title", desc: "home.trust3Desc" },
-  ];
-  const steps = [
-    { n: 1, title: "home.step1Title", desc: "home.step1Desc" },
-    { n: 2, title: "home.step2Title", desc: "home.step2Desc" },
-    { n: 3, title: "home.step3Title", desc: "home.step3Desc" },
-  ];
-  const chips = ["home.heroChip1", "home.heroChip2", "home.heroChip3"];
-  const stats = [
-    { num: "home.stat1Num", label: "home.stat1Label" },
-    { num: "home.stat2Num", label: "home.stat2Label" },
-    { num: "home.stat3Num", label: "home.stat3Label" },
-  ];
-  const creds = ["home.cred1", "home.cred2", "home.cred3", "home.cred4"];
-  const tiers = [
-    { icon: icons.eye, title: "home.tier1Title", desc: "home.tier1Desc", w: "w-1/3" },
-    { icon: icons.users, title: "home.tier2Title", desc: "home.tier2Desc", w: "w-2/3" },
-    { icon: icons.lock, title: "home.tier3Title", desc: "home.tier3Desc", w: "w-full" },
-  ];
+  const btnGold = "inline-flex items-center justify-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft px-5 py-2.5 text-sm font-bold text-navy transition hover:brightness-110 hover:-translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
+  const btnGoldLg = "inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-gold to-gold-soft px-7 py-4 text-base font-bold text-navy transition hover:brightness-110 hover:-translate-y-px";
+  const btnGhostLg = "inline-flex items-center justify-center rounded-xl border border-white/30 px-7 py-4 text-base font-bold text-white transition hover:border-gold hover:text-gold";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAF9]">
-      <PublicHeader />
-      <main className="flex-1">
-        {/* ===== Hero ===== */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-baraka-light/70 via-[#F8FAF9] to-[#F8FAF9]" />
-          <div className="absolute inset-0 -z-10 bg-grid" />
-          <div className="absolute -top-24 start-0 -z-10 h-72 w-72 rounded-full bg-baraka/20 blur-3xl" />
-          <div className="absolute top-20 end-0 -z-10 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl" />
-
-          <div className="max-w-6xl mx-auto px-6 pt-16 pb-20 sm:pt-24 grid items-center gap-12 lg:grid-cols-2">
-            {/* النص */}
-            <div className="flex flex-col items-start gap-6 text-start">
-              <span className="rise inline-flex items-center gap-2 rounded-full border border-baraka/20 bg-white/70 px-4 py-1.5 text-xs font-semibold text-baraka-dark shadow-sm backdrop-blur">
-                <span className="text-baraka"><Icon d={icons.spark} size={14} /></span>
-                {t(locale, "home.heroBadge")}
-              </span>
-              <h1 className="rise text-4xl sm:text-5xl lg:text-6xl font-extrabold text-baraka-dark leading-[1.12] tracking-tight" style={{ animationDelay: "60ms" }}>
-                {t(locale, "home.title")}
-              </h1>
-              <p className="rise max-w-xl text-lg leading-relaxed text-gray-600" style={{ animationDelay: "120ms" }}>
-                {t(locale, "home.tagline")}
-              </p>
-              <div className="rise flex flex-wrap items-center gap-2.5" style={{ animationDelay: "180ms" }}>
-                {chips.map((c) => (
-                  <span key={c} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-200">
-                    <span className="text-baraka"><Icon d={icons.check} size={13} /></span>
-                    {t(locale, c)}
-                  </span>
-                ))}
-              </div>
-              <div className="rise flex flex-wrap items-center gap-3 pt-1" style={{ animationDelay: "240ms" }}>
-                <Link href="/opportunities" className="group inline-flex items-center gap-2 rounded-xl bg-baraka px-7 py-3.5 font-semibold text-white shadow-lg shadow-baraka/25 transition-all duration-200 hover:bg-baraka-dark hover:shadow-xl hover:shadow-baraka/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-baraka">
-                  {t(locale, "home.browse")}
-                  <span className={isRtl ? "rotate-180" : ""}><Icon d={icons.arrow} size={18} /></span>
-                </Link>
-                <Link href="/how-it-works" className="inline-flex items-center rounded-xl border border-baraka/30 bg-white px-7 py-3.5 font-semibold text-baraka-dark transition-colors duration-200 hover:bg-baraka-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-baraka">
-                  {t(locale, "home.learnMore")}
-                </Link>
-              </div>
-            </div>
-
-            {/* العنصر البصري — بطاقة فرصة زجاجية */}
-            <div className="rise relative mx-auto w-full max-w-md lg:mx-0" style={{ animationDelay: "200ms" }}>
-              <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-baraka/15 to-teal-400/10 blur-2xl" />
-              {/* البطاقة الرئيسية */}
-              <div className="float rotate-[-2deg] rounded-3xl border border-white/60 bg-white/80 p-3 shadow-2xl shadow-baraka/10 backdrop-blur">
-                <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-                  {/* الغلاف */}
-                  <div className="relative h-36 bg-gradient-to-br from-emerald-500 to-teal-600">
-                    <svg className="absolute bottom-0 start-0 text-white opacity-25" width="180" height="100" viewBox="0 0 160 96" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M14 84h132M28 58l34-16 34 10 34-26M130 28h-14m14 0v14" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col justify-between p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="rounded bg-white/25 px-2 py-0.5 text-xs text-white backdrop-blur-sm">{t(locale, "home.heroCardSector")}</span>
-                        <span className="whitespace-nowrap rounded bg-white/90 px-2 py-0.5 text-xs font-semibold text-baraka-dark">300K – 600K USD</span>
-                      </div>
-                      <span className="text-sm font-bold text-white drop-shadow">{t(locale, "home.heroCardCountry")}</span>
-                    </div>
-                  </div>
-                  {/* الجسم */}
-                  <div className="p-5">
-                    <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-baraka-light px-2.5 py-1 text-[11px] font-semibold text-baraka-dark">
-                      <Icon d={icons.lock} size={12} />
-                      {t(locale, "home.heroCardBadge")}
-                    </div>
-                    <h3 className="mb-3 font-bold text-gray-900">{t(locale, "home.heroCardTitle")}</h3>
-                    <div className="space-y-2">
-                      <div className="h-2.5 w-full rounded-full bg-gray-100" />
-                      <div className="h-2.5 w-4/5 rounded-full bg-gray-100" />
-                      <div className="h-2.5 w-3/5 rounded-full bg-gray-100" />
-                    </div>
-                    <div className="mt-4 flex items-center gap-1.5 border-t border-gray-100 pt-3 text-xs text-gray-500">
-                      <span className="h-2 w-2 rounded-full bg-baraka" />
-                      <span className="h-2 w-2 rounded-full bg-baraka/50" />
-                      <span className="h-2 w-2 rounded-full bg-gray-200" />
-                      <span className="ms-1.5">{t(locale, "home.heroCardTiers")}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* شارة عائمة */}
-              <div className="float-slow absolute -bottom-5 -start-5 flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-xl">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-baraka text-white">
-                  <Icon d={icons.check} size={16} />
-                </span>
-                <div className="leading-tight">
-                  <p className="text-sm font-bold text-gray-900">{t(locale, "home.heroFloat")}</p>
-                  <p className="text-[11px] text-gray-500">NCNDA</p>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#f6f7f9] text-[#1a2433]">
+      {/* ===== Header ===== */}
+      <header className="sticky top-0 z-50 border-b border-gold/20 bg-navy/90 backdrop-blur">
+        <div className="mx-auto flex h-[74px] max-w-6xl items-center justify-between gap-4 px-6">
+          <Link href="/" className="flex items-center gap-3 text-white">
+            <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">ب</span>
+            <span className="font-extrabold leading-tight">
+              {locale === "en" ? "Baraka Partners" : "شركاء البركة"}
+              <small className="block text-[11px] font-medium tracking-wider text-gold-soft">{c.brandSub}</small>
+            </span>
+          </Link>
+          <nav className="hidden items-center gap-7 text-[15px] font-medium text-[#cdd6e4] lg:flex">
+            <Link href="/" className="hover:text-gold">{c.nav.home}</Link>
+            <Link href="/opportunities" className="hover:text-gold">{c.nav.opps}</Link>
+            <Link href="/register" className="hover:text-gold">{c.nav.inv}</Link>
+            <Link href="/register/owner" className="hover:text-gold">{c.nav.own}</Link>
+            <Link href="/how-it-works" className="hover:text-gold">{c.nav.how}</Link>
+            <Link href="/contact" className="hover:text-gold">{c.nav.contact}</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <LocaleSwitcher locale={locale} className="hidden text-[13px] text-[#cdd6e4] transition hover:text-gold disabled:opacity-50 sm:inline" />
+            <Link href="/login" className="hidden rounded-[10px] border border-white/30 px-5 py-2.5 text-sm font-bold text-white transition hover:border-gold hover:text-gold sm:inline-flex">{c.login}</Link>
+            <Link href="/register" className={btnGold}>{c.signup}</Link>
           </div>
+        </div>
+      </header>
 
-          {/* شريط الإحصاءات */}
-          <div className="max-w-5xl mx-auto px-6 pb-4">
-            <div className="grid grid-cols-3 divide-x divide-gray-200 rounded-2xl border border-gray-200 bg-white/80 py-6 shadow-sm backdrop-blur rtl:divide-x-reverse">
-              {stats.map((s) => (
-                <div key={s.label} className="flex flex-col items-center gap-1 px-2">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-baraka tabular-nums">{t(locale, s.num)}</span>
-                  <span className="text-center text-xs leading-snug text-gray-500 sm:text-sm">{t(locale, s.label)}</span>
-                </div>
-              ))}
-            </div>
+      {/* ===== Hero ===== */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-navy via-navy-700 to-navy-600 py-20 text-white sm:py-24">
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 85% 20%, rgba(201,162,75,.18), transparent 45%), radial-gradient(circle at 10% 90%, rgba(201,162,75,.1), transparent 40%)" }} />
+        <div className="relative mx-auto max-w-6xl px-6">
+          <span className="mb-6 inline-block rounded-full border border-gold/40 bg-gold/15 px-4 py-1.5 text-[13px] font-semibold text-gold-soft">{c.heroTag}</span>
+          <h1 className="mb-5 text-4xl font-black leading-[1.25] sm:text-5xl lg:text-[52px]">
+            {c.heroH1a}{" "}
+            <span className="bg-gradient-to-br from-gold to-gold-soft bg-clip-text text-transparent">{c.heroH1gold}</span>
+            <br />
+            {c.heroH1b}
+          </h1>
+          <p className="mb-9 max-w-2xl text-lg leading-relaxed text-[#c5d0e0]">{c.heroLead}</p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/opportunities" className={btnGoldLg}>{c.heroBtn1}</Link>
+            <Link href="/register/owner" className={btnGhostLg}>{c.heroBtn2}</Link>
           </div>
-        </section>
-
-        {/* ===== Credibility strip ===== */}
-        <section className="border-y border-gray-100 bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-7">
-            <p className="mb-4 text-center text-sm font-medium text-gray-500">{t(locale, "home.credStrip")}</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-              {creds.map((c) => (
-                <span key={c} className="inline-flex items-center gap-2 text-sm font-semibold text-baraka-dark">
-                  <Icon d={icons.shield} size={16} />
-                  {t(locale, c)}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Featured opportunities ===== */}
-        <section className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <span className="text-sm font-bold uppercase tracking-wider text-baraka">{t(locale, "home.featuredEyebrow")}</span>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-baraka-dark">{t(locale, "home.featuredTitle")}</h2>
-              <p className="mt-1 text-gray-500">{t(locale, "home.featuredSub")}</p>
-            </div>
-            <Link href="/opportunities" className="group inline-flex items-center gap-2 rounded-xl border border-baraka/30 bg-white px-5 py-2.5 text-sm font-semibold text-baraka-dark transition-colors hover:bg-baraka-light">
-              {t(locale, "home.featuredCta")}
-              <span className={isRtl ? "rotate-180" : ""}><Icon d={icons.arrow} size={16} /></span>
-            </Link>
-          </div>
-          {featured.length > 0 ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((d) => <OpportunityCard key={d.id} data={d} locale={locale} />)}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
-              <p className="text-gray-500">{t(locale, "home.featuredEmpty")}</p>
-            </div>
-          )}
-        </section>
-
-        {/* ===== Confidentiality tiers ===== */}
-        <section className="border-y border-gray-100 bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-16 sm:py-20 grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <span className="text-sm font-bold uppercase tracking-wider text-baraka">{t(locale, "home.tiersEyebrow")}</span>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-baraka-dark">{t(locale, "home.tiersTitle")}</h2>
-              <p className="mt-3 max-w-md leading-relaxed text-gray-500">{t(locale, "home.tiersSub")}</p>
-            </div>
-            {/* تمثيل بصري للمستويات الثلاثة */}
-            <div className="flex flex-col gap-4">
-              {tiers.map((tier, i) => (
-                <div key={tier.title} className={`${tier.w} ms-auto flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md`}>
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-baraka-light text-baraka-dark">
-                    <Icon d={tier.icon} size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-baraka">{i + 1}</span>
-                      <h3 className="truncate font-bold text-gray-900">{t(locale, tier.title)}</h3>
-                    </div>
-                    <p className="truncate text-sm text-gray-500">{t(locale, tier.desc)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Trust ===== */}
-        <section className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-          <div className="mb-10 text-center">
-            <span className="text-sm font-bold uppercase tracking-wider text-baraka">{t(locale, "home.trustEyebrow")}</span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-baraka-dark">{t(locale, "home.trustTitle")}</h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {trust.map((c) => (
-              <div key={c.title} className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-baraka/30 hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-baraka-light text-baraka-dark transition-colors duration-200 group-hover:bg-baraka group-hover:text-white">
-                  <Icon d={c.icon} />
-                </div>
-                <h3 className="mb-1.5 text-lg font-bold text-gray-900">{t(locale, c.title)}</h3>
-                <p className="text-sm leading-relaxed text-gray-500">{t(locale, c.desc)}</p>
+          <div className="mt-14 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/10 pt-9">
+            {c.trust.map((it) => (
+              <div key={it.l} className="flex flex-col">
+                <span className="text-3xl font-black text-gold-soft">{it.n}</span>
+                <span className="text-sm text-[#aebbcf]">{it.l}</span>
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ===== How it works ===== */}
-        <section className="border-y border-gray-100 bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-            <div className="mb-12 text-center">
-              <span className="text-sm font-bold uppercase tracking-wider text-baraka">{t(locale, "home.howEyebrow")}</span>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-baraka-dark">{t(locale, "home.howTitle")}</h2>
-              <p className="mt-2 text-gray-500">{t(locale, "home.howSub")}</p>
-            </div>
-            <div className="relative grid gap-6 md:grid-cols-3">
-              <div className="pointer-events-none absolute inset-x-0 top-12 hidden h-px bg-gradient-to-r from-transparent via-baraka/25 to-transparent md:block" />
-              {steps.map((s) => (
-                <div key={s.n} className="relative rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-baraka text-lg font-extrabold text-white shadow-md shadow-baraka/30 ring-4 ring-white">
-                    {s.n}
+      {/* ===== Two paths ===== */}
+      <section className="py-20 sm:py-24" id="paths">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="mb-2.5 text-sm font-bold tracking-wider text-gold">{c.pathsKicker}</div>
+            <h2 className="mb-3 text-3xl font-black text-navy sm:text-4xl">{c.pathsTitle}</h2>
+            <p className="text-lg text-[#5c6b80]">{c.pathsSub}</p>
+          </div>
+          <div className="grid gap-7 md:grid-cols-2">
+            {[
+              { icon: "📈", tone: "bg-gold/15 text-gold", title: c.invTitle, desc: c.invDesc, list: c.invList, btn: c.invBtn, href: "/register" },
+              { icon: "🏗️", tone: "bg-navy/10 text-navy", title: c.ownTitle, desc: c.ownDesc, list: c.ownList, btn: c.ownBtn, href: "/register/owner" },
+            ].map((p) => (
+              <div key={p.title} className="group rounded-3xl border border-[#e6e9ef] bg-white p-9 transition-all duration-300 hover:-translate-y-1 hover:border-gold hover:shadow-[0_20px_50px_rgba(10,31,60,.1)]">
+                <div className={`mb-5 grid h-14 w-14 place-items-center rounded-2xl text-3xl ${p.tone}`}>{p.icon}</div>
+                <h3 className="mb-3 text-2xl font-extrabold text-navy">{p.title}</h3>
+                <p className="mb-6 min-h-[80px] text-[#5c6b80]">{p.desc}</p>
+                <ul className="mb-7 flex flex-col gap-3">
+                  {p.list.map((li) => (
+                    <li key={li} className="flex items-start gap-2.5 text-[15px]">
+                      <span className="font-black text-gold">✓</span>
+                      <span>{li}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href={p.href} className={`${btnGold} w-full`}>{p.btn}</Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== How it works ===== */}
+      <section className="bg-navy py-20 text-white sm:py-24" id="how">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="mb-2.5 text-sm font-bold tracking-wider text-gold-soft">{c.howKicker}</div>
+            <h2 className="mb-3 text-3xl font-black sm:text-4xl">{c.howTitle}</h2>
+            <p className="text-lg text-[#aebbcf]">{c.howSub}</p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {c.steps.map((s, i) => (
+              <div key={s.h} className="text-center">
+                <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">{i + 1}</div>
+                <h4 className="mb-2.5 text-lg font-extrabold">{s.h}</h4>
+                <p className="text-sm text-[#aebbcf]">{s.p}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Opportunities ===== */}
+      <section className="py-20 sm:py-24" id="opps">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="mb-2.5 text-sm font-bold tracking-wider text-gold">{c.oppsKicker}</div>
+            <h2 className="mb-3 text-3xl font-black text-navy sm:text-4xl">{c.oppsTitle}</h2>
+            <p className="text-lg text-[#5c6b80]">{c.oppsSub}</p>
+          </div>
+          {featured.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {featured.map((o) => (
+                <Link key={o.id} href={`/opportunities/${o.id}`} className="group flex flex-col overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-gold-soft hover:shadow-[0_18px_44px_rgba(10,31,60,.1)]">
+                  <div className="relative h-44 bg-navy bg-cover bg-center" style={o.imageUrl ? { backgroundImage: `url(${o.imageUrl})` } : undefined}>
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-navy/30" />
+                    <span className="absolute end-4 top-4 rounded-full border border-gold/40 bg-gold/20 px-2.5 py-1 text-[11px] font-bold text-gold-soft backdrop-blur">{c.oppStatus}</span>
+                    <div className="absolute inset-x-0 bottom-0 p-5">
+                      <div className="mb-1.5 text-xs font-bold tracking-wide text-gold-soft">{o.sector}</div>
+                      <h4 className="text-lg font-extrabold leading-snug text-white drop-shadow">{o.title}</h4>
+                    </div>
                   </div>
-                  <h3 className="mb-2 text-base font-bold text-gray-900">{t(locale, s.title)}</h3>
-                  <p className="text-sm leading-relaxed text-gray-500">{t(locale, s.desc)}</p>
+                  <div className="flex flex-1 flex-col p-6">
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      <span className="rounded-lg border border-[#e6e9ef] bg-[#f6f7f9] px-2.5 py-1 text-xs text-[#5c6b80]">📍 {o.country}</span>
+                      <span className="rounded-lg border border-[#e6e9ef] bg-[#f6f7f9] px-2.5 py-1 text-xs text-[#5c6b80]">{o.sector}</span>
+                    </div>
+                    <p className="mb-4 flex-1 text-sm leading-relaxed text-[#5c6b80] line-clamp-3">{o.summary || "—"}</p>
+                    <div className="flex items-center justify-between border-t border-[#e6e9ef] pt-4">
+                      <div className="font-black text-navy">
+                        {o.range ? `${o.range.replace(" USD", "")} $` : "—"}
+                        <small className="block text-[11px] font-medium text-[#5c6b80]">{c.oppRangeLabel}</small>
+                      </div>
+                      <span className="text-sm font-bold text-gold group-hover:underline">{c.oppInterest}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-[#5c6b80]">{c.oppsEmpty}</div>
+          )}
+          <div className="mt-11 text-center">
+            <Link href="/opportunities" className={btnGoldLg}>{c.oppsAll}</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Sectors ===== */}
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="mb-2.5 text-sm font-bold tracking-wider text-gold">{c.secKicker}</div>
+            <h2 className="text-3xl font-black text-navy sm:text-4xl">{c.secTitle}</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {c.sectors.map((s) => (
+              <div key={s.h} className="rounded-2xl border border-[#e6e9ef] bg-white p-6 text-center transition-all duration-200 hover:-translate-y-1 hover:border-gold">
+                <div className="mb-3 text-3xl">{s.e}</div>
+                <h4 className="font-bold text-navy">{s.h}</h4>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Confidentiality ===== */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid items-center gap-12 rounded-[24px] bg-gradient-to-br from-[#0c2647] to-navy-600 p-8 text-white sm:p-14 lg:grid-cols-2">
+            <div>
+              <h2 className="mb-4 text-3xl font-black sm:text-[32px]">
+                {c.confTitleA} <span className="text-gold-soft">{c.confTitleGold}</span>
+              </h2>
+              <p className="mb-6 text-[#c5d0e0]">{c.confP}</p>
+              <Link href="/how-it-works" className={btnGold}>{c.confBtn}</Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {c.conf.map((it) => (
+                <div key={it.h} className="rounded-2xl border border-gold/25 bg-white/[0.06] p-5">
+                  <div className="mb-2.5 text-2xl">{it.e}</div>
+                  <h4 className="mb-1.5 font-bold text-gold-soft">{it.h}</h4>
+                  <p className="text-[13px] text-[#aebbcf]">{it.p}</p>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ===== Quote ===== */}
-        <section className="max-w-4xl mx-auto px-6 py-16 sm:py-20 text-center">
-          <span className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-baraka-light text-baraka">
-            <Icon d={icons.quote} size={24} />
-          </span>
-          <blockquote className="text-xl sm:text-2xl font-bold leading-relaxed text-baraka-dark">
-            {t(locale, "home.quote")}
-          </blockquote>
-          <div className="mt-6">
-            <p className="font-bold text-gray-900">{t(locale, "home.quoteAuthor")}</p>
-            <p className="text-sm text-gray-500">{t(locale, "home.quoteRole")}</p>
-          </div>
-        </section>
-
-        {/* ===== Audience split ===== */}
-        <section className="border-t border-gray-100 bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-            <div className="mb-10 text-center">
-              <span className="text-sm font-bold uppercase tracking-wider text-baraka">{t(locale, "home.audienceEyebrow")}</span>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-baraka-dark">{t(locale, "home.audienceTitle")}</h2>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:border-baraka/30 hover:shadow-lg">
-                <div className="absolute -end-8 -top-8 h-28 w-28 rounded-full bg-baraka-light/70 blur-2xl" />
-                <div className="relative flex flex-col">
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-baraka-light text-baraka-dark"><Icon d={icons.users} /></div>
-                  <h3 className="mb-2 text-xl font-bold text-baraka-dark">{t(locale, "home.forInvestorsTitle")}</h3>
-                  <p className="mb-6 flex-1 text-sm leading-relaxed text-gray-600">{t(locale, "home.forInvestorsDesc")}</p>
-                  <Link href="/register" className="inline-flex w-fit items-center gap-2 rounded-lg bg-baraka px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-baraka-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-baraka">
-                    {t(locale, "reg.asInvestor")}
-                    <span className={isRtl ? "rotate-180" : ""}><Icon d={icons.arrow} size={16} /></span>
-                  </Link>
-                </div>
-              </div>
-              <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-200 hover:border-baraka/30 hover:shadow-lg">
-                <div className="absolute -end-8 -top-8 h-28 w-28 rounded-full bg-baraka-light/70 blur-2xl" />
-                <div className="relative flex flex-col">
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-baraka-light text-baraka-dark"><Icon d={icons.lock} /></div>
-                  <h3 className="mb-2 text-xl font-bold text-baraka-dark">{t(locale, "home.forOwnersTitle")}</h3>
-                  <p className="mb-6 flex-1 text-sm leading-relaxed text-gray-600">{t(locale, "home.forOwnersDesc")}</p>
-                  <Link href="/register/owner" className="inline-flex w-fit items-center gap-2 rounded-lg border border-baraka/30 px-5 py-2.5 text-sm font-semibold text-baraka-dark transition-colors duration-200 hover:bg-baraka-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-baraka">
-                    {t(locale, "home.ownerRegister")}
-                    <span className={isRtl ? "rotate-180" : ""}><Icon d={icons.arrow} size={16} /></span>
-                  </Link>
-                </div>
-              </div>
+      {/* ===== CTA band ===== */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="rounded-[24px] bg-gradient-to-br from-gold to-gold-soft p-8 text-center text-navy sm:p-14">
+            <h2 className="mb-3.5 text-3xl font-black sm:text-[34px]">{c.ctaTitle}</h2>
+            <p className="mb-7 text-lg opacity-85">{c.ctaSub}</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/register" className="inline-flex items-center justify-center rounded-xl bg-navy px-7 py-4 text-base font-bold text-white transition hover:bg-navy-600">{c.ctaBtn1}</Link>
+              <Link href="/register/owner" className="inline-flex items-center justify-center rounded-xl bg-navy px-7 py-4 text-base font-bold text-white transition hover:bg-navy-600">{c.ctaBtn2}</Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ===== Final CTA ===== */}
-        <section className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-baraka to-baraka-dark px-8 py-14 text-center text-white shadow-xl">
-            <div className="absolute -end-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute -start-10 -bottom-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-            <div className="relative">
-              <h2 className="mb-3 text-2xl sm:text-3xl font-extrabold">{t(locale, "home.ctaTitle")}</h2>
-              <p className="mx-auto mb-7 max-w-xl text-baraka-light">{t(locale, "home.ctaSub")}</p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <Link href="/register" className="inline-flex items-center rounded-xl bg-white px-7 py-3.5 font-semibold text-baraka-dark shadow-lg transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                  {t(locale, "reg.asInvestor")}
-                </Link>
-                <Link href="/register/owner" className="inline-flex items-center rounded-xl border border-white/50 px-7 py-3.5 font-semibold text-white transition-colors duration-200 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                  {t(locale, "home.ownerRegister")}
-                </Link>
+      {/* ===== FAQ ===== */}
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="mb-2.5 text-sm font-bold tracking-wider text-gold">{c.faqKicker}</div>
+            <h2 className="text-3xl font-black text-navy sm:text-4xl">{c.faqTitle}</h2>
+          </div>
+          <Faq items={c.faq as unknown as { q: string; a: string }[]} />
+        </div>
+      </section>
+
+      {/* ===== Footer ===== */}
+      <footer className="bg-navy pt-16 pb-8 text-[#aebbcf]">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+            <div>
+              <div className="flex items-center gap-3 text-white">
+                <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">ب</span>
+                <span className="font-extrabold leading-tight">
+                  {locale === "en" ? "Baraka Partners" : "شركاء البركة"}
+                  <small className="block text-[11px] font-medium tracking-wider text-gold-soft">{c.brandSub}</small>
+                </span>
               </div>
+              <p className="mt-3.5 max-w-xs text-sm">{c.foot.about}</p>
+            </div>
+            <div>
+              <h5 className="mb-4 font-bold text-white">{c.foot.platform}</h5>
+              <ul className="flex flex-col gap-2.5 text-sm">
+                {c.footPlatform.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+              </ul>
+            </div>
+            <div>
+              <h5 className="mb-4 font-bold text-white">{c.foot.users}</h5>
+              <ul className="flex flex-col gap-2.5 text-sm">
+                {c.footUsers.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+              </ul>
+            </div>
+            <div>
+              <h5 className="mb-4 font-bold text-white">{c.foot.legal}</h5>
+              <ul className="flex flex-col gap-2.5 text-sm">
+                {c.footLegal.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+              </ul>
             </div>
           </div>
-        </section>
-      </main>
-      <Footer />
+          <div className="flex flex-wrap justify-between gap-3 border-t border-white/10 pt-6 text-[13px]">
+            <span>{c.rights}</span>
+            <span>العربية · English</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
