@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getLocale } from "@/lib/i18n-server";
 import { dir } from "@/lib/i18n";
 
@@ -16,7 +17,10 @@ export default async function RootLayout({
   const locale = await getLocale();
   return (
     <html lang={locale} dir={dir(locale)}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
