@@ -325,22 +325,36 @@ export default async function Home() {
       </header>
 
       {/* ===== Hero ===== */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-navy via-navy-700 to-navy-600 py-20 text-white sm:py-24">
-        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 85% 20%, rgba(201,162,75,.18), transparent 45%), radial-gradient(circle at 10% 90%, rgba(201,162,75,.1), transparent 40%)" }} />
+      <section className="relative overflow-hidden bg-navy py-24 text-white sm:py-32">
+        {/* صورة أفق المدينة المالية ليلاً مع تكبير سينمائي بطيء */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div
+            className="hero-zoom h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: "url(https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=1920&q=70)" }}
+          />
+        </div>
+        {/* طبقات تعتيم كحلية لقراءة النص + توهّج ذهبي */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy via-navy/85 to-navy/65" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy/80 via-navy/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 85% 18%, rgba(201,162,75,.22), transparent 45%), radial-gradient(circle at 12% 92%, rgba(201,162,75,.12), transparent 40%)" }} />
+        {/* كرات ذهبية عائمة */}
+        <div className="float pointer-events-none absolute -top-8 end-1/4 h-44 w-44 rounded-full bg-gold/20 blur-3xl" />
+        <div className="float-slow pointer-events-none absolute bottom-8 start-12 h-32 w-32 rounded-full bg-gold/10 blur-3xl" />
+
         <div className="relative mx-auto max-w-6xl px-6">
-          <span className="mb-6 inline-block rounded-full border border-gold/40 bg-gold/15 px-4 py-1.5 text-[13px] font-semibold text-gold-soft">{c.heroTag}</span>
-          <h1 className="mb-5 text-4xl font-black leading-[1.25] sm:text-5xl lg:text-[52px]">
+          <span className="rise mb-6 inline-block rounded-full border border-gold/40 bg-gold/15 px-4 py-1.5 text-[13px] font-semibold text-gold-soft backdrop-blur">{c.heroTag}</span>
+          <h1 className="rise mb-5 text-4xl font-black leading-[1.25] drop-shadow-[0_2px_20px_rgba(0,0,0,0.35)] sm:text-5xl lg:text-[54px]" style={{ animationDelay: "120ms" }}>
             {c.heroH1a}{" "}
-            <span className="bg-gradient-to-br from-gold to-gold-soft bg-clip-text text-transparent">{c.heroH1gold}</span>
+            <span className="text-shimmer">{c.heroH1gold}</span>
             <br />
             {c.heroH1b}
           </h1>
-          <p className="mb-9 max-w-2xl text-lg leading-relaxed text-[#c5d0e0]">{c.heroLead}</p>
-          <div className="flex flex-wrap gap-4">
+          <p className="rise mb-9 max-w-2xl text-lg leading-relaxed text-[#d3dcea]" style={{ animationDelay: "240ms" }}>{c.heroLead}</p>
+          <div className="rise flex flex-wrap gap-4" style={{ animationDelay: "360ms" }}>
             <Link href="/opportunities" className={btnGoldLg}>{c.heroBtn1}</Link>
             <Link href="/register/owner" className={btnGhostLg}>{c.heroBtn2}</Link>
           </div>
-          <div className="mt-14 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/10 pt-9">
+          <div className="rise mt-14 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/10 pt-9" style={{ animationDelay: "480ms" }}>
             {c.trust.map((it) => (
               <div key={it.l} className="flex flex-col">
                 <span className="text-3xl font-black text-gold-soft">{it.n}</span>

@@ -21,6 +21,17 @@ body { background: #F8FAF9; color: #1a1a1a; }
   mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 55%, transparent 100%);
 }
 
+/* نص ذهبي متلألئ + الأساس لتكبير صورة الهيرو (يعمل حتى مع تقليل الحركة) */
+.text-shimmer {
+  background: linear-gradient(110deg, #c9a24b 18%, #e3c987 38%, #fff7e6 50%, #e3c987 62%, #c9a24b 82%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.hero-zoom { transform: scale(1.06); will-change: transform; }
+
 /* حركات دخول لطيفة — تُعطّل عند تفضيل تقليل الحركة */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes baraka-rise {
@@ -37,6 +48,19 @@ body { background: #F8FAF9; color: #1a1a1a; }
   }
   .float { animation: baraka-float 6s ease-in-out infinite; }
   .float-slow { animation: baraka-float 8s ease-in-out infinite; }
+
+  /* تكبير سينمائي بطيء (Ken Burns) لصورة الهيرو */
+  @keyframes baraka-kenburns {
+    from { transform: scale(1.06); }
+    to   { transform: scale(1.2); }
+  }
+  .hero-zoom { animation: baraka-kenburns 28s ease-in-out infinite alternate; }
+
+  /* تلألؤ ذهبي يمرّ عبر النص */
+  @keyframes baraka-shimmer {
+    to { background-position: -200% center; }
+  }
+  .text-shimmer { animation: baraka-shimmer 7s linear infinite; }
 }
 
 /* شريط تمرير أفقي بلا إطار للمصداقية */
