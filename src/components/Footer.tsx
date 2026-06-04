@@ -6,42 +6,47 @@ export default async function Footer() {
   const locale = await getLocale();
 
   return (
-    <footer className="bg-white border-t border-gray-200 mt-16">
-      <div className="max-w-5xl mx-auto px-6 py-10 grid gap-8 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-baraka-light flex items-center justify-center text-baraka-dark font-bold text-sm">
-              ع
+    <footer className="bg-navy pt-14 pb-8 text-[#aebbcf]">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
+          <div>
+            <div className="flex items-center gap-2.5 text-white">
+              <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">
+                ب
+              </span>
+              <span className="font-extrabold leading-tight">
+                {t(locale, "brand")}
+                <small className="block text-[10px] font-medium tracking-[0.15em] text-gold-soft">
+                  BARAKA PARTNERS
+                </small>
+              </span>
             </div>
-            <span className="font-bold">{t(locale, "brand")}</span>
+            <p className="mt-3.5 max-w-xs text-sm leading-relaxed">{t(locale, "footer.tagline")}</p>
+            <p className="mt-2 text-xs text-[#7e8aa0]">{t(locale, "footer.managedBy")}</p>
           </div>
-          <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
-            {t(locale, "footer.tagline")}
-          </p>
-          <p className="text-xs text-gray-400 mt-2">{t(locale, "footer.managedBy")}</p>
+
+          <div>
+            <h5 className="mb-4 font-bold text-white">{t(locale, "footer.explore")}</h5>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              <li><Link href="/opportunities" className="transition hover:text-gold">{t(locale, "nav.opportunities")}</Link></li>
+              <li><Link href="/how-it-works" className="transition hover:text-gold">{t(locale, "nav.how")}</Link></li>
+              <li><Link href="/register" className="transition hover:text-gold">{t(locale, "nav.register")}</Link></li>
+              <li><Link href="/login" className="transition hover:text-gold">{t(locale, "nav.login")}</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h5 className="mb-4 font-bold text-white">{t(locale, "footer.company")}</h5>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              <li><Link href="/about" className="transition hover:text-gold">{t(locale, "nav.about")}</Link></li>
+              <li><Link href="/contact" className="transition hover:text-gold">{t(locale, "nav.contact")}</Link></li>
+            </ul>
+          </div>
         </div>
 
-        <div>
-          <p className="font-bold text-sm mb-3">{t(locale, "footer.explore")}</p>
-          <ul className="flex flex-col gap-2 text-sm text-gray-600">
-            <li><Link href="/opportunities" className="hover:text-baraka">{t(locale, "nav.opportunities")}</Link></li>
-            <li><Link href="/how-it-works" className="hover:text-baraka">{t(locale, "nav.how")}</Link></li>
-            <li><Link href="/register" className="hover:text-baraka">{t(locale, "nav.register")}</Link></li>
-            <li><Link href="/login" className="hover:text-baraka">{t(locale, "nav.login")}</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <p className="font-bold text-sm mb-3">{t(locale, "footer.company")}</p>
-          <ul className="flex flex-col gap-2 text-sm text-gray-600">
-            <li><Link href="/about" className="hover:text-baraka">{t(locale, "nav.about")}</Link></li>
-            <li><Link href="/contact" className="hover:text-baraka">{t(locale, "nav.contact")}</Link></li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-gray-100">
-        <div className="max-w-5xl mx-auto px-6 py-4 text-xs text-gray-400">
-          {t(locale, "footer.rights")}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-[13px]">
+          <span>{t(locale, "footer.rights")}</span>
+          <span>العربية · English · Türkçe · 中文</span>
         </div>
       </div>
     </footer>

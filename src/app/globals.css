@@ -4,9 +4,10 @@
 @tailwind utilities;
 
 :root {
-  --baraka: #0F6E56;
-  --baraka-dark: #085041;
-  --baraka-light: #E1F5EE;
+  --baraka: #0f2b52;
+  --baraka-dark: #0a1f3c;
+  --baraka-light: #eef2f8;
+  --gold: #c9a24b;
 }
 html { font-family: 'Tajawal', system-ui, sans-serif; }
 body { background: #F8FAF9; color: #1a1a1a; }
@@ -14,8 +15,8 @@ body { background: #F8FAF9; color: #1a1a1a; }
 /* خلفية شبكية خفيفة للأقسام البطلة */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(15, 110, 86, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 110, 86, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(15, 43, 82, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 43, 82, 0.06) 1px, transparent 1px);
   background-size: 44px 44px;
   -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 55%, transparent 100%);
   mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 55%, transparent 100%);
