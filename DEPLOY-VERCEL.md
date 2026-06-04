@@ -22,21 +22,22 @@
 
 ## 2) المستودع (GitHub)
 
-1. ادفع المشروع إلى مستودع **خاص** على GitHub.
-2. تأكّد من وجود مجلّد `prisma/migrations`. إن لم يوجد (كنت تستخدم db push)، شغّل محليّاً مرّة:
-   ```
-   npx prisma migrate dev --name init
-   ```
-   ثم احفظ المجلّد في Git. هذا ضروري ليطبّق Vercel الهجرات تلقائيّاً.
-3. (أُضيف `postinstall: prisma generate` في `package.json` — يُولّد عميل Prisma على كل بناء.)
+1. ادفع المشروع إلى مستودع على GitHub. ✅ (تم الرفع إلى `barakapartnersdev-glitch/baraka`).
+2. ✅ مجلّد `prisma/migrations/0_init` جاهز ومحفوظ في Git (تم عمل baseline للقاعدة الحالية). Vercel سيطبّق الهجرات تلقائياً عبر `vercel.json`.
+3. ✅ `postinstall: prisma generate` موجود في `package.json` — يُولّد عميل Prisma على كل بناء.
+4. ✅ `vercel.json` يضبط أمر البناء تلقائياً، فلا حاجة لتعديله يدوياً في لوحة Vercel.
 
 ---
 
 ## 3) قاعدة البيانات — Neon
 
 1. من لوحة Neon افتح مشروعك ← **Connection string**.
-2. انسخ سلسلة **Pooled** (تحتوي `-pooler`) لاستخدامها على Vercel ← `DATABASE_URL`.
-3. تأكّد أنها تنتهي بـ `?sslmode=require`.
+2. انسخ سلسلتين:
+   - **Pooled** (تحتوي `-pooler`) ← `DATABASE_URL` (اتصال زمن التشغيل على Vercel).
+   - **Direct** (بدون `-pooler`) ← `DIRECT_URL` (يستخدمها `prisma migrate deploy` أثناء البناء).
+3. تأكّد أن كلتيهما تنتهيان بـ `?sslmode=require`.
+
+> لماذا اثنتان؟ بيئة Vercel بلا خوادم (serverless) تحتاج اتصالاً **مجمّعاً** لتفادي استنزاف اتصالات القاعدة، بينما الهجرات تحتاج اتصالاً **مباشراً**. المخطط معدّ لذلك عبر `url` + `directUrl`.
 
 ---
 
@@ -78,7 +79,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 1. [vercel.com](https://vercel.com) ← **Add New… → Project** ← استورد مستودع GitHub.
 2. Framework Preset: **Next.js** (يُكتشف تلقائيّاً).
-3. **Build Command** — عدّله إلى (يطبّق الهجرات عند كل نشر):
+3. **Build Command** — اتركه كما هو؛ `vercel.json` يضبطه تلقائياً إلى:
    ```
    prisma generate && prisma migrate deploy && next build
    ```
@@ -100,6 +101,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ```
 DATABASE_URL=postgresql://...-pooler.neon.tech/...?sslmode=require
+DIRECT_URL=postgresql://...neon.tech/...?sslmode=require
 SESSION_SECRET=<سلسلة 32+ حرف>
 APP_BASE_URL=https://yourdomain.com
 
@@ -150,6 +152,6 @@ $env:ADMIN_EMAIL="you@domain.com"; $env:ADMIN_PASSWORD="سرّ-قوي"; $env:ADM
 
 ## ملخّص الإلزامي مقابل الاختياري
 
-- **إلزامي للتشغيل:** Neon (`DATABASE_URL`)، `SESSION_SECRET`، Vercel، الدومين.
+- **إلزامي للتشغيل:** Neon (`DATABASE_URL` + `DIRECT_URL`)، `SESSION_SECRET`، Vercel، الدومين.
 - **إلزامي على Vercel لميزة الملفات:** Cloudflare R2 (`S3_*`).
 - **اختياري (بريد فعلي):** Resend (`RESEND_API_KEY`, `EMAIL_FROM`) — وإلا تكفي الإشعارات الداخلية.
