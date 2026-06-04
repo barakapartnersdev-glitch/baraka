@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
+import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
 import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
@@ -280,13 +281,13 @@ export default async function Home() {
     select: { id: true, sector: true, country: true, currency: true, investmentMin: true, investmentMax: true, publicVersion: true },
   });
   const featured = opps.map((o) => {
-    const pv = toVersion(o.publicVersion);
+    const pv = localizeVersion(toVersion(o.publicVersion), locale);
     return {
       id: o.id,
-      title: pv?.displayTitle || o.sector,
+      title: pv?.displayTitle || localizeTerm(SECTOR_I18N, o.sector, locale),
       summary: pv?.summary || "",
-      sector: o.sector,
-      country: o.country,
+      sector: localizeTerm(SECTOR_I18N, o.sector, locale),
+      country: localizeTerm(COUNTRY_I18N, o.country, locale),
       range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
       imageUrl: pv?.imageUrl ?? null,
     };

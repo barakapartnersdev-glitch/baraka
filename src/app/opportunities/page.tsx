@@ -3,6 +3,7 @@ import PublicHeader from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import OpportunityCard, { type OpportunityCardData } from "@/components/OpportunityCard";
 import { toVersion } from "@/lib/opportunity";
+import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
 
@@ -46,14 +47,15 @@ export default async function PublicOpportunities() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {opps.map((o) => {
-              const pv = toVersion(o.publicVersion);
+              const pv = localizeVersion(toVersion(o.publicVersion), locale);
+              const localSector = localizeTerm(SECTOR_I18N, o.sector, locale);
               const data: OpportunityCardData = {
                 id: o.id,
                 href: `/opportunities/${o.id}`,
-                title: pv?.displayTitle || `${t(locale, "opp.inSector")} ${o.sector}`,
+                title: pv?.displayTitle || `${t(locale, "opp.inSector")} ${localSector}`,
                 summary: pv?.summary,
-                sector: o.sector,
-                country: o.country,
+                sector: localSector,
+                country: localizeTerm(COUNTRY_I18N, o.country, locale),
                 range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
                 imageUrl: pv?.imageUrl ?? null,
               };
