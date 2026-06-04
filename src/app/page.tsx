@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
+import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +16,7 @@ function fmtRange(min: bigint | null, max: bigint | null, cur: string) {
 // ===== محتوى الصفحة ثنائي اللغة =====
 const C = {
   ar: {
+    brand: "شركاء البركة",
     brandSub: "BARAKA PARTNERS",
     nav: { home: "الرئيسية", opps: "الفرص الاستثمارية", inv: "للمستثمرين", own: "لأصحاب الفرص", how: "كيف نعمل", contact: "اتصل بنا" },
     login: "تسجيل الدخول", signup: "إنشاء حساب",
@@ -78,6 +79,7 @@ const C = {
     rights: "© 2026 شركاء البركة — جميع الحقوق محفوظة لشركة عهد البركة",
   },
   en: {
+    brand: "Baraka Partners",
     brandSub: "BARAKA PARTNERS",
     nav: { home: "Home", opps: "Opportunities", inv: "For investors", own: "For owners", how: "How it works", contact: "Contact" },
     login: "Log in", signup: "Sign up",
@@ -139,11 +141,74 @@ const C = {
     footLegal: [["Terms & conditions", "/about"], ["Privacy policy", "/about"], ["Contact", "/contact"]],
     rights: "© 2026 Baraka Partners — All rights reserved to Ahd Al-Baraka",
   },
+  zh: {
+    brand: "巴拉卡合伙人",
+    brandSub: "BARAKA PARTNERS",
+    nav: { home: "首页", opps: "投资机会", inv: "投资者", own: "项目方", how: "运作方式", contact: "联系我们" },
+    login: "登录", signup: "注册",
+    heroTag: "由 Ahd Al-Baraka 公司运营的投资平台",
+    heroH1a: "连接", heroH1gold: "国际资本", heroH1b: "与经过审核的真实机会",
+    heroLead: "一个值得信赖的中介平台，汇聚来自各国的认真投资者与有潜力的项目方和资产——在透明、治理与保密的框架内，为所有合作伙伴创造共同价值。",
+    heroBtn1: "我是投资者 — 浏览机会", heroBtn2: "我有项目或投资资产",
+    trust: [
+      { n: "8+", l: "投资领域" },
+      { n: "全球", l: "国际机会覆盖" },
+      { n: "100%", l: "保密与治理" },
+      { n: "USD", l: "统一估值货币" },
+    ],
+    pathsKicker: "两条清晰路径",
+    pathsTitle: "无论您处于交易的哪一方，我们都为您铺路",
+    pathsSub: "无论您在寻找经过审核的投资机会，还是拥有需要合作伙伴的优质项目，您的旅程都从这里开始。",
+    invTitle: "面向投资者",
+    invDesc: "精心筛选并分类的机会，以简洁、安全的方式呈现。浏览符合您兴趣的内容，并申请查看完整详情。",
+    invList: ["上线前已审核的机会", "按行业、国家和投资规模筛选", "申请通过后查看完整详情", "由专业团队管理关系"],
+    invBtn: "注册为投资者",
+    ownTitle: "面向项目方",
+    ownDesc: "拥有土地、工厂、运营中的公司或扩张项目？我们帮助您将机会转化为专业的投资档案，并呈现给合适的投资者。",
+    ownList: ["对机会进行资格审核并准备档案", "触达国际投资者网络", "全面保护您的数据与身份", "跟进交易直至谈判阶段"],
+    ownBtn: "提交您的机会",
+    howKicker: "简单而可信的流程", howTitle: "平台如何运作", howSub: "从构想到合作——清晰的步骤，保障各方权益。",
+    steps: [
+      { h: "注册与审核", p: "以投资者或项目方身份创建账户，并提交资料供我们团队审核。" },
+      { h: "准备与分类", p: "我们审核机会、评估其成熟度，并准备简洁、安全的投资档案。" },
+      { h: "匹配与意向", p: "我们将机会呈现给合适的投资者，您可对符合策略的机会表达意向。" },
+      { h: "谈判与成交", p: "申请通过后揭示详情，我们陪伴您完成谈判与交易。" },
+    ],
+    oppsKicker: "精选机会", oppsTitle: "当前可投资的机会", oppsSub: "合格机会的简要展示。登录以查看更多详情。",
+    oppStatus: "已发布", oppRangeLabel: "所需投资区间", oppInterest: "表达意向 →", oppsAll: "浏览全部机会", oppsEmpty: "新机会正在准备中——立即注册，第一时间获取。",
+    secKicker: "多元领域", secTitle: "我们接受各主要投资领域的机会",
+    sectors: [
+      { e: "🏢", h: "房地产与开发" }, { e: "🏭", h: "工业与工厂" }, { e: "🌾", h: "农业与土地" }, { e: "🍲", h: "食品工业" },
+      { e: "⚡", h: "可再生能源" }, { e: "🏨", h: "旅游与酒店" }, { e: "🚚", h: "物流" }, { e: "💻", h: "科技与金融科技" },
+    ],
+    confTitleA: "保密与治理", confTitleGold: "是我们工作的核心",
+    confP: "我们不只是展示机会，而是经营一段建立在信任之上的关系。在确认认真意向与审核通过之前，敏感信息始终受到保护，以保障项目方与投资者双方的权益。",
+    confBtn: "了解我们的方式",
+    conf: [
+      { e: "🔒", h: "安全的简要展示", p: "机会以匿名方式呈现，不泄露身份或精确位置。" },
+      { e: "📝", h: "每个机会一份协议", p: "签署该机会的保密协议后，方可获得完整详情。" },
+      { e: "👁️", h: "平台内查看", p: "敏感文件仅在平台内查看，以保护内容。" },
+      { e: "✅", h: "人工审核", p: "每个机会在呈现给投资者前，都经过我们团队的审核与资格认定。" },
+    ],
+    ctaTitle: "与巴拉卡合伙人开启您的旅程", ctaSub: "加入一个兼具认真、专业与信任的平台。", ctaBtn1: "注册为投资者", ctaBtn2: "提交您的投资机会",
+    faqKicker: "常见问题", faqTitle: "最常被问到的问题解答",
+    faq: [
+      { q: "展示我的机会是否意味着向所有人公开我的数据？", a: "不会。您的数据与身份始终受保护，公众仅能看到简要、匿名的展示。详情仅在受治理的框架内、且满足保密条件后才会揭示。" },
+      { q: "你们接受来自哪些国家的机会和投资者？", a: "我们欢迎来自多个国家的机会与投资者，涵盖我们认可的领域，并以美元进行统一估值。" },
+      { q: "作为投资者我该如何开始？", a: "创建账户，浏览可用的简要机会，并对适合您的机会表达意向。审核后，完整详情将向您开放。" },
+      { q: "平台是否专注于特定领域？", a: "是的——房地产、工业、农业、食品、能源、旅游、物流与科技。" },
+    ],
+    foot: { about: "由 Ahd Al-Baraka 公司运营的投资平台，在透明与治理的框架内，将国际资本与经审核的机会相连接。", platform: "平台", users: "用户", legal: "法律" },
+    footPlatform: [["关于 BarakaPartners", "/about"], ["投资机会", "/opportunities"], ["运作方式", "/how-it-works"], ["联系我们", "/contact"]],
+    footUsers: [["投资者", "/register"], ["项目方", "/register/owner"], ["注册", "/register"], ["登录", "/login"]],
+    footLegal: [["条款与条件", "/about"], ["隐私政策", "/about"], ["联系我们", "/contact"]],
+    rights: "© 2026 巴拉卡合伙人 — Ahd Al-Baraka 公司版权所有",
+  },
 } as const;
 
 export default async function Home() {
   const locale = await getLocale();
-  const c = C[locale === "en" ? "en" : "ar"];
+  const c = C[locale] ?? C.ar;
 
   const opps = await prisma.opportunity.findMany({
     where: { state: "PUBLISHED" },
@@ -176,7 +241,7 @@ export default async function Home() {
           <Link href="/" className="flex items-center gap-3 text-white">
             <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">ب</span>
             <span className="font-extrabold leading-tight">
-              {locale === "en" ? "Baraka Partners" : "شركاء البركة"}
+              {c.brand}
               <small className="block text-[11px] font-medium tracking-wider text-gold-soft">{c.brandSub}</small>
             </span>
           </Link>
@@ -189,7 +254,7 @@ export default async function Home() {
             <Link href="/contact" className="hover:text-gold">{c.nav.contact}</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <LocaleSwitcher locale={locale} className="hidden text-[13px] text-[#cdd6e4] transition hover:text-gold disabled:opacity-50 sm:inline" />
+            <LocaleMenu locale={locale} />
             <Link href="/login" className="hidden rounded-[10px] border border-white/30 px-5 py-2.5 text-sm font-bold text-white transition hover:border-gold hover:text-gold sm:inline-flex">{c.login}</Link>
             <Link href="/register" className={btnGold}>{c.signup}</Link>
           </div>
@@ -423,7 +488,7 @@ export default async function Home() {
           </div>
           <div className="flex flex-wrap justify-between gap-3 border-t border-white/10 pt-6 text-[13px]">
             <span>{c.rights}</span>
-            <span>العربية · English</span>
+            <span>العربية · English · 中文</span>
           </div>
         </div>
       </footer>
