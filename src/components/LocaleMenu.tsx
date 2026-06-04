@@ -7,6 +7,7 @@ import type { Locale } from "@/lib/i18n";
 const LANGS: { code: Locale; label: string }[] = [
   { code: "ar", label: "ع" },
   { code: "en", label: "EN" },
+  { code: "tr", label: "TR" },
   { code: "zh", label: "中" },
 ];
 

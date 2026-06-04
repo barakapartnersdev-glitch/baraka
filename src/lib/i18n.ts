@@ -2,8 +2,8 @@
 // وحدة خالصة (بلا next/headers) لتكون قابلة للاستيراد في الواجهة والخادم معاً.
 // قراءة اللغة من الكوكي في lib/i18n-server.ts، والتبديل عبر app/_i18n/actions.ts.
 
-export type Locale = "ar" | "en" | "zh";
-export const LOCALES: Locale[] = ["ar", "en", "zh"];
+export type Locale = "ar" | "en" | "zh" | "tr";
+export const LOCALES: Locale[] = ["ar", "en", "zh", "tr"];
 export const DEFAULT_LOCALE: Locale = "ar";
 export const LOCALE_COOKIE = "locale";
 
@@ -856,7 +856,7 @@ const en: Dict = {
 };
 
 // الصينية تعتمد الإنجليزية كاحتياط للصفحات المشتركة (الصفحة الرئيسية لها ترجمتها الكاملة).
-const dicts: Record<Locale, Dict> = { ar, en, zh: en };
+const dicts: Record<Locale, Dict> = { ar, en, zh: en, tr: en };
 
 export function t(locale: Locale, key: string): string {
   return dicts[locale]?.[key] ?? dicts[DEFAULT_LOCALE][key] ?? key;

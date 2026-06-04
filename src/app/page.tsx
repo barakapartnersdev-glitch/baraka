@@ -204,6 +204,69 @@ const C = {
     footLegal: [["条款与条件", "/about"], ["隐私政策", "/about"], ["联系我们", "/contact"]],
     rights: "© 2026 巴拉卡合伙人 — Ahd Al-Baraka 公司版权所有",
   },
+  tr: {
+    brand: "Baraka Partners",
+    brandSub: "BARAKA PARTNERS",
+    nav: { home: "Ana sayfa", opps: "Fırsatlar", inv: "Yatırımcılar için", own: "Sahipler için", how: "Nasıl çalışır", contact: "İletişim" },
+    login: "Giriş", signup: "Kayıt ol",
+    heroTag: "Ahd Al-Baraka şirketi tarafından işletilen bir yatırım platformu",
+    heroH1a: "Uluslararası sermayeyi", heroH1gold: "gerçek, incelenmiş fırsatlara", heroH1b: "bağlıyoruz",
+    heroLead: "Farklı ülkelerden ciddi yatırımcıları, gelecek vaat eden proje sahipleri ve varlıklarla bir araya getiren güvenilir bir aracı platform — şeffaflık, yönetişim ve gizlilik çerçevesinde, tüm ortakların ortak yararı için.",
+    heroBtn1: "Yatırımcıyım — fırsatları incele", heroBtn2: "Bir fırsatım ya da varlığım var",
+    trust: [
+      { n: "8+", l: "Yatırım sektörü" },
+      { n: "Küresel", l: "Uluslararası erişim" },
+      { n: "100%", l: "Gizlilik ve yönetişim" },
+      { n: "USD", l: "Birleşik değerleme birimi" },
+    ],
+    pathsKicker: "İki net yol",
+    pathsTitle: "İşlemin neresinde olursanız olun, yolu biz açarız",
+    pathsSub: "İster incelenmiş bir yatırım fırsatı arıyor olun, ister ortak arayan umut vaat eden bir projeniz olsun, yolculuğunuz burada başlar.",
+    invTitle: "Yatırımcılar için",
+    invDesc: "Özenle nitelendirilmiş ve sınıflandırılmış fırsatlar, kısa ve güvenli bir şekilde sunulur. İlginize uyanları inceleyin ve tüm ayrıntılar için talepte bulunun.",
+    invList: ["Listelenmeden önce incelenen fırsatlar", "Sektör, ülke ve yatırım büyüklüğüne göre filtreleme", "Talebiniz onaylandıktan sonra tüm ayrıntılar", "Özel bir ekip tarafından ilişki yönetimi"],
+    invBtn: "Yatırımcı olarak kaydol",
+    ownTitle: "Fırsat ve proje sahipleri için",
+    ownDesc: "Araziniz, fabrikanız, faaliyetteki bir şirketiniz veya genişleme projeniz mi var? Fırsatınızı profesyonel bir yatırım dosyasına dönüştürüp doğru yatırımcılara sunmanıza yardımcı oluyoruz.",
+    ownList: ["Fırsatı niteleyip dosyasını hazırlama", "Uluslararası yatırımcı ağına erişim", "Verilerinizin ve kimliğinizin tam korunması", "Müzakere aşamasına kadar takip"],
+    ownBtn: "Fırsatınızı sunun",
+    howKicker: "Basit ve güvenilir bir yolculuk", howTitle: "Platform nasıl çalışır", howSub: "Fikirden ortaklığa — herkesin haklarını koruyan net adımlar.",
+    steps: [
+      { h: "Kayıt ve niteleme", p: "Yatırımcı veya sahip olarak hesabınızı oluşturun ve ekibimizin incelemesi için bilgilerinizi gönderin." },
+      { h: "Hazırlık ve sınıflandırma", p: "Fırsatları inceler, hazırlık düzeyini sınıflandırır ve kısa, güvenli bir dosya hazırlarız." },
+      { h: "Eşleştirme ve ilgi", p: "Fırsatları doğru yatırımcılara sunarız ve stratejinize uyanlara ilgi gösterirsiniz." },
+      { h: "Müzakere ve kapanış", p: "Onaydan sonra ayrıntılar açıklanır ve müzakere ile kapanışa kadar size eşlik ederiz." },
+    ],
+    oppsKicker: "Seçkin fırsatlar", oppsTitle: "Şu anda mevcut fırsatlar", oppsSub: "Nitelikli fırsatların kısa görünümü. Daha fazla ayrıntı için giriş yapın.",
+    oppStatus: "Yayında", oppRangeLabel: "Talep edilen yatırım aralığı", oppInterest: "İlgi göster →", oppsAll: "Tüm fırsatları incele", oppsEmpty: "Yeni fırsatlar hazırlanıyor — ilk görenlerden olmak için kaydolun.",
+    secKicker: "Çeşitli sektörler", secTitle: "Başlıca yatırım sektörlerindeki fırsatları kabul ediyoruz",
+    sectors: [
+      { e: "🏢", h: "Gayrimenkul ve geliştirme" }, { e: "🏭", h: "Sanayi ve fabrikalar" }, { e: "🌾", h: "Tarım ve arazi" }, { e: "🍲", h: "Gıda sanayii" },
+      { e: "⚡", h: "Yenilenebilir enerji" }, { e: "🏨", h: "Turizm ve oteller" }, { e: "🚚", h: "Lojistik" }, { e: "💻", h: "Teknoloji ve fintek" },
+    ],
+    confTitleA: "Gizlilik ve yönetişim", confTitleGold: "işimizin merkezinde",
+    confP: "Yalnızca fırsat sunmuyoruz; güvene dayalı bir ilişki yönetiyoruz. Ciddiyet ve onay teyit edilene kadar hassas ayrıntılar korunur; böylece hem sahiplerin hem de yatırımcıların hakları güvence altına alınır.",
+    confBtn: "Yaklaşımımızı öğrenin",
+    conf: [
+      { e: "🔒", h: "Güvenli kısa görünüm", p: "Fırsat, kimlik veya kesin konum açıklanmadan anonim olarak görünür." },
+      { e: "📝", h: "Her fırsata bir sözleşme", p: "Tüm ayrıntılar, fırsata özel gizlilik sözleşmesi imzalandıktan sonra açıklanır." },
+      { e: "👁️", h: "Platform içi görüntüleme", p: "Hassas dosyalar içeriği korumak için yalnızca platform içinde görüntülenir." },
+      { e: "✅", h: "İnsan incelemesi", p: "Her fırsat yatırımcılara sunulmadan önce ekibimizce incelenir ve nitelendirilir." },
+    ],
+    ctaTitle: "Baraka Partners ile yolculuğunuza başlayın", ctaSub: "Ciddiyeti, profesyonelliği ve güveni birleştiren bir platforma katılın.", ctaBtn1: "Yatırımcı olarak kaydol", ctaBtn2: "Yatırım fırsatınızı sunun",
+    faqKicker: "Sıkça sorulan sorular", faqTitle: "En çok sorulan soruların yanıtları",
+    faq: [
+      { q: "Fırsatımı sunmak verilerimi herkese açmak anlamına mı gelir?", a: "Hayır. Verileriniz ve kimliğiniz korunur; kamuya yalnızca kısa, anonim bir görünüm sunulur. Ayrıntılar yalnızca yönetilen bir çerçevede ve gizlilik koşulları karşılandıktan sonra açıklanır." },
+      { q: "Hangi ülkelerden fırsat ve yatırımcı kabul ediyorsunuz?", a: "Onaylı sektörlerimiz kapsamında, birçok ülkeden fırsat ve yatırımcıyı ABD doları cinsinden birleşik bir değerlemeyle kabul ediyoruz." },
+      { q: "Yatırımcı olarak nasıl başlarım?", a: "Hesabınızı oluşturun, mevcut kısa fırsatları inceleyin ve size uyanlara ilgi gösterin. İnceleme sonrası tüm ayrıntılar size açılır." },
+      { q: "Platform belirli sektörlere mi odaklanıyor?", a: "Evet — gayrimenkul, sanayi, tarım, gıda, enerji, turizm, lojistik ve teknoloji." },
+    ],
+    foot: { about: "Ahd Al-Baraka tarafından işletilen, uluslararası sermayeyi şeffaflık ve yönetişim çerçevesinde incelenmiş fırsatlara bağlayan bir yatırım platformu.", platform: "Platform", users: "Kullanıcılar", legal: "Yasal" },
+    footPlatform: [["BarakaPartners hakkında", "/about"], ["Fırsatlar", "/opportunities"], ["Nasıl çalışır", "/how-it-works"], ["İletişim", "/contact"]],
+    footUsers: [["Yatırımcılar için", "/register"], ["Sahipler için", "/register/owner"], ["Kayıt ol", "/register"], ["Giriş", "/login"]],
+    footLegal: [["Şartlar ve koşullar", "/about"], ["Gizlilik politikası", "/about"], ["İletişim", "/contact"]],
+    rights: "© 2026 Baraka Partners — Tüm hakları Ahd Al-Baraka'ya aittir",
+  },
 } as const;
 
 export default async function Home() {
@@ -488,7 +551,7 @@ export default async function Home() {
           </div>
           <div className="flex flex-wrap justify-between gap-3 border-t border-white/10 pt-6 text-[13px]">
             <span>{c.rights}</span>
-            <span>العربية · English · 中文</span>
+            <span>العربية · English · Türkçe · 中文</span>
           </div>
         </div>
       </footer>
