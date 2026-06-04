@@ -300,26 +300,27 @@ export default async function Home() {
     <div className="min-h-screen bg-[#f6f7f9] text-[#1a2433]">
       {/* ===== Header ===== */}
       <header className="sticky top-0 z-50 border-b border-gold/20 bg-navy/90 backdrop-blur">
-        <div className="mx-auto flex h-[74px] max-w-6xl items-center justify-between gap-4 px-6">
-          <Link href="/" className="flex items-center gap-3 text-white">
+        <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5 text-white">
             <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">ب</span>
             <span className="font-extrabold leading-tight">
               {c.brand}
-              <small className="block text-[11px] font-medium tracking-wider text-gold-soft">{c.brandSub}</small>
+              <small className="block text-[10px] font-medium tracking-[0.15em] text-gold-soft">{c.brandSub}</small>
             </span>
           </Link>
-          <nav className="hidden items-center gap-7 text-[15px] font-medium text-[#cdd6e4] lg:flex">
-            <Link href="/" className="hover:text-gold">{c.nav.home}</Link>
-            <Link href="/opportunities" className="hover:text-gold">{c.nav.opps}</Link>
-            <Link href="/register" className="hover:text-gold">{c.nav.inv}</Link>
-            <Link href="/register/owner" className="hover:text-gold">{c.nav.own}</Link>
-            <Link href="/how-it-works" className="hover:text-gold">{c.nav.how}</Link>
-            <Link href="/contact" className="hover:text-gold">{c.nav.contact}</Link>
+          <nav className="hidden items-center gap-6 whitespace-nowrap text-sm font-medium text-[#cdd6e4] xl:flex">
+            <Link href="/" className="transition hover:text-gold">{c.nav.home}</Link>
+            <Link href="/opportunities" className="transition hover:text-gold">{c.nav.opps}</Link>
+            <Link href="/register" className="transition hover:text-gold">{c.nav.inv}</Link>
+            <Link href="/register/owner" className="transition hover:text-gold">{c.nav.own}</Link>
+            <Link href="/how-it-works" className="transition hover:text-gold">{c.nav.how}</Link>
+            <Link href="/contact" className="transition hover:text-gold">{c.nav.contact}</Link>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <LocaleMenu locale={locale} />
-            <Link href="/login" className="hidden rounded-[10px] border border-white/30 px-5 py-2.5 text-sm font-bold text-white transition hover:border-gold hover:text-gold sm:inline-flex">{c.login}</Link>
-            <Link href="/register" className={btnGold}>{c.signup}</Link>
+            <span className="hidden h-6 w-px bg-white/15 sm:block" aria-hidden="true" />
+            <Link href="/login" className="hidden whitespace-nowrap rounded-[10px] border border-white/30 px-4 py-2.5 text-sm font-bold text-white transition hover:border-gold hover:text-gold sm:inline-flex">{c.login}</Link>
+            <Link href="/register" className={`${btnGold} whitespace-nowrap`}>{c.signup}</Link>
           </div>
         </div>
       </header>
@@ -341,7 +342,7 @@ export default async function Home() {
         <div className="float pointer-events-none absolute -top-8 end-1/4 h-44 w-44 rounded-full bg-gold/20 blur-3xl" />
         <div className="float-slow pointer-events-none absolute bottom-8 start-12 h-32 w-32 rounded-full bg-gold/10 blur-3xl" />
 
-        <div className="relative mx-auto max-w-6xl px-6">
+        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
           <span className="rise mb-6 inline-block rounded-full border border-gold/40 bg-gold/15 px-4 py-1.5 text-[13px] font-semibold text-gold-soft backdrop-blur">{c.heroTag}</span>
           <h1 className="rise mb-5 text-4xl font-black leading-[1.25] drop-shadow-[0_2px_20px_rgba(0,0,0,0.35)] sm:text-5xl lg:text-[54px]" style={{ animationDelay: "120ms" }}>
             {c.heroH1a}{" "}
@@ -350,13 +351,13 @@ export default async function Home() {
             {c.heroH1b}
           </h1>
           <p className="rise mb-9 max-w-2xl text-lg leading-relaxed text-[#d3dcea]" style={{ animationDelay: "240ms" }}>{c.heroLead}</p>
-          <div className="rise flex flex-wrap gap-4" style={{ animationDelay: "360ms" }}>
+          <div className="rise flex flex-wrap justify-center gap-4" style={{ animationDelay: "360ms" }}>
             <Link href="/opportunities" className={btnGoldLg}>{c.heroBtn1}</Link>
             <Link href="/register/owner" className={btnGhostLg}>{c.heroBtn2}</Link>
           </div>
-          <div className="rise mt-14 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/10 pt-9" style={{ animationDelay: "480ms" }}>
+          <div className="rise mt-14 flex w-full max-w-3xl flex-wrap justify-center gap-x-12 gap-y-6 border-t border-white/10 pt-9" style={{ animationDelay: "480ms" }}>
             {c.trust.map((it) => (
-              <div key={it.l} className="flex flex-col">
+              <div key={it.l} className="flex flex-col items-center">
                 <span className="text-3xl font-black text-gold-soft">{it.n}</span>
                 <span className="text-sm text-[#aebbcf]">{it.l}</span>
               </div>
