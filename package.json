@@ -1,0 +1,43 @@
+{
+  "name": "baraka-partners",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BarakaPartners — منصة شركاء البركة الاستثمارية (MVP)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.mjs",
+    "db:seed:admin": "node prisma/seed-admin.mjs",
+    "db:studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "@prisma/client": "^6.2.1",
+    "bcryptjs": "^2.4.3",
+    "jose": "^5.9.6",
+    "next": "^16.2.6",
+    "pdf-lib": "^1.17.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  }
+}

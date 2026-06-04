@@ -1,0 +1,220 @@
+// مخطط قاعدة بيانات منصة شركاء البركة (BarakaPartners)
+// يغطي الكيانات الأساسية التي تشغّل لوحة الإدارة ومنطق الحوكمة.
+// قابل للتوسعة لبقية الكيانات (الرسائل، سجل النشاط، محتوى الموقع... إلخ).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== المستخدمون والأدوار =====
+enum UserRole {
+  ADMIN // مدير المنصة (عهد البركة)
+  PROJECT_OWNER // صاحب المشروع
+  INVESTOR // المستثمر
+}
+
+enum AccountStatus {
+  PENDING_EMAIL // بانتظار تفعيل البريد
+  PENDING_REVIEW // بانتظار توثيق ومراجعة الإدارة
+  ACTIVE // مفعّل
+  SUSPENDED // موقوف
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  fullName      String
+  phone         String?
+  role          UserRole
+  accountStatus AccountStatus @default(PENDING_EMAIL)
+  passwordHash  String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // العلاقات
+  ownedOpportunities Opportunity[] @relation("OwnerOpportunities")
+  investorEntities   InvestorEntity[]
+  interests          Interest[]
+  reviewedOpps       Opportunity[] @relation("ReviewerOpportunities")
+  activityLogs       ActivityLog[]
+  notifications      Notification[]
+
+  @@index([role])
+  @@index([accountStatus])
+}
+
+// ===== سجل النشاط (التدقيق) =====
+// يسجّل كل إجراء إداري حسّاس: من فعل ماذا، على أي كيان، ومتى.
+model ActivityLog {
+  id         String   @id @default(cuid())
+  actor      User     @relation(fields: [actorId], references: [id])
+  actorId    String
+  action     String // نوع الإجراء، مثل: OPP_STATE_CHANGE, VERSION_SAVED, INTEREST_APPROVED
+  entityType String // الكيان المتأثّر: Opportunity / Interest / MissingItem ...
+  entityId   String
+  details    Json? // تفاصيل إضافية (من حالة إلى حالة، إلخ)
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+}
+
+// كيان استثماري يملكه مستثمر (يمكن للمستثمر امتلاك أكثر من كيان/شركة)
+model InvestorEntity {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // فرد / شركة / صندوق
+  country   String?
+  investor  User     @relation(fields: [investorId], references: [id])
+  investorId String
+  interests Interest[]
+  createdAt DateTime @default(now())
+
+  @@index([investorId])
+}
+
+// ===== الفرص الاستثمارية =====
+// الحالات تعكس رحلة الحوكمة من بيانات المصدر حتى النشر.
+enum OpportunityState {
+  DRAFT_SOURCE // مسودة بيانات المصدر (صاحب المشروع)
+  SUBMITTED // مُرسلة للإدارة
+  UNDER_REVIEW // قيد مراجعة الإدارة
+  NEEDS_INFO // بانتظار استكمال نواقص
+  READY_TO_PUBLISH // جاهزة للنشر (اعتمدت النسخ)
+  PUBLISHED // منشورة
+  PAUSED // موقوفة مؤقتاً
+  CLOSED // مغلقة
+  ARCHIVED // مؤرشفة
+}
+
+model Opportunity {
+  id        String           @id @default(cuid())
+  title     String // عنوان داخلي (مرجع الإدارة)
+  sector    String
+  country   String
+  state     OpportunityState @default(DRAFT_SOURCE)
+
+  // مالك المشروع
+  owner   User   @relation("OwnerOpportunities", fields: [ownerId], references: [id])
+  ownerId String
+
+  // مراجع الإدارة (اختياري)
+  reviewer   User?   @relation("ReviewerOpportunities", fields: [reviewerId], references: [id])
+  reviewerId String?
+
+  // بيانات المصدر — للإدارة فقط، لا تُنشر أبداً كما هي
+  sourceData Json?
+
+  // النسخ الثلاث للنشر (تصوغها الإدارة)
+  publicVersion    Json? // النسخة العامة (للزائر)
+  investorVersion  Json? // نسخة المستثمر المسجل قبل NCNDA
+  postNcndaVersion Json? // نسخة ما بعد توقيع NCNDA
+
+  // مبلغ الاستثمار المطلوب (نطاق)
+  investmentMin BigInt?
+  investmentMax BigInt?
+  currency      String  @default("USD")
+
+  missingItems MissingItem[]
+  files        OpportunityFile[]
+  interests    Interest[]
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([state])
+  @@index([sector])
+}
+
+// النواقص التي تطلبها الإدارة من صاحب المشروع
+model MissingItem {
+  id            String      @id @default(cuid())
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId String
+  description   String
+  resolved      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  @@index([opportunityId])
+}
+
+// ملفات الفرصة (تخزّن مرجعاً آمناً + مستوى الإتاحة)
+enum FileVisibility {
+  ADMIN_ONLY // للإدارة فقط
+  POST_NCNDA // تظهر بعد توقيع NCNDA
+}
+
+model OpportunityFile {
+  id            String         @id @default(cuid())
+  opportunity   Opportunity    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId String
+  fileName      String
+  storageKey    String // مرجع التخزين الآمن
+  visibility    FileVisibility @default(ADMIN_ONLY)
+  approved      Boolean        @default(false) // معتمد من الإدارة
+  createdAt     DateTime       @default(now())
+
+  @@index([opportunityId])
+}
+
+// ===== طلبات الاهتمام و NCNDA =====
+enum InterestStatus {
+  REQUESTED // طلب اهتمام جديد
+  ADMIN_APPROVED // اعتمدته الإدارة (يحق له التوقيع)
+  NCNDA_SIGNED // وقّع NCNDA — تُفتح تفاصيل ما بعد التوقيع
+  DECLINED // مرفوض
+  WITHDRAWN // مسحوب
+}
+
+model Interest {
+  id            String         @id @default(cuid())
+  opportunity   Opportunity    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId String
+  investor      User           @relation(fields: [investorId], references: [id])
+  investorId    String
+  entity        InvestorEntity? @relation(fields: [entityId], references: [id])
+  entityId      String?
+  status          InterestStatus @default(REQUESTED)
+  ncndaSignedAt   DateTime?
+  ncndaSignerName String? // الاسم المكتوب كتوقيع
+  ncndaDocKey     String? // مفتاح تخزين نسخة الاتفاقية الموقّعة
+  createdAt       DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([opportunityId, investorId])
+  @@index([status])
+}
+
+// ===== الإشعارات داخل المنصة =====
+enum NotificationType {
+  NEW_REGISTRATION          // للإدارة: تسجيل مستثمر جديد
+  ACCOUNT_APPROVED          // للمستخدم: اعتُمد حسابه
+  ACCOUNT_SUSPENDED         // للمستخدم: أُوقف حسابه
+  INTEREST_REQUESTED        // للإدارة: طلب اهتمام جديد
+  INTEREST_APPROVED         // للمستثمر: اعتُمد طلبه
+  INTEREST_DECLINED         // للمستثمر: رُفض طلبه
+  NCNDA_SIGNED              // متعلّق بتوقيع NCNDA
+  MISSING_INFO_REQUESTED    // لصاحب المشروع: طُلبت نواقص
+  OPPORTUNITY_PUBLISHED     // لصاحب المشروع: نُشرت فرصته
+  OPPORTUNITY_STATE_CHANGED // لصاحب المشروع: تغيّرت حالة فرصته
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      NotificationType
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
