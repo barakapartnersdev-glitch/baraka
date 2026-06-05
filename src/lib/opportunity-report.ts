@@ -1,6 +1,7 @@
 // بناء تقرير منظّم من إجابات نموذج الفرصة — نسختان: كاملة (للإدارة) ومستثمر (بلا معلومات حساسة).
 // مخرجات: أقسام مهيكلة (للعرض)، HTML للطباعة/Word، و Markdown جاهز للذكاء الصناعي.
 import { FORM_PAGES, labelOf, type Ans } from "@/lib/opportunity-form";
+import { LOGO_DATA_URI } from "@/lib/logo-data";
 
 export type ReportMode = "full" | "investor";
 
@@ -83,14 +84,17 @@ export function buildReportHtml(meta: ReportMeta, sections: ReportSection[], for
   const rows = sections
     .map(
       (s) => `
-    <h2>${esc(s.title)}</h2>
-    <table>
-      ${s.fields
-        .map(
-          (f) => `<tr><th>${esc(f.label)}</th><td>${esc(f.value).replace(/\n/g, "<br/>")}</td></tr>`
-        )
-        .join("\n      ")}
-    </table>`
+    <section class="block">
+      <h2>${esc(s.title)}</h2>
+      <table>
+        ${s.fields
+          .map(
+            (f, i) =>
+              `<tr${i % 2 ? ' class="alt"' : ""}><th>${esc(f.label)}</th><td>${esc(f.value).replace(/\n/g, "<br/>")}</td></tr>`
+          )
+          .join("\n        ")}
+      </table>
+    </section>`
     )
     .join("\n");
 
@@ -98,49 +102,75 @@ export function buildReportHtml(meta: ReportMeta, sections: ReportSection[], for
     ? ""
     : `<div class="noprint actions"><button onclick="window.print()">طباعة / حفظ PDF</button></div>`;
 
+  const metaPills = [
+    `المرجع: ${esc(meta.ref)}`,
+    `القطاع: ${esc(meta.sector)}`,
+    `الدولة: ${esc(meta.country)}`,
+    meta.ownerName ? `مقدّم الطلب: ${esc(meta.ownerName)}` : "",
+  ]
+    .filter(Boolean)
+    .map((x) => `<span class="pill">${x}</span>`)
+    .join("");
+
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>تقرير الفرصة — ${esc(meta.title)}</title>
+<title>${isInvestor ? "ملف الفرصة" : "تقرير الفرصة"} — ${esc(meta.title)}</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
   * { box-sizing: border-box; }
-  body { font-family: 'Tajawal', system-ui, sans-serif; color: #14213d; line-height: 1.8; max-width: 820px; margin: 24px auto; padding: 0 24px; }
-  .head { border-bottom: 3px solid #c9a24b; padding-bottom: 14px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
-  .brand { color: #0a1f3c; font-weight: 700; font-size: 20px; }
-  .brand small { display:block; font-size:11px; letter-spacing:2px; color:#c9a24b; font-weight:500; }
-  h1 { font-size: 22px; margin: 14px 0 2px; color:#0a1f3c; }
-  .meta { color: #5c6b80; font-size: 13px; margin-bottom: 18px; }
-  .tag { display:inline-block; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; }
-  .tag.full { background:#0a1f3c; color:#fff; }
-  .tag.inv { background:#fdf3da; color:#7a5b12; border:1px solid #e3c987; }
-  .banner { background:#fdf3da; border:1px solid #e3c987; color:#7a5b12; padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:18px; }
-  h2 { font-size: 16px; color:#0a1f3c; margin: 22px 0 8px; padding-bottom:5px; border-bottom:1px solid #e6e9ef; }
-  table { width:100%; border-collapse: collapse; margin-bottom: 6px; }
-  th, td { text-align: start; vertical-align: top; padding: 7px 10px; border:1px solid #e6e9ef; font-size: 13.5px; }
-  th { background:#f6f7f9; color:#0a1f3c; font-weight:700; width: 38%; }
-  .foot { margin-top: 26px; color:#8a94a6; font-size:11px; text-align:center; border-top:1px solid #e6e9ef; padding-top:12px; }
-  .actions { margin: 14px 0 22px; }
-  .actions button { background:#0a1f3c; color:#fff; border:0; border-radius:8px; padding:10px 18px; font-family:inherit; font-weight:700; cursor:pointer; }
-  @media print { body { margin:0; } .noprint { display:none !important; } }
+  body { font-family: 'Tajawal', system-ui, sans-serif; color: #1a2433; line-height: 1.85; max-width: 820px; margin: 0 auto; padding: 32px 28px 48px; background: #fff; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .brandbox { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 46px; height: 46px; }
+  .brand { color: #0a1f3c; font-weight: 800; font-size: 19px; line-height: 1.2; }
+  .brand small { display: block; font-size: 10px; letter-spacing: 2.5px; color: #c9a24b; font-weight: 500; margin-top: 2px; }
+  .tag { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: #0a1f3c; color: #fff; }
+  .rule { height: 3px; background: linear-gradient(90deg, #c9a24b, #e3c987); border-radius: 3px; margin: 14px 0 22px; }
+  .kicker { color: #c9a24b; font-weight: 700; font-size: 12px; letter-spacing: 1px; margin: 0 0 4px; }
+  h1 { font-size: 25px; margin: 0 0 14px; color: #0a1f3c; font-weight: 800; line-height: 1.3; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .pill { display: inline-block; font-size: 12px; color: #0a1f3c; background: #eef2f8; border: 1px solid #dde4ef; border-radius: 20px; padding: 4px 12px; }
+  .date { color: #5c6b80; font-size: 12.5px; margin: 6px 0 0; }
+  .actions { margin: 18px 0 22px; }
+  .actions button { background: #0a1f3c; color: #fff; border: 0; border-radius: 9px; padding: 11px 22px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .actions button:hover { background: #13315e; }
+  .block { margin-bottom: 18px; page-break-inside: avoid; }
+  h2 { font-size: 16px; color: #0a1f3c; font-weight: 800; margin: 22px 0 10px; padding-inline-start: 11px; border-inline-start: 4px solid #c9a24b; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: start; vertical-align: top; padding: 8px 12px; border: 1px solid #e6e9ef; font-size: 13.5px; }
+  th { background: #eef2f8; color: #0a1f3c; font-weight: 700; width: 36%; }
+  tr.alt td { background: #fafbfc; }
+  .foot { margin-top: 30px; color: #5c6b80; font-size: 11.5px; text-align: center; border-top: 2px solid #c9a24b; padding-top: 14px; }
+  .foot strong { color: #0a1f3c; }
+  .foot span { color: #c9a24b; letter-spacing: 1px; }
+  @media print { body { margin: 0; padding: 0 12px; } .noprint { display: none !important; } }
 </style>
 </head>
 <body>
-  <div class="head">
-    <div class="brand">شركاء البركة<small>BARAKA PARTNERS</small></div>
-    <span class="tag ${isInvestor ? "inv" : "full"}">${isInvestor ? "نسخة المستثمر" : "نسخة كاملة — للإدارة"}</span>
-  </div>
+  <header class="head">
+    <div class="brandbox">
+      <img class="logo" src="${LOGO_DATA_URI}" alt="Baraka Partners" />
+      <div class="brand">شركاء البركة<small>BARAKA PARTNERS</small></div>
+    </div>
+    ${isInvestor ? "" : `<span class="tag">للاستخدام الداخلي</span>`}
+  </header>
+  <div class="rule"></div>
+
+  <p class="kicker">${isInvestor ? "ملف الفرصة الاستثمارية" : "تقرير الفرصة الاستثمارية"}</p>
   <h1>${esc(meta.title)}</h1>
-  <div class="meta">
-    المرجع: ${esc(meta.ref)} — القطاع: ${esc(meta.sector)} — الدولة: ${esc(meta.country)}${meta.ownerName ? ` — مقدّم الطلب: ${esc(meta.ownerName)}` : ""}<br/>
-    تاريخ التوليد: ${esc(meta.generatedAt)}
-  </div>
-  ${isInvestor ? `<div class="banner">هذه نسخة مخصّصة للمستثمر، حُجبت منها هوية المالك والموقع الدقيق والمعلومات الحساسة وفق تفضيلات صاحب الفرصة وسياسة المنصة.</div>` : ""}
+  <div class="pills">${metaPills}</div>
+  <p class="date">صدر بتاريخ ${esc(meta.generatedAt)}</p>
+
   ${printBtn}
   ${rows}
-  <div class="foot">مُولَّد آلياً من منصة شركاء البركة — ${isInvestor ? "نسخة مستثمر" : "للاستخدام الداخلي للإدارة"}.</div>
+
+  <div class="foot">
+    <strong>شركاء البركة — Baraka Partners</strong><br/>
+    <span>Where Global Capital Meets Real Opportunities</span>
+  </div>
 </body>
 </html>`;
 }
@@ -154,7 +184,7 @@ export function buildReportMarkdown(meta: ReportMeta, sections: ReportSection[])
   lines.push(`- **القطاع:** ${meta.sector}`);
   lines.push(`- **الدولة:** ${meta.country}`);
   if (meta.ownerName) lines.push(`- **مقدّم الطلب:** ${meta.ownerName}`);
-  lines.push(`- **النسخة:** ${meta.mode === "investor" ? "مستثمر (بلا معلومات حساسة)" : "كاملة (للإدارة)"}`);
+  lines.push(`- **النسخة:** ${meta.mode === "investor" ? "ملف الفرصة (للمستثمر)" : "كاملة (للإدارة)"}`);
   lines.push(`- **تاريخ التوليد:** ${meta.generatedAt}`);
   lines.push("");
   for (const s of sections) {
