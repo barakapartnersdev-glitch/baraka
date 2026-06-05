@@ -13,6 +13,8 @@ import {
   type SourceData,
 } from "@/lib/opportunity";
 import { labelOf, type Ans } from "@/lib/opportunity-form";
+import { isFormComplete, buildPublicVersionDraft, buildInvestorVersionDraft } from "@/lib/opportunity-card";
+import { extractAnswers } from "@/lib/opportunity-report";
 import { storeFile, removeFile } from "@/lib/files";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
@@ -271,9 +273,26 @@ export async function submitForReview(
     return { ok: false, error: t(locale, "err.cannotSubmitState") };
   }
 
+  // إعداد بطاقة العرض تلقائياً من إجابات النموذج إن اكتملت ولم تُصَغ بعد.
+  const full = await prisma.opportunity.findUnique({
+    where: { id: opportunityId },
+    select: { sourceData: true, publicVersion: true },
+  });
+  const answers = extractAnswers(full?.sourceData);
+  const cardData: {
+    state: "SUBMITTED";
+    publicVersion?: Prisma.InputJsonValue;
+    investorVersion?: Prisma.InputJsonValue;
+  } = { state: "SUBMITTED" };
+  const noPublicYet = !full?.publicVersion || Object.keys(full.publicVersion as object).length === 0;
+  if (noPublicYet && isFormComplete(answers)) {
+    cardData.publicVersion = buildPublicVersionDraft(answers) as Prisma.InputJsonValue;
+    cardData.investorVersion = buildInvestorVersionDraft(answers) as Prisma.InputJsonValue;
+  }
+
   await prisma.opportunity.update({
     where: { id: opportunityId },
-    data: { state: "SUBMITTED" },
+    data: cardData,
   });
 
   await logActivity({
