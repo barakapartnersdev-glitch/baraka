@@ -14,6 +14,17 @@ const INVESTOR_HIDDEN_PAGES = new Set(["applicant", "relation", "ownership", "pr
 const ALWAYS_SENSITIVE = new Set(["coords", "mapUrl", "projectArea", "minEntry"]);
 const LOCATION_FIELDS = new Set(["projectCity", "projectArea", "coords", "mapUrl"]);
 const FINANCIAL_FIELDS = new Set(["financialData", "annualRevenue", "netProfit", "hasDebts", "debtsNature", "hasValuation"]);
+// تنقية نسخة المستثمر: حقول داخلية/تفضيلية/سلبية لا تخدم العرض الترويجي
+const INVESTOR_HIDDEN_FIELDS = new Set([
+  // تفضيلات وإعدادات داخلية
+  "showLocation", "locationSensitive", "readyToUpload", "amountMode", "amountBasis", "hasProposedShare",
+  // موقع دقيق
+  "projectCity", "projectArea", "coords", "mapUrl",
+  // تحديات ونزاعات والتزامات (لا تُعرض في الملف الترويجي)
+  "challenges", "hasLegalDispute", "disputeDetail", "investorObligations",
+  // مالية داخلية خام (يبقى العائد المتوقّع فقط)
+  "financialData", "annualRevenue", "netProfit", "hasDebts", "debtsNature", "hasValuation", "minEntry",
+]);
 
 export function extractAnswers(sourceData: unknown): Ans {
   if (sourceData && typeof sourceData === "object" && "answers" in (sourceData as object)) {
@@ -35,6 +46,7 @@ export function buildReport(answers: Ans, mode: ReportMode): ReportSection[] {
   const hidden = (pageId: string, fieldId: string): boolean => {
     if (mode === "full") return false;
     if (INVESTOR_HIDDEN_PAGES.has(pageId)) return true;
+    if (INVESTOR_HIDDEN_FIELDS.has(fieldId)) return true;
     if (ALWAYS_SENSITIVE.has(fieldId)) return true;
     if (hideExact && LOCATION_FIELDS.has(fieldId)) return true;
     if (hideFin && FINANCIAL_FIELDS.has(fieldId)) return true;
