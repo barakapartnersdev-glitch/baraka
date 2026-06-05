@@ -56,7 +56,7 @@ export async function generateAiReport(
     if (e instanceof MissingApiKeyError) {
       return {
         ok: false,
-        error: "ميزة الذكاء الاصطناعي غير مُفعّلة: أضِف المتغيّر ANTHROPIC_API_KEY في بيئة التشغيل.",
+        error: "ميزة الذكاء الاصطناعي غير مُفعّلة: أضِف المتغيّر OPENAI_API_KEY في بيئة التشغيل.",
       };
     }
     return { ok: false, error: "تعذّر الاتصال بخدمة الذكاء الاصطناعي. حاول لاحقاً." };

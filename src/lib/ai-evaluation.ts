@@ -1,12 +1,12 @@
-// توليد تقرير تقييم الفرصة بالذكاء الاصطناعي (Anthropic Claude API).
+// توليد تقرير تقييم الفرصة بالذكاء الاصطناعي.
+// المزوّد الافتراضي: OpenAI (OPENAI_API_KEY). احتياطياً: Anthropic (ANTHROPIC_API_KEY).
 // نسختان: تقرير إداري كامل، ونسخة عرض للمستثمر بلا معلومات حساسة.
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 
-// النموذج الافتراضي الأحدث والأقوى (قابل للتجاوز عبر متغيّر بيئة).
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o";
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
 
-// تعليمات النظام — ثابتة بين الطلبين ليستفيد من التخزين المؤقت (prompt caching).
+// تعليمات النظام — ثابتة بين الطلبين.
 const SYSTEM = `أنت محلّل استثماري خبير في منصة «شركاء البركة» التي يديرها فريق عهد البركة. مهمّتك إعداد تقرير تقييم احترافي لفرصة استثمارية اعتماداً على البيانات التي قدّمها صاحب الفرصة عبر نموذج التسجيل.
 
 اكتب بالعربية الفصحى، بصيغة Markdown منظّمة بعناوين واضحة. كن دقيقاً وواقعياً، واعتمد فقط على المعطيات الواردة؛ وعند نقص معلومة اذكر ذلك صراحةً ولا تختلق أرقاماً أو حقائق.
@@ -30,42 +30,71 @@ export type EvalMode = "full" | "investor";
 
 export class MissingApiKeyError extends Error {
   constructor() {
-    super("ANTHROPIC_API_KEY غير مضبوط.");
+    super("OPENAI_API_KEY (أو ANTHROPIC_API_KEY) غير مضبوط.");
     this.name = "MissingApiKeyError";
   }
+}
+
+function userContent(markdown: string, mode: EvalMode): string {
+  const versionLabel =
+    mode === "full" ? "تقرير إداري كامل" : "نسخة للمستثمر بلا معلومات حساسة";
+  return `النسخة المطلوبة: ${versionLabel}\n\nبيانات الفرصة:\n\n${markdown}`;
 }
 
 export async function generateEvaluation(
   markdown: string,
   mode: EvalMode
 ): Promise<{ text: string; model: string }> {
-  if (!process.env.ANTHROPIC_API_KEY) throw new MissingApiKeyError();
+  const content = userContent(markdown, mode);
+  if (process.env.OPENAI_API_KEY) return viaOpenAI(content);
+  if (process.env.ANTHROPIC_API_KEY) return viaAnthropic(content);
+  throw new MissingApiKeyError();
+}
 
-  const client = new Anthropic(); // يقرأ ANTHROPIC_API_KEY من البيئة
-  const versionLabel =
-    mode === "full" ? "تقرير إداري كامل" : "نسخة للمستثمر بلا معلومات حساسة";
+// ===== OpenAI (Chat Completions) =====
+async function viaOpenAI(content: string): Promise<{ text: string; model: string }> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      temperature: 0.4,
+      max_tokens: 4000,
+      messages: [
+        { role: "system", content: SYSTEM },
+        { role: "user", content },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`OpenAI ${res.status}: ${detail.slice(0, 300)}`);
+  }
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string } }[];
+  };
+  const text = data.choices?.[0]?.message?.content?.trim() || "تعذّر توليد التقرير.";
+  return { text, model: OPENAI_MODEL };
+}
 
+// ===== Anthropic (احتياطي) =====
+async function viaAnthropic(content: string): Promise<{ text: string; model: string }> {
+  const { default: Anthropic } = await import("@anthropic-ai/sdk");
+  const client = new Anthropic();
   const msg = await client.messages.create({
-    model: MODEL,
+    model: ANTHROPIC_MODEL,
     max_tokens: 16000,
     thinking: { type: "adaptive" },
-    system: [
-      // التخزين المؤقت: التعليمات ثابتة فيُعاد استخدامها بين النسختين
-      { type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } },
-    ],
-    messages: [
-      {
-        role: "user",
-        content: `النسخة المطلوبة: ${versionLabel}\n\nبيانات الفرصة:\n\n${markdown}`,
-      },
-    ],
+    system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+    messages: [{ role: "user", content }],
   });
-
   const text = msg.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
+    .filter((b) => b.type === "text")
+    .map((b) => (b as { text: string }).text)
     .join("\n")
     .trim();
-
-  return { text: text || "تعذّر توليد التقرير.", model: MODEL };
+  return { text: text || "تعذّر توليد التقرير.", model: ANTHROPIC_MODEL };
 }
