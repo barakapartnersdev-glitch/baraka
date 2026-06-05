@@ -9,6 +9,7 @@ import VersionsEditor from "./VersionsEditor";
 import MissingItems from "./MissingItems";
 import InterestActions from "./InterestActions";
 import FilesManager from "./FilesManager";
+import { buildReport, extractAnswers } from "@/lib/opportunity-report";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
 
@@ -47,6 +48,11 @@ export default async function OpportunityDetail({ params }: { params: Promise<{ 
     postNcndaVersion: asVersion(opp.postNcndaVersion),
   };
 
+  const reportSections = buildReport(extractAnswers(opp.sourceData), "full");
+  const hasForm = reportSections.length > 0;
+  const reportUrl = (v: "full" | "investor", format: string) =>
+    `/admin/opportunities/${opp.id}/report?v=${v}&format=${format}`;
+
   return (
     <div>
       <Link href="/admin/opportunities" className="text-sm text-baraka hover:underline">
@@ -70,15 +76,49 @@ export default async function OpportunityDetail({ params }: { params: Promise<{ 
       </section>
 
       <section className="mb-8">
-        <h2 className="text-base font-bold mb-2 flex items-center gap-2">
-          {t(locale, "ownerEditor.sourceTitle")}
-          <span className="text-xs font-normal text-red-600 bg-red-50 px-2 py-0.5 rounded">
-            {t(locale, "adminOpp.adminOnlyTag")}
-          </span>
-        </h2>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-700">
-          <pre className="whitespace-pre-wrap font-sans">{JSON.stringify(opp.sourceData, null, 2)}</pre>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="flex items-center gap-2 text-base font-bold">
+            بيانات النموذج المقدّم
+            <span className="rounded bg-red-50 px-2 py-0.5 text-xs font-normal text-red-600">
+              {t(locale, "adminOpp.adminOnlyTag")}
+            </span>
+          </h2>
+          {hasForm && (
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+              <span className="text-gray-400">تنزيل:</span>
+              <a href={reportUrl("full", "html")} target="_blank" rel="noreferrer" className="rounded-lg bg-navy px-2.5 py-1.5 font-semibold text-white transition hover:bg-navy-600">كامل · PDF</a>
+              <a href={reportUrl("full", "doc")} className="rounded-lg border border-navy/30 px-2.5 py-1.5 font-semibold text-navy transition hover:bg-baraka-light">كامل · Word</a>
+              <a href={reportUrl("full", "md")} className="rounded-lg border border-navy/30 px-2.5 py-1.5 font-semibold text-navy transition hover:bg-baraka-light">Markdown (للذكاء الصناعي)</a>
+              <span className="mx-1 text-gray-300">|</span>
+              <a href={reportUrl("investor", "html")} target="_blank" rel="noreferrer" className="rounded-lg bg-gradient-to-br from-gold to-gold-soft px-2.5 py-1.5 font-semibold text-navy transition hover:brightness-110">مستثمر · PDF</a>
+              <a href={reportUrl("investor", "doc")} className="rounded-lg border border-gold/50 px-2.5 py-1.5 font-semibold text-navy transition hover:bg-gold/10">مستثمر · Word</a>
+            </div>
+          )}
         </div>
+        {hasForm ? (
+          <div className="flex flex-col gap-4">
+            {reportSections.map((s) => (
+              <div key={s.id} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                <h3 className="border-b border-gray-100 bg-navy/[0.04] px-4 py-2.5 text-sm font-bold text-navy">{s.title}</h3>
+                <table className="w-full text-sm">
+                  <tbody>
+                    {s.fields.map((f, i) => (
+                      <tr key={i} className="border-t border-gray-100 first:border-t-0">
+                        <th className="w-2/5 bg-gray-50/60 p-3 text-start align-top font-semibold text-gray-600">{f.label}</th>
+                        <td className="whitespace-pre-wrap p-3 text-gray-800">{f.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">
+            <p className="mb-2">لم يُقدَّم نموذج تفصيلي لهذه الفرصة (بيانات مصدر قديمة):</p>
+            <pre className="whitespace-pre-wrap font-sans text-xs text-gray-600">{JSON.stringify(opp.sourceData, null, 2)}</pre>
+          </div>
+        )}
       </section>
 
       <section className="mb-8">
