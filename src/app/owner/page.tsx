@@ -23,15 +23,15 @@ export default async function OwnerHome() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold mb-1">{t(locale, "ownerHome.title")}</h1>
+          <h1 className="text-2xl font-extrabold text-navy mb-1">{t(locale, "ownerHome.title")}</h1>
           <p className="text-gray-500 text-sm">{t(locale, "ownerHome.sub")}</p>
         </div>
         {verified && (
           <Link
             href="/owner/opportunities/new"
-            className="bg-baraka text-white text-sm px-4 py-2 rounded-lg hover:bg-baraka-dark transition shrink-0"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-br from-gold to-gold-soft px-5 py-2.5 text-sm font-bold text-navy shadow-sm transition hover:brightness-110 hover:-translate-y-px"
           >
             {t(locale, "ownerHome.new")}
           </Link>
@@ -49,32 +49,32 @@ export default async function OwnerHome() {
           {verified ? t(locale, "ownerHome.emptyVerified") : t(locale, "ownerHome.empty")}
         </p>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-right">
+            <thead className="bg-navy/[0.04] text-start text-navy">
               <tr>
-                <th className="p-3 font-medium">{t(locale, "col.title")}</th>
-                <th className="p-3 font-medium">{t(locale, "col.sector")}</th>
-                <th className="p-3 font-medium">{t(locale, "col.state")}</th>
-                <th className="p-3 font-medium">{t(locale, "col.pendingItems")}</th>
+                <th className="p-3.5 font-bold">{t(locale, "col.title")}</th>
+                <th className="p-3.5 font-bold">{t(locale, "col.sector")}</th>
+                <th className="p-3.5 font-bold">{t(locale, "col.state")}</th>
+                <th className="p-3.5 font-bold">{t(locale, "col.pendingItems")}</th>
               </tr>
             </thead>
             <tbody>
               {opps.map((o) => (
-                <tr key={o.id} className="border-t border-gray-100 hover:bg-gray-50">
-                  <td className="p-3 font-medium">
+                <tr key={o.id} className="border-t border-gray-100 transition-colors hover:bg-baraka-light/50">
+                  <td className="p-3.5 font-semibold">
                     <Link
                       href={`/owner/opportunities/${o.id}`}
-                      className="hover:text-baraka"
+                      className="text-navy hover:text-gold"
                     >
                       {o.title}
                     </Link>
                   </td>
-                  <td className="p-3 text-gray-600">{o.sector}</td>
-                  <td className="p-3">
+                  <td className="p-3.5 text-gray-600">{o.sector}</td>
+                  <td className="p-3.5">
                     <Badge {...oppBadge(locale, o.state)} />
                   </td>
-                  <td className="p-3 text-gray-600">
+                  <td className="p-3.5 text-gray-600">
                     {o._count.missingItems > 0 ? (
                       <span className="text-amber-600">{o._count.missingItems}</span>
                     ) : (

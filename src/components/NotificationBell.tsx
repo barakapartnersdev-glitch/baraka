@@ -14,9 +14,11 @@ interface BellItem {
 export default function NotificationBell({
   count,
   items,
+  dark = false,
 }: {
   count: number;
   items: BellItem[];
+  dark?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [, startTransition] = useTransition();
@@ -37,7 +39,9 @@ export default function NotificationBell({
       <button
         onClick={toggle}
         aria-label="الإشعارات"
-        className="relative p-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+        className={`relative rounded-lg p-1.5 transition ${
+          dark ? "text-[#cdd6e4] hover:bg-white/10 hover:text-gold" : "text-gray-600 hover:bg-gray-100"
+        }`}
       >
         <svg
           width="20"
