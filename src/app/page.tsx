@@ -304,9 +304,11 @@ export default async function Home() {
         <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-white">
             <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
-            <span className="font-extrabold leading-tight">
-              {c.brand}
-              <small className="block text-[10px] font-medium tracking-[0.15em] text-gold-soft">{c.brandSub}</small>
+            <span className="flex flex-col items-start font-extrabold leading-tight">
+              <span className="block">{c.brand}</span>
+              <small className="block text-[10px] font-medium text-gold-soft">
+                <span className="inline-block tracking-[0.15em]">{c.brandSub}</span>
+              </small>
             </span>
           </Link>
           <nav className="hidden items-center gap-6 whitespace-nowrap text-sm font-medium text-[#cdd6e4] xl:flex">
@@ -539,9 +541,11 @@ export default async function Home() {
             <div>
               <div className="flex items-center gap-3 text-white">
                 <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
-                <span className="font-extrabold leading-tight">
-                  {locale === "en" ? "Baraka Partners" : "شركاء البركة"}
-                  <small className="block text-[11px] font-medium tracking-wider text-gold-soft">{c.brandSub}</small>
+                <span className="flex flex-col items-start font-extrabold leading-tight">
+                  <span className="block">{c.brand}</span>
+                  <small className="block text-[10px] font-medium text-gold-soft">
+                    <span className="inline-block tracking-[0.15em]">{c.brandSub}</span>
+                  </small>
                 </span>
               </div>
               <p className="mt-3.5 max-w-xs text-sm">{c.foot.about}</p>

@@ -12,10 +12,10 @@ export default async function Footer() {
           <div>
             <div className="flex items-center gap-2.5 text-white">
               <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
-              <span className="font-extrabold leading-tight">
-                {t(locale, "brand")}
-                <small className="block text-[10px] font-medium tracking-[0.15em] text-gold-soft">
-                  BARAKA PARTNERS
+              <span className="flex flex-col items-start font-extrabold leading-tight">
+                <span className="block">{t(locale, "brand")}</span>
+                <small className="block text-[10px] font-medium text-gold-soft">
+                  <span className="inline-block tracking-[0.15em]">BARAKA PARTNERS</span>
                 </small>
               </span>
             </div>
