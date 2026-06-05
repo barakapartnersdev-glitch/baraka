@@ -10,10 +10,12 @@ import MissingItems from "./MissingItems";
 import InterestActions from "./InterestActions";
 import FilesManager from "./FilesManager";
 import { buildReport, extractAnswers } from "@/lib/opportunity-report";
+import AiReport from "./AiReport";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // توليد تقارير الذكاء الاصطناعي قد يستغرق وقتاً
 
 function asVersion(value: unknown): VersionData | null {
   return value && typeof value === "object" ? (value as VersionData) : null;
@@ -52,6 +54,15 @@ export default async function OpportunityDetail({ params }: { params: Promise<{ 
   const hasForm = reportSections.length > 0;
   const reportUrl = (v: "full" | "investor", format: string) =>
     `/admin/opportunities/${opp.id}/report?v=${v}&format=${format}`;
+
+  const sd =
+    opp.sourceData && typeof opp.sourceData === "object"
+      ? (opp.sourceData as Record<string, unknown>)
+      : {};
+  const aiReport = (sd.aiReport && typeof sd.aiReport === "object" ? sd.aiReport : {}) as {
+    full?: { text: string; at: string; model?: string };
+    investor?: { text: string; at: string; model?: string };
+  };
 
   return (
     <div>
@@ -119,6 +130,20 @@ export default async function OpportunityDetail({ params }: { params: Promise<{ 
             <pre className="whitespace-pre-wrap font-sans text-xs text-gray-600">{JSON.stringify(opp.sourceData, null, 2)}</pre>
           </div>
         )}
+      </section>
+
+      <section className="mb-8">
+        <h2 className="mb-3 flex items-center gap-2 text-base font-bold">
+          تقرير التقييم بالذكاء الاصطناعي
+          <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-xs font-normal text-navy">
+            نسختان: إدارة / مستثمر
+          </span>
+        </h2>
+        <AiReport
+          opportunityId={opp.id}
+          initial={{ full: aiReport.full, investor: aiReport.investor }}
+          hasForm={hasForm}
+        />
       </section>
 
       <section className="mb-8">
