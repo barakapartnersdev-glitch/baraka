@@ -24,9 +24,7 @@ export default async function InvestorLayout({
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/investor" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-baraka-light flex items-center justify-center text-baraka-dark font-bold text-sm">
-              ع
-            </div>
+            <img src="/logo-mark.png" alt="Baraka Partners" width={32} height={32} className="h-8 w-8 shrink-0 rounded-lg" />
             <span className="font-bold text-sm">{t(locale, "portal.investor")}</span>
           </Link>
           <div className="flex items-center gap-4">

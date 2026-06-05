@@ -12,7 +12,7 @@ export default function Sidebar({ locale }: { locale: Locale }) {
   return (
     <aside className="w-60 shrink-0 bg-white border-l border-gray-200 min-h-screen p-4">
       <div className="flex items-center gap-2 mb-8 px-2">
-        <div className="w-9 h-9 rounded-lg bg-baraka-light flex items-center justify-center text-baraka-dark font-bold">ع</div>
+        <img src="/logo-mark.png" alt="Baraka Partners" width={36} height={36} className="h-9 w-9 shrink-0 rounded-lg" />
         <div>
           <p className="font-bold text-sm">{t(locale, "portal.adminOrg")}</p>
           <p className="text-xs text-gray-500">{t(locale, "portal.adminPanel")}</p>

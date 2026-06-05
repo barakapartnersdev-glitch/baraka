@@ -11,9 +11,7 @@ export default async function Footer() {
         <div className="mb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5 text-white">
-              <span className="grid h-10 w-10 place-items-center rounded-[10px] bg-gradient-to-br from-gold to-gold-soft text-xl font-black text-navy">
-                ب
-              </span>
+              <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
               <span className="font-extrabold leading-tight">
                 {t(locale, "brand")}
                 <small className="block text-[10px] font-medium tracking-[0.15em] text-gold-soft">
