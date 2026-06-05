@@ -11,18 +11,25 @@ import {
   extractAnswers,
   type ReportMeta,
 } from "@/lib/opportunity-report";
-import { generateEvaluation, MissingApiKeyError, type EvalMode } from "@/lib/ai-evaluation";
+import {
+  generateEvaluation,
+  MissingApiKeyError,
+  type EvalMode,
+  type EvalLang,
+} from "@/lib/ai-evaluation";
 
 export interface AiReportResult {
   ok: boolean;
   text?: string;
   at?: string;
+  lang?: EvalLang;
   error?: string;
 }
 
 export async function generateAiReport(
   opportunityId: string,
-  mode: EvalMode
+  mode: EvalMode,
+  lang: EvalLang = "ar"
 ): Promise<AiReportResult> {
   await requireRole("ADMIN");
 
@@ -51,7 +58,7 @@ export async function generateAiReport(
 
   let result;
   try {
-    result = await generateEvaluation(markdown, mode);
+    result = await generateEvaluation(markdown, mode, lang);
   } catch (e) {
     if (e instanceof MissingApiKeyError) {
       return {
@@ -74,7 +81,7 @@ export async function generateAiReport(
       : {};
   const newSource = {
     ...existing,
-    aiReport: { ...prevReport, [mode]: { text: result.text, at, model: result.model } },
+    aiReport: { ...prevReport, [mode]: { text: result.text, at, model: result.model, lang } },
   } as Prisma.InputJsonValue;
 
   await prisma.opportunity.update({
@@ -91,5 +98,5 @@ export async function generateAiReport(
   });
 
   revalidatePath(`/admin/opportunities/${opportunityId}`);
-  return { ok: true, text: result.text, at };
+  return { ok: true, text: result.text, at, lang };
 }

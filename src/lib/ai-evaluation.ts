@@ -9,7 +9,7 @@ const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
 // تعليمات النظام — ثابتة بين الطلبين.
 const SYSTEM = `أنت محلّل استثماري خبير في منصة «شركاء البركة» التي يديرها فريق عهد البركة. مهمّتك إعداد تقرير تقييم احترافي لفرصة استثمارية اعتماداً على البيانات التي قدّمها صاحب الفرصة عبر نموذج التسجيل.
 
-اكتب بالعربية الفصحى، بصيغة Markdown منظّمة بعناوين واضحة. كن دقيقاً وواقعياً، واعتمد فقط على المعطيات الواردة؛ وعند نقص معلومة اذكر ذلك صراحةً ولا تختلق أرقاماً أو حقائق.
+اكتب التقرير بالكامل بلغة الإخراج المحدّدة في رسالة المستخدم (بما في ذلك العناوين)، بصيغة Markdown منظّمة بعناوين واضحة. كن دقيقاً وواقعياً، واعتمد فقط على المعطيات الواردة؛ وعند نقص معلومة اذكر ذلك صراحةً ولا تختلق أرقاماً أو حقائق.
 
 تتلقّى في رسالة المستخدم: (1) نوع النسخة المطلوبة، (2) بيانات الفرصة.
 
@@ -27,6 +27,14 @@ const SYSTEM = `أنت محلّل استثماري خبير في منصة «شر
 ابدأ مباشرةً بعنوان التقرير دون أي ديباجة قبله أو تعليقات بعده.`;
 
 export type EvalMode = "full" | "investor";
+export type EvalLang = "ar" | "en" | "tr" | "zh";
+
+const LANG_NAME: Record<EvalLang, string> = {
+  ar: "العربية الفصحى",
+  en: "English",
+  tr: "Türkçe",
+  zh: "简体中文",
+};
 
 export class MissingApiKeyError extends Error {
   constructor() {
@@ -35,17 +43,18 @@ export class MissingApiKeyError extends Error {
   }
 }
 
-function userContent(markdown: string, mode: EvalMode): string {
+function userContent(markdown: string, mode: EvalMode, lang: EvalLang): string {
   const versionLabel =
     mode === "full" ? "تقرير إداري كامل" : "نسخة للمستثمر بلا معلومات حساسة";
-  return `النسخة المطلوبة: ${versionLabel}\n\nبيانات الفرصة:\n\n${markdown}`;
+  return `لغة الإخراج المطلوبة: ${LANG_NAME[lang]} — اكتب التقرير بالكامل بهذه اللغة بما في ذلك العناوين.\nالنسخة المطلوبة: ${versionLabel}\n\nبيانات الفرصة:\n\n${markdown}`;
 }
 
 export async function generateEvaluation(
   markdown: string,
-  mode: EvalMode
+  mode: EvalMode,
+  lang: EvalLang = "ar"
 ): Promise<{ text: string; model: string }> {
-  const content = userContent(markdown, mode);
+  const content = userContent(markdown, mode, lang);
   if (process.env.OPENAI_API_KEY) return viaOpenAI(content);
   if (process.env.ANTHROPIC_API_KEY) return viaAnthropic(content);
   throw new MissingApiKeyError();

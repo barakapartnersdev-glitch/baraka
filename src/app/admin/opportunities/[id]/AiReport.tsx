@@ -2,8 +2,17 @@
 import { useState, useTransition } from "react";
 import { generateAiReport } from "./ai-actions";
 
-interface StoredReport { text: string; at: string; model?: string }
+type EvalLang = "ar" | "en" | "tr" | "zh";
+interface StoredReport { text: string; at: string; model?: string; lang?: EvalLang }
 type EvalMode = "full" | "investor";
+
+const LANGS: { v: EvalLang; label: string }[] = [
+  { v: "ar", label: "العربية" },
+  { v: "en", label: "English" },
+  { v: "tr", label: "Türkçe" },
+  { v: "zh", label: "中文" },
+];
+const LANG_LABEL: Record<EvalLang, string> = { ar: "العربية", en: "English", tr: "Türkçe", zh: "中文" };
 
 export default function AiReport({
   opportunityId,
@@ -15,6 +24,7 @@ export default function AiReport({
   hasForm: boolean;
 }) {
   const [reports, setReports] = useState(initial);
+  const [lang, setLang] = useState<EvalLang>("ar");
   const [pending, startTransition] = useTransition();
   const [busyMode, setBusyMode] = useState<EvalMode | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +33,10 @@ export default function AiReport({
     setError(null);
     setBusyMode(mode);
     startTransition(async () => {
-      const r = await generateAiReport(opportunityId, mode);
+      const r = await generateAiReport(opportunityId, mode, lang);
       setBusyMode(null);
       if (r.ok && r.text) {
-        setReports((prev) => ({ ...prev, [mode]: { text: r.text!, at: r.at! } }));
+        setReports((prev) => ({ ...prev, [mode]: { text: r.text!, at: r.at!, lang: r.lang } }));
       } else {
         setError(r.error ?? "تعذّر التوليد.");
       }
@@ -48,12 +58,34 @@ export default function AiReport({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* محدّد لغة التقرير */}
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5">
+        <span className="text-sm font-semibold text-gray-600">لغة التقرير:</span>
+        <div className="flex flex-wrap gap-1.5">
+          {LANGS.map((l) => (
+            <button
+              key={l.v}
+              type="button"
+              onClick={() => setLang(l.v)}
+              disabled={pending}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:opacity-50 ${
+                lang === l.v ? "bg-navy text-white" : "border border-gray-200 text-gray-600 hover:bg-baraka-light"
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>
       )}
+
       {cards.map((c) => {
         const rep = reports[c.mode];
         const busy = pending && busyMode === c.mode;
+        const rtl = (rep?.lang ?? "ar") === "ar";
         return (
           <div key={c.mode} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 bg-navy/[0.03] px-4 py-2.5">
@@ -70,16 +102,20 @@ export default function AiReport({
                     : "bg-navy text-white hover:bg-navy-600"
                 }`}
               >
-                {busy ? "جارٍ التوليد بالذكاء الاصطناعي..." : rep ? "إعادة التوليد" : "ولّد التقرير"}
+                {busy ? "جارٍ التوليد..." : rep ? `إعادة التوليد (${LANG_LABEL[lang]})` : `ولّد التقرير (${LANG_LABEL[lang]})`}
               </button>
             </div>
             {rep ? (
               <div className="p-4">
                 <p className="mb-2 text-[11px] text-gray-400">
+                  {rep.lang ? `اللغة: ${LANG_LABEL[rep.lang]} · ` : ""}
                   وُلّد في {new Date(rep.at).toLocaleString("ar")}
                   {rep.model ? ` · ${rep.model}` : ""}
                 </p>
-                <div className="max-h-[28rem] overflow-auto whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm leading-relaxed text-gray-800">
+                <div
+                  dir={rtl ? "rtl" : "ltr"}
+                  className="max-h-[28rem] overflow-auto whitespace-pre-wrap rounded-lg bg-gray-50 p-4 text-sm leading-relaxed text-gray-800"
+                >
                   {rep.text}
                 </div>
                 <button
