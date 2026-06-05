@@ -5,15 +5,20 @@ import { prisma } from "@/lib/prisma";
 import { putObject, deleteObject } from "@/lib/storage";
 import { t, type Locale } from "@/lib/i18n";
 
-const MAX_BYTES = 20 * 1024 * 1024; // 20MB
+const MAX_BYTES = 50 * 1024 * 1024; // 50MB (يشمل مقاطع فيديو قصيرة)
 const ALLOWED_TYPES = new Set([
   "application/pdf",
   "image/png",
   "image/jpeg",
+  "image/webp",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
   "application/msword",
   "application/vnd.ms-excel",
+  // فيديو (مقاطع قصيرة لعرض المشروع)
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
 ]);
 
 export interface FileResult {

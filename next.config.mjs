@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     // رفع ملفات حتى 20MB عبر إجراءات الخادم
-    serverActions: { bodySizeLimit: "25mb" },
+    serverActions: { bodySizeLimit: "55mb" },
   },
 };
 export default nextConfig;

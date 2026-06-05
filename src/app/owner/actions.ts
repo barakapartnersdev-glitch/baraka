@@ -12,6 +12,7 @@ import {
   ownerCanSubmit,
   type SourceData,
 } from "@/lib/opportunity";
+import { labelOf, type Ans } from "@/lib/opportunity-form";
 import { storeFile, removeFile } from "@/lib/files";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
@@ -96,6 +97,100 @@ export async function createOpportunity(
   });
 
   redirect(`/owner/opportunities/${opp.id}`);
+}
+
+export interface DraftResult {
+  ok: boolean;
+  id?: string;
+  error?: string;
+}
+
+// حفظ مسودة معالج الفرصة (ينشئها إن لم تكن موجودة) واشتقاق أعمدة الفرصة من الإجابات.
+export async function saveOpportunityDraft(
+  opportunityId: string | null,
+  answers: Ans
+): Promise<DraftResult> {
+  const session = await requireRole("PROJECT_OWNER");
+  const locale = await getLocale();
+  if (!(await isActiveOwner(session.userId))) {
+    return { ok: false, error: t(locale, "err.ownerPendingCreate") };
+  }
+
+  const str = (id: string) =>
+    typeof answers[id] === "string" ? (answers[id] as string).trim() : "";
+  const labels = (id: string) =>
+    Array.isArray(answers[id])
+      ? (answers[id] as string[]).map((v) => labelOf(id, v)).join("، ")
+      : "";
+
+  const title = str("projectName") || "مسودة فرصة";
+  const sector = str("opportunityNature")
+    ? labelOf("opportunityNature", str("opportunityNature"))
+    : "—";
+  const country = str("projectCountry") || "—";
+
+  let min: bigint | null = null;
+  let max: bigint | null = null;
+  if (answers["amountMode"] === "fixed") {
+    min = parseAmount(str("amountFixed"));
+    max = min;
+  } else if (answers["amountMode"] === "range") {
+    min = parseAmount(str("amountMin"));
+    max = parseAmount(str("amountMax"));
+  }
+
+  // اشتقاق ملخّص للإدارة (بجانب الإجابات الكاملة)
+  const legacy = {
+    summary: [title, str("opportunityNature") && labelOf("opportunityNature", str("opportunityNature"))]
+      .filter(Boolean)
+      .join(" — "),
+    useOfFunds: labels("useOfCapital"),
+    financials: [
+      str("financialData") && labelOf("financialData", str("financialData")),
+      str("annualRevenue") && `إيرادات سنوية ~ ${str("annualRevenue")}`,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    ownerContact: [str("fullName"), str("phone"), str("email")].filter(Boolean).join(" · "),
+    exactLocation: [str("projectCity"), str("projectArea"), str("coords")].filter(Boolean).join(" · "),
+  };
+  const sourceData = { ...legacy, answers } as Prisma.InputJsonValue;
+
+  if (opportunityId) {
+    const opp = await loadOwned(opportunityId, session.userId);
+    if (!opp) return { ok: false, error: t(locale, "err.notAuthorizedOpp") };
+    if (!ownerCanEdit(opp.state)) {
+      return { ok: false, error: t(locale, "err.cannotEditAfterSubmit") };
+    }
+    await prisma.opportunity.update({
+      where: { id: opportunityId },
+      data: { title, sector, country, investmentMin: min, investmentMax: max, sourceData },
+    });
+    revalidatePath(`/owner/opportunities/${opportunityId}`);
+    revalidatePath("/owner");
+    return { ok: true, id: opportunityId };
+  }
+
+  const opp = await prisma.opportunity.create({
+    data: {
+      title,
+      sector,
+      country,
+      ownerId: session.userId,
+      state: "DRAFT_SOURCE",
+      investmentMin: min,
+      investmentMax: max,
+      sourceData,
+    },
+  });
+  await logActivity({
+    actorId: session.userId,
+    action: "OPP_CREATED",
+    entityType: "Opportunity",
+    entityId: opp.id,
+  });
+  revalidatePath("/owner");
+  return { ok: true, id: opp.id };
 }
 
 // تحميل فرصة بعد التأكد أنها تخصّ المالك الحالي
@@ -199,7 +294,7 @@ export async function submitForReview(
 export async function uploadOwnerFile(
   opportunityId: string,
   formData: FormData
-): Promise<ActionResult> {
+): Promise<ActionResult & { fileId?: string; fileName?: string }> {
   const session = await requireRole("PROJECT_OWNER");
   const locale = await getLocale();
 
@@ -224,7 +319,7 @@ export async function uploadOwnerFile(
   });
 
   revalidatePath(`/owner/opportunities/${opportunityId}`);
-  return { ok: true };
+  return { ok: true, fileId: res.fileId, fileName: file.name };
 }
 
 // حذف ملف رفعه المالك بنفسه على فرصته (وما زالت قابلة للتحرير)
