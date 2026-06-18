@@ -5,15 +5,16 @@ import PublicHeader from "@/components/PublicHeader";
 import VersionView from "@/components/VersionView";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
-import { t } from "@/lib/i18n";
+import { t, localeHref } from "@/lib/i18n";
 import Footer from "@/components/Footer";
+import InterestLeadForm from "./InterestLeadForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function PublicOpportunityDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }) {
   const { id } = await params;
   const locale = await getLocale();
@@ -46,7 +47,7 @@ export default async function PublicOpportunityDetail({
     <div className="min-h-screen">
       <PublicHeader />
       <main className="max-w-3xl mx-auto p-6 md:p-8">
-        <Link href="/opportunities" className="text-sm text-baraka hover:underline">
+        <Link href={localeHref(locale, "/opportunities")} className="text-sm text-baraka hover:underline">
           {t(locale, "opp.back")}
         </Link>
         <h1 className="text-2xl font-bold mt-2 mb-2">{title}</h1>
@@ -64,15 +65,16 @@ export default async function PublicOpportunityDetail({
           <VersionView data={pv} locale={locale} />
         </div>
 
-        <div className="bg-baraka-light border border-baraka/20 rounded-xl p-5 text-center">
-          <p className="text-sm text-baraka-dark mb-3">{t(locale, "opp.loginPrompt")}</p>
-          <Link
-            href="/login"
-            className="inline-block bg-baraka text-white px-5 py-2 rounded-lg text-sm hover:bg-baraka-dark transition"
-          >
+        {/* نموذج طلب الاهتمام العام (CRM) — يلتقط المهتمين كـ leads في لوحة الإدارة */}
+        <InterestLeadForm opportunityId={opp.id} locale={locale} />
+
+        {/* تلميح للمستثمر المسجّل */}
+        <p className="mt-4 text-center text-xs text-gray-400">
+          {t(locale, "opp.loginPrompt")}{" "}
+          <Link href="/login" className="text-baraka hover:underline">
             {t(locale, "home.login")}
           </Link>
-        </div>
+        </p>
       </main>
       <Footer />
     </div>

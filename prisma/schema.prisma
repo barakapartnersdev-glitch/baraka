@@ -19,6 +19,7 @@ enum UserRole {
   ADMIN // مدير المنصة (عهد البركة)
   PROJECT_OWNER // صاحب المشروع
   INVESTOR // المستثمر
+  AMBASSADOR // سفير استثمار (يرشّح مستثمرين بعد اعتماد الإدارة وتوقيع العقد)
 }
 
 enum AccountStatus {
@@ -40,12 +41,34 @@ model User {
   updatedAt     DateTime      @updatedAt
 
   // العلاقات
-  ownedOpportunities Opportunity[] @relation("OwnerOpportunities")
+  ownedOpportunities Opportunity[]    @relation("OwnerOpportunities")
   investorEntities   InvestorEntity[]
   interests          Interest[]
-  reviewedOpps       Opportunity[] @relation("ReviewerOpportunities")
+  reviewedOpps       Opportunity[]    @relation("ReviewerOpportunities")
   activityLogs       ActivityLog[]
   notifications      Notification[]
+
+  // علاقات الـ CRM (إدارة العلاقات)
+  crmAssignedLeads   CrmLead[]        @relation("CrmAssignee")
+  crmAssignedByLeads CrmLead[]        @relation("CrmAssigner")
+  crmNotes           CrmNote[]
+  crmFollowups       CrmFollowup[]
+  crmFiles           CrmFile[]
+  crmActivityLogs    CrmActivityLog[]
+
+  // علاقات سفراء الاستثمار
+  ambApplicationsAssigned AmbassadorApplication[]  @relation("AmbApplicationAssignee")
+  ambassadorAccount       AmbassadorAccount?       @relation("AmbAccountUser")
+  ambAccountsManaged      AmbassadorAccount[]      @relation("AmbAccountManager")
+  ambReferrals            AmbassadorReferral[]     @relation("AmbReferralAmbassador")
+  ambReferralsAssigned    AmbassadorReferral[]     @relation("AmbReferralAssignee")
+  ambMessages             AmbassadorMessage[]      @relation("AmbMessageAmbassador")
+  ambMessagesCreated      AmbassadorMessage[]      @relation("AmbMessageCreator")
+  ambMessageReplies       AmbassadorMessageReply[]
+  ambFilesOwned           AmbassadorFile[]         @relation("AmbFileOwner")
+  ambFilesUploaded        AmbassadorFile[]         @relation("AmbFileUploader")
+  ambActivityAsSubject    AmbassadorActivityLog[]  @relation("AmbActivitySubject")
+  ambActivityAsActor      AmbassadorActivityLog[]  @relation("AmbActivityActor")
 
   @@index([role])
   @@index([accountStatus])
@@ -69,17 +92,17 @@ model ActivityLog {
 
 // كيان استثماري يملكه مستثمر (يمكن للمستثمر امتلاك أكثر من كيان/شركة)
 model InvestorEntity {
-  id        String   @id @default(cuid())
-  name      String
-  type      String // فرد / شركة / صندوق
-  country   String?
+  id                 String     @id @default(cuid())
+  name               String
+  type               String // فرد / شركة / صندوق
+  country            String?
   // ملف التوثيق والاستثمار (KYC + تفضيلات المطابقة) — سرّي للإدارة فقط، لا يُكشف لأصحاب المشاريع
   profile            Json?
   profileSubmittedAt DateTime?
-  investor  User     @relation(fields: [investorId], references: [id])
-  investorId String
-  interests Interest[]
-  createdAt DateTime @default(now())
+  investor           User       @relation(fields: [investorId], references: [id])
+  investorId         String
+  interests          Interest[]
+  createdAt          DateTime   @default(now())
 
   @@index([investorId])
 }
@@ -99,11 +122,11 @@ enum OpportunityState {
 }
 
 model Opportunity {
-  id        String           @id @default(cuid())
-  title     String // عنوان داخلي (مرجع الإدارة)
-  sector    String
-  country   String
-  state     OpportunityState @default(DRAFT_SOURCE)
+  id      String           @id @default(cuid())
+  title   String // عنوان داخلي (مرجع الإدارة)
+  sector  String
+  country String
+  state   OpportunityState @default(DRAFT_SOURCE)
 
   // مالك المشروع
   owner   User   @relation("OwnerOpportunities", fields: [ownerId], references: [id])
@@ -129,6 +152,11 @@ model Opportunity {
   missingItems MissingItem[]
   files        OpportunityFile[]
   interests    Interest[]
+  crmLeads     CrmLead[] // طلبات الاهتمام العامة (CRM) المرتبطة بهذه الفرصة
+
+  // وجهة الاستثمار المرتبطة (اختياري) — تُعرض الفرصة ضمن صفحة الدولة المطابقة
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+  destinationId String?
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -136,6 +164,7 @@ model Opportunity {
 
   @@index([state])
   @@index([sector])
+  @@index([destinationId])
 }
 
 // النواقص التي تطلبها الإدارة من صاحب المشروع
@@ -179,19 +208,19 @@ enum InterestStatus {
 }
 
 model Interest {
-  id            String         @id @default(cuid())
-  opportunity   Opportunity    @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  opportunityId String
-  investor      User           @relation(fields: [investorId], references: [id])
-  investorId    String
-  entity        InvestorEntity? @relation(fields: [entityId], references: [id])
-  entityId      String?
-  status          InterestStatus @default(REQUESTED)
+  id              String          @id @default(cuid())
+  opportunity     Opportunity     @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId   String
+  investor        User            @relation(fields: [investorId], references: [id])
+  investorId      String
+  entity          InvestorEntity? @relation(fields: [entityId], references: [id])
+  entityId        String?
+  status          InterestStatus  @default(REQUESTED)
   ncndaSignedAt   DateTime?
   ncndaSignerName String? // الاسم المكتوب كتوقيع
   ncndaDocKey     String? // مفتاح تخزين نسخة الاتفاقية الموقّعة
-  createdAt       DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@unique([opportunityId, investorId])
   @@index([status])
@@ -199,16 +228,27 @@ model Interest {
 
 // ===== الإشعارات داخل المنصة =====
 enum NotificationType {
-  NEW_REGISTRATION          // للإدارة: تسجيل مستثمر جديد
-  ACCOUNT_APPROVED          // للمستخدم: اعتُمد حسابه
-  ACCOUNT_SUSPENDED         // للمستخدم: أُوقف حسابه
-  INTEREST_REQUESTED        // للإدارة: طلب اهتمام جديد
-  INTEREST_APPROVED         // للمستثمر: اعتُمد طلبه
-  INTEREST_DECLINED         // للمستثمر: رُفض طلبه
-  NCNDA_SIGNED              // متعلّق بتوقيع NCNDA
-  MISSING_INFO_REQUESTED    // لصاحب المشروع: طُلبت نواقص
-  OPPORTUNITY_PUBLISHED     // لصاحب المشروع: نُشرت فرصته
+  NEW_REGISTRATION // للإدارة: تسجيل مستثمر جديد
+  ACCOUNT_APPROVED // للمستخدم: اعتُمد حسابه
+  ACCOUNT_SUSPENDED // للمستخدم: أُوقف حسابه
+  INTEREST_REQUESTED // للإدارة: طلب اهتمام جديد
+  INTEREST_APPROVED // للمستثمر: اعتُمد طلبه
+  INTEREST_DECLINED // للمستثمر: رُفض طلبه
+  NCNDA_SIGNED // متعلّق بتوقيع NCNDA
+  MISSING_INFO_REQUESTED // لصاحب المشروع: طُلبت نواقص
+  OPPORTUNITY_PUBLISHED // لصاحب المشروع: نُشرت فرصته
   OPPORTUNITY_STATE_CHANGED // لصاحب المشروع: تغيّرت حالة فرصته
+  NEW_CRM_LEAD // للإدارة: طلب/رسالة جديدة من نماذج الموقع (CRM)
+  CRM_LEAD_ASSIGNED // للموظف: أُسند إليه طلب في الـ CRM
+  // ===== سفراء الاستثمار =====
+  AMBASSADOR_APPLICATION_RECEIVED // للإدارة: طلب انضمام سفير جديد
+  AMBASSADOR_STATUS_CHANGED // للمتقدم/السفير: تغيّرت حالة طلبه
+  AMBASSADOR_CONTRACT_SENT // للمتقدم: أُرسل العقد للتوقيع
+  AMBASSADOR_CONTRACT_SIGNED // للإدارة: تم توقيع العقد
+  AMBASSADOR_ACCOUNT_CREATED // للسفير: فُتح حسابه
+  AMBASSADOR_NEW_MESSAGE // للطرف الآخر: رسالة داخلية جديدة
+  AMBASSADOR_NEW_REFERRAL // لمدير السفراء: ترشيح مستثمر جديد
+  AMBASSADOR_REFERRAL_STATUS_CHANGED // للسفير: تحديث حالة ترشيح
 }
 
 model Notification {
@@ -223,4 +263,637 @@ model Notification {
 
   @@index([userId, read])
   @@index([userId, createdAt])
+}
+
+// ===== CRM / إدارة العلاقات الاستثمارية =====
+// يلتقط كل رسالة/طلب وارد من نماذج الموقع العامة (زوّار غير مسجّلين) ويحوّله
+// إلى سجل قابل للتصنيف والإسناد والمتابعة. منفصل عن Interest (للمستثمر المسجّل).
+
+// نوع الطلب — يحدّد أي نموذج أرسله ومسار متابعته
+enum LeadType {
+  INVESTOR_INTEREST // طلب اهتمام بفرصة استثمارية محددة
+  OPPORTUNITY_SUBMISSION // تقديم فرصة استثمارية (صاحب فرصة)
+  CONTACT // تواصل عام
+  HOME_QUICK // نموذج الصفحة الرئيسية السريع
+  INVESTMENT_AMBASSADOR_APPLICATION // طلب الانضمام كسفير استثمار
+}
+
+// مصدر الطلب — الصفحة التي أُرسل منها
+enum LeadSource {
+  OPPORTUNITY_PAGE
+  SUBMIT_PAGE
+  CONTACT_PAGE
+  HOME_PAGE
+  DESTINATION_PAGE // نموذج صفحة «استثمر في <دولة>» (وجهات الاستثمار)
+  INVESTMENT_AMBASSADORS_PAGE // صفحة سفراء الاستثمار
+}
+
+// درجة الأهمية
+enum LeadPriority {
+  VERY_HIGH
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model CrmLead {
+  id        String       @id @default(cuid())
+  leadType  LeadType
+  source    LeadSource
+  // الحالة كنص (كود موحّد) — مرنة وقابلة للتوسعة من الإدارة لاحقاً؛
+  // القيم المسموحة ومسارها لكل نوع معرّفة في src/lib/crm.ts
+  status    String       @default("NEW")
+  priority  LeadPriority @default(MEDIUM)
+  leadScore Int          @default(0)
+
+  // بيانات المرسل
+  fullName         String
+  email            String
+  phone            String?
+  whatsapp         String?
+  country          String?
+  city             String?
+  companyName      String?
+  senderRole       String? // كود موحّد: investor / broker / project_owner ...
+  preferredContact String? // whatsapp / email / phone / online_meeting
+  investmentBudget String? // نص حر (نطاق أو مبلغ)
+  sectorInterest   String?
+
+  // الرسالة واللغة (لا يُغيَّر النص الأصلي أبداً)
+  message                String?
+  languageCode           String  @default("ar") // ar / en / tr / zh
+  internalTranslation    String? // ترجمة داخلية يضيفها الفريق عند الحاجة
+  preferredReplyLanguage String?
+
+  // الربط بالفرصة (لطلبات الاهتمام من صفحة فرصة)
+  relatedOpportunity   Opportunity? @relation(fields: [relatedOpportunityId], references: [id])
+  relatedOpportunityId String?
+
+  // الربط بوجهة الاستثمار (لطلبات نموذج صفحة الدولة — source = DESTINATION_PAGE)
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+  destinationId String?
+
+  // حقول خاصة بتقديم فرصة استثمارية (OPPORTUNITY_SUBMISSION)
+  projectSector  String?
+  projectCountry String?
+  projectCity    String?
+  hasFeasibility String? // yes / no / in_progress
+  hasLicensing   String? // yes / no / partial
+
+  // الإسناد الداخلي
+  assignedTo   User?     @relation("CrmAssignee", fields: [assignedToId], references: [id])
+  assignedToId String?
+  assignedBy   User?     @relation("CrmAssigner", fields: [assignedById], references: [id])
+  assignedById String?
+  assignedAt   DateTime?
+  department   String? // كود قسم داخلي (investor_relations / opp_review / legal ...)
+
+  // أعلام وحالة
+  isRead          Boolean @default(false)
+  isSpam          Boolean @default(false)
+  privacyAccepted Boolean @default(false)
+
+  // بيانات تقنية (للحماية من السبام والتدقيق)
+  ipAddress String?
+  userAgent String?
+
+  lastFollowupAt DateTime? // آخر متابعة (للفرز والتنبيه على المتأخرات)
+
+  notes        CrmNote[]
+  followups    CrmFollowup[]
+  files        CrmFile[]
+  activityLogs CrmActivityLog[]
+
+  // ربط بنظام سفراء الاستثمار (طلب السفير / ترشيح المستثمر يظهر كـ Lead)
+  ambassadorApplications AmbassadorApplication[]
+  ambassadorReferrals    AmbassadorReferral[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadType])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedToId])
+  @@index([relatedOpportunityId])
+  @@index([destinationId])
+  @@index([isRead])
+  @@index([isSpam])
+  @@index([languageCode])
+  @@index([createdAt])
+}
+
+model CrmNote {
+  id        String   @id @default(cuid())
+  lead      CrmLead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  // نوع الملاحظة: internal_note / call_log / whatsapp_log / email_log /
+  // meeting_log / status_change / file_upload
+  noteType  String   @default("internal_note")
+  note      String
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model CrmFollowup {
+  id           String   @id @default(cuid())
+  lead         CrmLead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId       String
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+  assignedToId String?
+  followupAt   DateTime
+  followupType String   @default("call") // call / email / whatsapp / online_meeting / document_request / internal_review
+  status       String   @default("pending") // pending / done / cancelled
+  reminderSent Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([assignedToId])
+  @@index([followupAt])
+}
+
+model CrmFile {
+  id           String   @id @default(cuid())
+  lead         CrmLead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId       String
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+  uploadedById String?
+  fileName     String
+  storageKey   String // مرجع التخزين الآمن (S3)
+  fileType     String?
+  fileSize     Int?
+  visibility   String   @default("admin_only")
+  createdAt    DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model CrmEmailTemplate {
+  id           String   @id @default(cuid())
+  templateKey  String // مثل: investor_initial_reply
+  templateType String?
+  languageCode String // ar / en / tr / zh
+  subject      String
+  body         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([templateKey, languageCode])
+  @@index([languageCode])
+}
+
+model CrmActivityLog {
+  id          String   @id @default(cuid())
+  lead        CrmLead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId      String
+  actor       User?    @relation(fields: [actorId], references: [id])
+  actorId     String?
+  actionType  String // created / status_change / priority_change / assigned / note_added / read ...
+  oldValue    String?
+  newValue    String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+}
+
+// ===== وجهات الاستثمار (صفحات SEO تعريفية حسب الدولة) =====
+// قسم ثابت متعدّد اللغات يحسّن ظهور الموقع لعبارات «استثمر في <دولة>» ويحوّل الزائر
+// إلى Lead في الـ CRM. المحتوى وSEO قابلان للتحرير بالكامل من لوحة الإدارة لكل لغة.
+
+model Destination {
+  id            String  @id @default(cuid())
+  countryKey    String  @unique // مفتاح ثابت لا يتغيّر: turkey / syria / european-union / cyprus / egypt / jordan
+  region        String? // تصنيف جغرافي (الشرق الأوسط، أوروبا...) — للعرض والفلترة
+  flagEmoji     String? // رمز العلم (اختياري) لعرضه في البطاقات
+  featuredImage String? // صورة/خلفية رئيسية (مسار عام أو رابط)
+  isActive      Boolean @default(true) // تفعيل/إخفاء الصفحة بالكامل
+  showInMenu    Boolean @default(true)
+  showInFooter  Boolean @default(true)
+  inSitemap     Boolean @default(true) // إدراج في sitemap عند التفعيل
+  displayOrder  Int     @default(0) // ترتيب الظهور في القوائم والبطاقات
+
+  translations  DestinationTranslation[]
+  opportunities Opportunity[] // فرص منشورة مرتبطة بهذه الدولة
+  crmLeads      CrmLead[] // طلبات واردة من نموذج صفحة الدولة
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([displayOrder])
+}
+
+// محتوى وSEO صفحة الدولة لكل لغة (ar / en / tr / zh) — slug مستقل لكل لغة.
+model DestinationTranslation {
+  id            String      @id @default(cuid())
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  destinationId String
+  locale        String // ar / en / tr / zh
+  slug          String // فريد ضمن اللغة الواحدة، قابل للتعديل من الإدارة
+
+  // ---- المحتوى (يقابل بنية الصفحة الثابتة) ----
+  countryName           String? // اسم الدولة المختصر باللغة (تركيا / Turkey...) — للعناوين والمسار
+  pageTitle             String? // عنوان التبويب (إن خلا يُشتقّ من seoTitle/h1)
+  h1Title               String // العنوان الرئيسي H1
+  introText             String? // مقدمة تعريفية
+  whyInvestTitle        String?
+  whyInvestPoints       Json? // string[] — نقاط «لماذا الاستثمار»
+  keySectorsTitle       String?
+  keySectorsList        Json? // string[] — القطاعات الواعدة
+  opportunityTypesTitle String?
+  opportunityTypesList  Json? // string[] — أنواع الفرص المتاحة
+  investorNotesTitle    String?
+  investorNotesPoints   Json? // string[] — معلومات أولية للمستثمر
+  disclaimerText        String? // التنبيه القانوني
+  ctaTitle              String?
+  ctaDescription        String?
+  ctaButtonText         String?
+  faq                   Json? // {q,a}[] — أسئلة شائعة
+
+  // ---- SEO لكل لغة ----
+  seoTitle           String?
+  metaDescription    String?
+  focusKeyword       String?
+  secondaryKeywords  Json? // string[]
+  canonicalUrl       String? // تجاوز اختياري (الافتراضي يُبنى تلقائياً من APP_BASE_URL)
+  ogTitle            String?
+  ogDescription      String?
+  ogImage            String?
+  twitterTitle       String?
+  twitterDescription String?
+  twitterImage       String?
+  schemaJson         Json? // JSON-LD إضافي اختياري يحقنه الأدمن
+  robotsIndex        Boolean @default(true)
+  robotsFollow       Boolean @default(true)
+  sitemapPriority    Float   @default(0.7)
+  sitemapChangefreq  String  @default("monthly")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([destinationId, locale])
+  @@unique([locale, slug])
+  @@index([destinationId])
+}
+
+// ============================================================
+// ===== سفراء الاستثمار (Investment Ambassadors) =====
+// نظام فرعي متكامل: طلب انضمام عام → مراجعة وتقييم الإدارة → عقد → فتح حساب
+// → بوّابة سفير يرشّح عبرها مستثمرين ويراسل الإدارة. هجرة إضافية بالكامل.
+// ============================================================
+
+// حالة طلب الانضمام كسفير (قابلة للتوسعة من الإدارة لاحقاً)
+enum AmbassadorAppStatus {
+  NEW // جديد
+  UNDER_REVIEW // قيد المراجعة
+  NEEDS_INFO // يحتاج معلومات إضافية
+  INTERVIEW // قيد المقابلة
+  PRE_QUALIFIED // مؤهّل مبدئياً
+  NOT_QUALIFIED // غير مؤهّل
+  PRE_ACCEPTED // مقبول مبدئياً
+  AWAITING_CONTRACT // بانتظار توقيع العقد
+  CONTRACT_SIGNED // تم توقيع العقد
+  ACCOUNT_CREATED // تم فتح حساب السفير
+  ACTIVE // نشط
+  SUSPENDED // موقوف مؤقتاً
+  REJECTED // مرفوض
+  ARCHIVED // مؤرشف
+}
+
+// حالة ترشيح المستثمر من السفير
+enum ReferralStatus {
+  NEW // جديد
+  UNDER_REVIEW // قيد المراجعة
+  NEEDS_INFO // يحتاج معلومات إضافية
+  PRE_QUALIFIED // مؤهّل مبدئياً
+  NOT_QUALIFIED // غير مؤهّل
+  INVESTOR_CONTACTED // تم التواصل مع المستثمر
+  AWAITING_INVESTOR // بانتظار رد المستثمر
+  MEETING_SCHEDULED // تم ترتيب اجتماع
+  NEGOTIATING // قيد التفاوض
+  CLOSED_WON // مغلق بنجاح
+  CLOSED_LOST // مغلق بدون نتيجة
+  ARCHIVED // مؤرشف
+}
+
+// حالة عقد السفير (تدعم المسارين: رفع يدوي وتوقيع إلكتروني)
+enum AmbassadorContractStatus {
+  NOT_SENT // لم يتم الإرسال
+  SENT // تم الإرسال
+  OPENED // تم الفتح
+  AWAITING_SIGNATURE // بانتظار التوقيع
+  SIGNED // تم التوقيع
+  REJECTED // مرفوض
+  EXPIRED // منتهي الصلاحية
+}
+
+// حالة الرسالة الداخلية بين السفير والإدارة
+enum AmbassadorMessageStatus {
+  NEW // جديد
+  IN_PROGRESS // قيد الرد
+  REPLIED // تم الرد
+  CLOSED // مغلق
+}
+
+// طلب الانضمام كسفير استثمار (النموذج العام، 4 لغات)
+model AmbassadorApplication {
+  id String @id @default(cuid())
+
+  // ----- بيانات شخصية -----
+  fullName          String
+  nationality       String?
+  residenceCountry  String?
+  city              String?
+  phone             String?
+  whatsapp          String?
+  email             String
+  preferredLanguage String? // لغة التواصل المفضّلة (ar/en/tr/zh/other)
+  spokenLanguages   Json?
+  photoKey          String? // صورة شخصية اختيارية (مرجع تخزين آمن)
+
+  // ----- بيانات مهنية -----
+  currentTitle      String?
+  companyName       String?
+  professionalRole  String?
+  yearsOfExperience String?
+  workType          String? // individual / company / consulting_office / brokerage / other
+  website           String?
+  linkedinUrl       String?
+  otherLinks        String?
+
+  // ----- شبكة العلاقات -----
+  coveredCountries   Json?
+  investorTypes      Json? // hnwi / investment_company / family_office / fund / holding ...
+  coveredSectors     Json?
+  investmentRange    String? // نطاق حجم الاستثمار الذي يصل لمستثمرين مهتمين به
+  relationshipType   String? // direct / via_partners / mixed
+  previousExperience String? // yes / no — سبق العمل في جذب مستثمرين
+  experienceSummary  String?
+
+  // ----- أسئلة التقييم + أي حقول إضافية -----
+  motivation         String?
+  addedValue         String?
+  conflictOfInterest String?
+  answers            Json? // بقية أسئلة التقييم الحرّة (مفتاح→قيمة)
+
+  // ----- الموافقات الإلزامية -----
+  infoAccuracyAck     Boolean @default(false) // صحة المعلومات
+  privacyAccepted     Boolean @default(false) // سياسة الخصوصية
+  applicationAck      Boolean @default(false) // التقديم لا يعني القبول
+  noRepresentationAck Boolean @default(false) // عدم استخدام الاسم قبل الاعتماد
+  contactConsent      Boolean @default(false) // الموافقة على التواصل للمراجعة
+
+  // ----- إدارة / حوكمة -----
+  status       AmbassadorAppStatus @default(NEW)
+  score        Int                 @default(0)
+  assignedTo   User?               @relation("AmbApplicationAssignee", fields: [assignedToId], references: [id])
+  assignedToId String?
+
+  // ----- مصدر / لغة / ربط CRM -----
+  source       String   @default("investment_ambassadors_page")
+  languageCode String   @default("ar")
+  crmLead      CrmLead? @relation(fields: [crmLeadId], references: [id])
+  crmLeadId    String?
+
+  // ----- بيانات تقنية (حماية وتدقيق) -----
+  ipAddress String?
+  userAgent String?
+
+  // ----- علاقات -----
+  files     AmbassadorFile[]
+  contracts AmbassadorContract[]
+  account   AmbassadorAccount?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([residenceCountry])
+  @@index([score])
+  @@index([assignedToId])
+  @@index([createdAt])
+}
+
+// ملفات السفراء (مرتبطة بطلب/سفير/ترشيح/رسالة حسب الحاجة)
+model AmbassadorFile {
+  id String @id @default(cuid())
+
+  application   AmbassadorApplication? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String?
+
+  // ملفات «ملفاتي» داخل حساب السفير
+  ambassadorUser   User?   @relation("AmbFileOwner", fields: [ambassadorUserId], references: [id])
+  ambassadorUserId String?
+
+  referral   AmbassadorReferral? @relation(fields: [referralId], references: [id], onDelete: Cascade)
+  referralId String?
+
+  message   AmbassadorMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String?
+
+  fileName     String
+  storageKey   String // مرجع التخزين الآمن — لا يُخدم مباشرة
+  fileType     String?
+  fileSize     Int?
+  fileCategory String? // cv / company_profile / personal_profile / work_sample / supporting / referral_doc / message_attachment / internal
+  visibility   String  @default("admin_only") // admin_only / ambassador / shared
+
+  uploadedBy   User?   @relation("AmbFileUploader", fields: [uploadedById], references: [id])
+  uploadedById String?
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId])
+  @@index([ambassadorUserId])
+  @@index([referralId])
+  @@index([messageId])
+}
+
+// عقد السفير — يدعم رفع PDF موقّع يدوياً أو توقيعاً إلكترونياً مدمجاً (المرحلة 3)
+model AmbassadorContract {
+  id String @id @default(cuid())
+
+  application   AmbassadorApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+
+  // الحساب الذي يعتمد هذا العقد (علاقة 1-1 معكوسة)
+  account AmbassadorAccount? @relation("AccountContract")
+
+  templateId String? // قالب العقد المستخدم (CrmEmailTemplate أو قالب مخصّص لاحقاً)
+  status     AmbassadorContractStatus @default(NOT_SENT)
+
+  contractPdfKey String? // نسخة العقد المُرسَلة (غير موقّعة)
+  signedPdfKey   String? // نسخة العقد الموقّعة
+
+  sentAt    DateTime?
+  openedAt  DateTime?
+  signedAt  DateTime?
+  expiresAt DateTime?
+
+  // التوقيع الإلكتروني (المرحلة 3): DocuSign / Dropbox Sign / PandaDoc ...
+  signingProvider     String?
+  externalSignatureId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([status])
+}
+
+// حساب السفير المعتمد (يُفتح بعد توقيع العقد)
+model AmbassadorAccount {
+  id String @id @default(cuid())
+
+  user   User   @relation("AmbAccountUser", fields: [userId], references: [id])
+  userId String @unique
+
+  application   AmbassadorApplication @relation(fields: [applicationId], references: [id])
+  applicationId String                @unique
+
+  status    String    @default("active") // active / suspended / closed
+  startDate DateTime?
+
+  allowedCountries Json? // نطاق الدول المصرّح بها
+  allowedSectors   Json? // نطاق القطاعات المصرّح بها
+
+  assignedManager   User?   @relation("AmbAccountManager", fields: [assignedManagerId], references: [id])
+  assignedManagerId String?
+
+  contract   AmbassadorContract? @relation("AccountContract", fields: [contractId], references: [id])
+  contractId String?             @unique
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ترشيح مستثمر محتمل من السفير
+model AmbassadorReferral {
+  id String @id @default(cuid())
+
+  ambassadorUser   User   @relation("AmbReferralAmbassador", fields: [ambassadorUserId], references: [id])
+  ambassadorUserId String
+
+  // بيانات المستثمر المرشَّح
+  investorName    String
+  investorCompany String?
+  investorCountry String?
+  investorCity    String?
+  investorType    String? // individual / company / fund / family_office / holding / government / other
+
+  interestedSectors Json?
+  investmentRange   String?
+
+  relationshipWithAmbassador String? // direct / via_third_party / initial / prior_contact
+  seriousnessLevel           String? // high / medium / low
+  consentConfirmed           String? // yes / no / needs_confirmation
+
+  // بيانات التواصل (حسب ضوابط الخصوصية)
+  contactEmail String?
+  contactPhone String?
+  linkedinUrl  String?
+  website      String?
+
+  description     String?
+  ambassadorNotes String?
+
+  // إدارة (لا يراها السفير كاملة)
+  status        ReferralStatus @default(NEW)
+  internalScore Int?
+  assignedTo    User?          @relation("AmbReferralAssignee", fields: [assignedToId], references: [id])
+  assignedToId  String?
+
+  // ربط CRM (يظهر الترشيح كـ Investor Lead)
+  crmLead   CrmLead? @relation(fields: [crmLeadId], references: [id])
+  crmLeadId String?
+
+  files AmbassadorFile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ambassadorUserId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdAt])
+}
+
+// رسالة داخلية (محادثة) بين السفير والإدارة
+model AmbassadorMessage {
+  id String @id @default(cuid())
+
+  ambassadorUser   User   @relation("AmbMessageAmbassador", fields: [ambassadorUserId], references: [id])
+  ambassadorUserId String
+
+  relatedReferralId String? // ربط اختياري بترشيح معيّن
+
+  subject     String
+  messageType String                  @default("general") // general / new_investor / file_followup / clarification / technical / other
+  status      AmbassadorMessageStatus @default(NEW)
+
+  createdBy   User?   @relation("AmbMessageCreator", fields: [createdById], references: [id])
+  createdById String?
+
+  replies AmbassadorMessageReply[]
+  files   AmbassadorFile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ambassadorUserId])
+  @@index([status])
+}
+
+// رد ضمن محادثة داخلية
+model AmbassadorMessageReply {
+  id String @id @default(cuid())
+
+  message   AmbassadorMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String
+
+  sender       User?   @relation(fields: [senderUserId], references: [id])
+  senderUserId String?
+  senderRole   String? // ambassador / admin (لقطة للدور وقت الإرسال)
+
+  body String
+
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
+}
+
+// سجل نشاط نظام السفراء (تدقيق منفصل عن ActivityLog العام)
+model AmbassadorActivityLog {
+  id String @id @default(cuid())
+
+  ambassadorUser   User?   @relation("AmbActivitySubject", fields: [ambassadorUserId], references: [id])
+  ambassadorUserId String?
+
+  relatedEntityType String? // Application / Referral / Contract / Account / Message
+  relatedEntityId   String?
+
+  actionType  String // created / status_change / score_change / assigned / note_added / contract_sent / contract_signed / account_created ...
+  description String?
+  oldValue    String?
+  newValue    String?
+
+  createdBy   User?   @relation("AmbActivityActor", fields: [createdById], references: [id])
+  createdById String?
+
+  createdAt DateTime @default(now())
+
+  @@index([ambassadorUserId])
+  @@index([relatedEntityType, relatedEntityId])
+  @@index([createdAt])
 }

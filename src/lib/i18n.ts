@@ -11,6 +11,56 @@ export function dir(locale: Locale): "rtl" | "ltr" {
   return locale === "ar" ? "rtl" : "ltr";
 }
 
+// ===== مساعدات روابط اللغة (نقية — لا next/headers) =====
+// مسارات لا تُسبَق ببادئة اللغة: البوّابات المحمية والمصادقة وواجهات API.
+export const NON_LOCALIZED_PREFIXES = [
+  "/admin",
+  "/owner",
+  "/investor",
+  "/ambassador",
+  "/login",
+  "/register",
+  "/api",
+  "/auth",
+] as const;
+
+export function isLocale(value: string | undefined | null): value is Locale {
+  return !!value && (LOCALES as readonly string[]).includes(value);
+}
+
+// يستخرج بادئة اللغة من المسار (إن وُجدت) وبقيّة المسار بعدها (بلا شرطة ختامية).
+export function parseLocaleFromPath(pathname: string): {
+  locale: Locale | null;
+  rest: string;
+} {
+  const segments = pathname.split("/"); // ["", "en", "opportunities", ...]
+  if (isLocale(segments[1])) {
+    const joined = "/" + segments.slice(2).join("/");
+    const rest = joined === "/" ? "/" : joined.replace(/\/+$/, "") || "/";
+    return { locale: segments[1], rest };
+  }
+  return { locale: null, rest: pathname };
+}
+
+// يحذف بادئة اللغة من المسار إن وُجدت.
+export function stripLocale(pathname: string): string {
+  return parseLocaleFromPath(pathname).rest;
+}
+
+// يبني رابطاً مسبوقاً بلغة. `path` يبدأ بـ "/" (مثل "/opportunities")؛ فكرة idempotent.
+export function localeHref(locale: Locale, path: string = "/"): string {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  const base = stripLocale(clean);
+  return base === "/" ? `/${locale}` : `/${locale}${base}`;
+}
+
+// هل ينبغي أن يُسبَق هذا المسار ببادئة اللغة؟ (المحتوى العام فقط)
+export function shouldLocalizePath(pathname: string): boolean {
+  return !NON_LOCALIZED_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+}
+
 type Dict = Record<string, string>;
 
 const ar: Dict = {
@@ -92,6 +142,7 @@ const ar: Dict = {
   "sidebar.home": "الرئيسية",
   "sidebar.opportunities": "الفرص",
   "sidebar.interests": "طلبات الاهتمام و NCNDA",
+  "sidebar.crm": "إدارة الاتصالات",
   "sidebar.users": "المستثمرون",
 
   // لوحات البداية
@@ -518,6 +569,7 @@ const en: Dict = {
   "sidebar.home": "Home",
   "sidebar.opportunities": "Opportunities",
   "sidebar.interests": "Interests & NCNDA",
+  "sidebar.crm": "Communications CRM",
   "sidebar.users": "Users",
 
   // dashboards
@@ -922,6 +974,7 @@ const zh: Dict = {
 "sidebar.home": "首页",
 "sidebar.opportunities": "投资机会",
 "sidebar.interests": "意向与NCNDA",
+"sidebar.crm": "沟通CRM",
 "sidebar.users": "用户",
 "owner.nav.mine": "我的机会",
 "owner.nav.new": "新增机会",
@@ -1261,6 +1314,7 @@ const tr: Dict = {
 "sidebar.home": "Ana sayfa",
 "sidebar.opportunities": "Fırsatlar",
 "sidebar.interests": "İlgiler ve NCNDA",
+"sidebar.crm": "İletişim CRM",
 "sidebar.users": "Kullanıcılar",
 "owner.nav.mine": "Fırsatlarım",
 "owner.nav.new": "Yeni fırsat",

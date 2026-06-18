@@ -19,6 +19,16 @@ const SUBJECTS: Record<NotificationType, string> = {
   MISSING_INFO_REQUESTED: "طلب استكمال نواقص",
   OPPORTUNITY_PUBLISHED: "تم نشر فرصتك",
   OPPORTUNITY_STATE_CHANGED: "تحديث حالة فرصتك",
+  NEW_CRM_LEAD: "طلب/رسالة جديدة من الموقع",
+  CRM_LEAD_ASSIGNED: "تم إسناد طلب إليك",
+  AMBASSADOR_APPLICATION_RECEIVED: "طلب انضمام سفير استثمار جديد",
+  AMBASSADOR_STATUS_CHANGED: "تحديث حالة طلب الانضمام كسفير",
+  AMBASSADOR_CONTRACT_SENT: "عقد سفير الاستثمار جاهز للتوقيع",
+  AMBASSADOR_CONTRACT_SIGNED: "تم توقيع عقد سفير الاستثمار",
+  AMBASSADOR_ACCOUNT_CREATED: "تم فتح حساب سفير الاستثمار",
+  AMBASSADOR_NEW_MESSAGE: "رسالة داخلية جديدة",
+  AMBASSADOR_NEW_REFERRAL: "ترشيح مستثمر جديد من سفير",
+  AMBASSADOR_REFERRAL_STATUS_CHANGED: "تحديث حالة ترشيح مستثمر",
 };
 
 // إشعار مستخدم واحد (+ بريد إن كان مُفعّلاً). أفضل جهد: لا يرمي للأعلى.

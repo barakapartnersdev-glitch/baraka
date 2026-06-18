@@ -2,6 +2,8 @@
 // إن لم تُضبط المفاتيح يسجّل فقط (وضع تطوير)، ولا يفشل الإجراء أبداً بسبب البريد.
 // لتبديل المزوّد (SendGrid/SMTP-عبر-بوابة...): عدّل دالة sendEmail فقط.
 import "server-only";
+import { tc } from "@/lib/crm-i18n";
+import { dir, type Locale } from "@/lib/i18n";
 
 export function emailConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
@@ -69,5 +71,18 @@ export function notificationEmailHtml(params: {
     <p style="margin:0;line-height:1.9">${escapeHtml(params.message)}</p>
     ${button}
     <p style="color:#888;font-size:12px;margin-top:24px">هذا بريد آلي من منصة شركاء البركة.</p>
+  </div></body></html>`;
+}
+
+// بريد تأكيد متعدّد اللغات للعميل بعد إرسال نموذج CRM — يحترم لغة النموذج واتجاهها.
+export function crmConfirmationEmailHtml(locale: Locale, params: { fullName: string }): string {
+  const isRtl = dir(locale) === "rtl";
+  const align = isRtl ? "right" : "left";
+  return `<!DOCTYPE html><html lang="${locale}" dir="${dir(locale)}"><body style="font-family:Tajawal,Arial,sans-serif;background:#F8FAF9;padding:24px;color:#1a1a1a;margin:0;text-align:${align}">
+  <div style="max-width:520px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:28px">
+    <div style="color:#0F6E56;font-weight:700;font-size:18px;margin-bottom:12px">Baraka Partners</div>
+    <p style="margin:0 0 8px">${tc(locale, "email.confirmGreeting")} ${escapeHtml(params.fullName)},</p>
+    <p style="margin:0;line-height:1.9">${tc(locale, "email.confirmBody")}</p>
+    <p style="color:#0F6E56;font-weight:600;margin-top:20px">${tc(locale, "email.confirmSignature")}</p>
   </div></body></html>`;
 }

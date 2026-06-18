@@ -5,7 +5,7 @@ import OpportunityCard, { type OpportunityCardData } from "@/components/Opportun
 import { toVersion } from "@/lib/opportunity";
 import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { t } from "@/lib/i18n";
+import { t, localeHref } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +51,7 @@ export default async function PublicOpportunities() {
               const localSector = localizeTerm(SECTOR_I18N, o.sector, locale);
               const data: OpportunityCardData = {
                 id: o.id,
-                href: `/opportunities/${o.id}`,
+                href: localeHref(locale, `/opportunities/${o.id}`),
                 title: pv?.displayTitle || `${t(locale, "opp.inSector")} ${localSector}`,
                 summary: pv?.summary,
                 sector: localSector,

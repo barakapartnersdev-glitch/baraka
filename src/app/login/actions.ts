@@ -15,6 +15,7 @@ const HOME_BY_ROLE: Record<Role, string> = {
   ADMIN: "/admin",
   PROJECT_OWNER: "/owner",
   INVESTOR: "/investor",
+  AMBASSADOR: "/ambassador",
 };
 
 export async function login(

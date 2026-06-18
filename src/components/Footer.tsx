@@ -1,14 +1,20 @@
 import Link from "next/link";
 import { getLocale } from "@/lib/i18n-server";
-import { t } from "@/lib/i18n";
+import { t, localeHref } from "@/lib/i18n";
+import { getDestinationCards, destPath } from "@/lib/destinations";
+import { destUi } from "@/lib/dest-i18n";
 
 export default async function Footer() {
   const locale = await getLocale();
+  const ui = destUi(locale);
+  const footerDests = (await getDestinationCards(locale))
+    .filter(({ dest }) => dest.showInFooter)
+    .slice(0, 6);
 
   return (
     <footer className="bg-navy pt-14 pb-8 text-[#aebbcf]">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
+        <div className="mb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1.2fr]">
           <div>
             <div className="flex items-center gap-2.5 text-white">
               <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
@@ -26,8 +32,8 @@ export default async function Footer() {
           <div>
             <h5 className="mb-4 font-bold text-white">{t(locale, "footer.explore")}</h5>
             <ul className="flex flex-col gap-2.5 text-sm">
-              <li><Link href="/opportunities" className="transition hover:text-gold">{t(locale, "nav.opportunities")}</Link></li>
-              <li><Link href="/how-it-works" className="transition hover:text-gold">{t(locale, "nav.how")}</Link></li>
+              <li><Link href={localeHref(locale, "/opportunities")} className="transition hover:text-gold">{t(locale, "nav.opportunities")}</Link></li>
+              <li><Link href={localeHref(locale, "/how-it-works")} className="transition hover:text-gold">{t(locale, "nav.how")}</Link></li>
               <li><Link href="/register" className="transition hover:text-gold">{t(locale, "nav.register")}</Link></li>
               <li><Link href="/login" className="transition hover:text-gold">{t(locale, "nav.login")}</Link></li>
             </ul>
@@ -36,10 +42,27 @@ export default async function Footer() {
           <div>
             <h5 className="mb-4 font-bold text-white">{t(locale, "footer.company")}</h5>
             <ul className="flex flex-col gap-2.5 text-sm">
-              <li><Link href="/about" className="transition hover:text-gold">{t(locale, "nav.about")}</Link></li>
-              <li><Link href="/contact" className="transition hover:text-gold">{t(locale, "nav.contact")}</Link></li>
+              <li><Link href={localeHref(locale, "/about")} className="transition hover:text-gold">{t(locale, "nav.about")}</Link></li>
+              <li><Link href={localeHref(locale, "/contact")} className="transition hover:text-gold">{t(locale, "nav.contact")}</Link></li>
             </ul>
           </div>
+
+          {footerDests.length > 0 && (
+            <div>
+              <h5 className="mb-4 font-bold text-white">
+                <Link href={`/${locale}/investment-destinations`} className="transition hover:text-gold">{ui.hub}</Link>
+              </h5>
+              <ul className="flex flex-col gap-2.5 text-sm">
+                {footerDests.map(({ dest, tr }) => (
+                  <li key={dest.id}>
+                    <Link href={destPath(locale, tr.slug)} className="transition hover:text-gold">
+                      {tr.h1Title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-[13px]">

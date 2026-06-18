@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
 
-export type Role = "ADMIN" | "PROJECT_OWNER" | "INVESTOR";
+export type Role = "ADMIN" | "PROJECT_OWNER" | "INVESTOR" | "AMBASSADOR";
 
 export interface SessionUser {
   userId: string;

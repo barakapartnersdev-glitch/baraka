@@ -3,8 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
 import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
+import { localeHref, shouldLocalizePath } from "@/lib/i18n";
 import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
+import { getDestinationCards, destPath } from "@/lib/destinations";
+import { destUi } from "@/lib/dest-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -273,6 +276,16 @@ const C = {
 export default async function Home() {
   const locale = await getLocale();
   const c = C[locale] ?? C.ar;
+  const du = destUi(locale);
+  const destCards = (await getDestinationCards(locale)).slice(0, 6);
+  const exploreDestTitle = ({
+    ar: "استكشف وجهات الاستثمار",
+    en: "Explore investment destinations",
+    tr: "Yatırım destinasyonlarını keşfedin",
+    zh: "探索投资目的地",
+  } as const)[locale];
+  // يُسبِق روابط المحتوى العام بادئة اللغة؛ روابط البوّابات/المصادقة تبقى كما هي.
+  const lh = (p: string) => (shouldLocalizePath(p) ? localeHref(locale, p) : p);
 
   const opps = await prisma.opportunity.findMany({
     where: { state: "PUBLISHED" },
@@ -302,7 +315,7 @@ export default async function Home() {
       {/* ===== Header ===== */}
       <header className="sticky top-0 z-50 border-b border-gold/20 bg-navy/90 backdrop-blur">
         <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5 text-white">
+          <Link href={lh("/")} className="flex shrink-0 items-center gap-2.5 text-white">
             <img src="/logo-mark.png" alt="Baraka Partners" width={40} height={40} className="h-10 w-10 shrink-0 rounded-[10px]" />
             <span className="flex flex-col items-start font-extrabold leading-tight">
               <span className="block">{c.brand}</span>
@@ -312,12 +325,13 @@ export default async function Home() {
             </span>
           </Link>
           <nav className="hidden items-center gap-6 whitespace-nowrap text-sm font-medium text-[#cdd6e4] xl:flex">
-            <Link href="/" className="transition hover:text-gold">{c.nav.home}</Link>
-            <Link href="/opportunities" className="transition hover:text-gold">{c.nav.opps}</Link>
+            <Link href={lh("/")} className="transition hover:text-gold">{c.nav.home}</Link>
+            <Link href={lh("/opportunities")} className="transition hover:text-gold">{c.nav.opps}</Link>
+            <Link href={lh("/investment-destinations")} className="transition hover:text-gold">{du.hub}</Link>
             <Link href="/register" className="transition hover:text-gold">{c.nav.inv}</Link>
             <Link href="/register/owner" className="transition hover:text-gold">{c.nav.own}</Link>
-            <Link href="/how-it-works" className="transition hover:text-gold">{c.nav.how}</Link>
-            <Link href="/contact" className="transition hover:text-gold">{c.nav.contact}</Link>
+            <Link href={lh("/how-it-works")} className="transition hover:text-gold">{c.nav.how}</Link>
+            <Link href={lh("/contact")} className="transition hover:text-gold">{c.nav.contact}</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <LocaleMenu locale={locale} />
@@ -355,7 +369,7 @@ export default async function Home() {
           </h1>
           <p className="rise mb-9 max-w-2xl text-lg leading-relaxed text-[#d3dcea]" style={{ animationDelay: "240ms" }}>{c.heroLead}</p>
           <div className="rise flex flex-wrap justify-center gap-4" style={{ animationDelay: "360ms" }}>
-            <Link href="/opportunities" className={btnGoldLg}>{c.heroBtn1}</Link>
+            <Link href={lh("/opportunities")} className={btnGoldLg}>{c.heroBtn1}</Link>
             <Link href="/register/owner" className={btnGhostLg}>{c.heroBtn2}</Link>
           </div>
           <div className="rise mt-14 flex w-full max-w-3xl flex-wrap justify-center gap-x-12 gap-y-6 border-t border-white/10 pt-9" style={{ animationDelay: "480ms" }}>
@@ -394,7 +408,7 @@ export default async function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link href={p.href} className={`${btnGold} w-full`}>{p.btn}</Link>
+                <Link href={lh(p.href)} className={`${btnGold} w-full`}>{p.btn}</Link>
               </div>
             ))}
           </div>
@@ -432,7 +446,7 @@ export default async function Home() {
           {featured.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {featured.map((o) => (
-                <Link key={o.id} href={`/opportunities/${o.id}`} className="group flex flex-col overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-gold-soft hover:shadow-[0_18px_44px_rgba(10,31,60,.1)]">
+                <Link key={o.id} href={lh(`/opportunities/${o.id}`)} className="group flex flex-col overflow-hidden rounded-2xl border border-[#e6e9ef] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-gold-soft hover:shadow-[0_18px_44px_rgba(10,31,60,.1)]">
                   <div className="relative h-44 bg-navy bg-cover bg-center" style={o.imageUrl ? { backgroundImage: `url(${o.imageUrl})` } : undefined}>
                     <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/80 to-navy/30" />
                     <span className="absolute end-4 top-4 rounded-full border border-gold/40 bg-gold/20 px-2.5 py-1 text-[11px] font-bold text-gold-soft backdrop-blur">{c.oppStatus}</span>
@@ -462,10 +476,43 @@ export default async function Home() {
             <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-[#5c6b80]">{c.oppsEmpty}</div>
           )}
           <div className="mt-11 text-center">
-            <Link href="/opportunities" className={btnGoldLg}>{c.oppsAll}</Link>
+            <Link href={lh("/opportunities")} className={btnGoldLg}>{c.oppsAll}</Link>
           </div>
         </div>
       </section>
+
+      {/* ===== Investment Destinations ===== */}
+      {destCards.length > 0 && (
+        <section className="bg-white py-20 sm:py-24">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="mx-auto mb-12 max-w-2xl text-center">
+              <div className="mb-2.5 text-sm font-bold tracking-wider text-gold">{du.hub}</div>
+              <h2 className="mb-3 text-3xl font-black text-navy sm:text-4xl">{exploreDestTitle}</h2>
+              <p className="text-lg text-[#5c6b80]">{du.hubLead}</p>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {destCards.map(({ dest, tr }) => (
+                <Link
+                  key={dest.id}
+                  href={destPath(locale, tr.slug)}
+                  className="group flex items-center gap-4 rounded-2xl border border-[#e6e9ef] bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-gold hover:shadow-[0_18px_44px_rgba(10,31,60,.08)]"
+                >
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-navy text-3xl">
+                    {dest.flagEmoji ?? "🌍"}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-extrabold text-navy group-hover:text-baraka">{tr.h1Title}</span>
+                    {tr.countryName && <span className="mt-0.5 block truncate text-sm text-[#5c6b80]">{tr.countryName}</span>}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-11 text-center">
+              <Link href={lh("/investment-destinations")} className={btnGoldLg}>{exploreDestTitle}</Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ===== Sectors ===== */}
       <section className="bg-white py-20 sm:py-24">
@@ -494,7 +541,7 @@ export default async function Home() {
                 {c.confTitleA} <span className="text-gold-soft">{c.confTitleGold}</span>
               </h2>
               <p className="mb-6 text-[#c5d0e0]">{c.confP}</p>
-              <Link href="/how-it-works" className={btnGold}>{c.confBtn}</Link>
+              <Link href={lh("/how-it-works")} className={btnGold}>{c.confBtn}</Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {c.conf.map((it) => (
@@ -553,19 +600,19 @@ export default async function Home() {
             <div>
               <h5 className="mb-4 font-bold text-white">{c.foot.platform}</h5>
               <ul className="flex flex-col gap-2.5 text-sm">
-                {c.footPlatform.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+                {c.footPlatform.map(([label, href]) => <li key={href + label}><Link href={lh(href)} className="hover:text-gold">{label}</Link></li>)}
               </ul>
             </div>
             <div>
               <h5 className="mb-4 font-bold text-white">{c.foot.users}</h5>
               <ul className="flex flex-col gap-2.5 text-sm">
-                {c.footUsers.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+                {c.footUsers.map(([label, href]) => <li key={href + label}><Link href={lh(href)} className="hover:text-gold">{label}</Link></li>)}
               </ul>
             </div>
             <div>
               <h5 className="mb-4 font-bold text-white">{c.foot.legal}</h5>
               <ul className="flex flex-col gap-2.5 text-sm">
-                {c.footLegal.map(([label, href]) => <li key={href + label}><Link href={href} className="hover:text-gold">{label}</Link></li>)}
+                {c.footLegal.map(([label, href]) => <li key={href + label}><Link href={lh(href)} className="hover:text-gold">{label}</Link></li>)}
               </ul>
             </div>
           </div>

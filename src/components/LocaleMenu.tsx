@@ -1,8 +1,8 @@
 "use client";
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { setLocale } from "@/app/_i18n/actions";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, parseLocaleFromPath, type Locale } from "@/lib/i18n";
 
 const LANGS: { code: Locale; label: string }[] = [
   { code: "ar", label: "ع" },
@@ -13,13 +13,21 @@ const LANGS: { code: Locale; label: string }[] = [
 
 export default function LocaleMenu({ locale }: { locale: Locale }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [pending, start] = useTransition();
 
   function pick(code: Locale) {
     if (code === locale || pending) return;
+    const { locale: pathLocale } = parseLocaleFromPath(pathname);
     start(async () => {
-      await setLocale(code);
-      router.refresh();
+      if (pathLocale) {
+        // صفحة عامة مُسبَقة بلغة → بدّل بادئة اللغة في الرابط
+        router.push(localeHref(code, pathname));
+      } else {
+        // بوّابة/مصادقة (بلا لغة في الرابط) → بدّل عبر الكوكي
+        await setLocale(code);
+        router.refresh();
+      }
     });
   }
 
