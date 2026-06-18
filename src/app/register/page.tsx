@@ -24,7 +24,7 @@ export default async function RegisterPage() {
           </p>
         </div>
 
-        <RegisterForm action={registerInvestor} locale={locale} />
+        <RegisterForm action={registerInvestor} locale={locale} showInvestorType />
 
         <div className="mt-6 space-y-1 text-center text-sm text-gray-500">
           <p>

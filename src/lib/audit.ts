@@ -22,12 +22,13 @@ export type AuditAction =
   | "USER_REGISTERED"
   | "USER_APPROVED"
   | "USER_SUSPENDED"
-  | "USER_REACTIVATED";
+  | "USER_REACTIVATED"
+  | "INVESTOR_PROFILE_SUBMITTED";
 
 export async function logActivity(params: {
   actorId: string;
   action: AuditAction;
-  entityType: "Opportunity" | "Interest" | "MissingItem" | "User";
+  entityType: "Opportunity" | "Interest" | "MissingItem" | "User" | "InvestorEntity";
   entityId: string;
   details?: Prisma.InputJsonValue;
 }): Promise<void> {

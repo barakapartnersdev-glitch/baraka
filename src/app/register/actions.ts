@@ -29,6 +29,10 @@ async function registerUser(
   const phone = String(formData.get("phone") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
+  const investorTypeRaw = String(formData.get("investorType") ?? "").trim();
+  const investorType = ["individual", "company", "fund"].includes(investorTypeRaw)
+    ? investorTypeRaw
+    : "individual";
 
   if (fullName.length < 3) {
     return { error: t(locale, "err.nameTooShort") };
@@ -79,6 +83,13 @@ async function registerUser(
 
   if (!created) {
     return { error: t(locale, "err.emailTaken") };
+  }
+
+  // للمستثمر: أنشئ كيانه الأساسي بنوعه المختار (يُستكمل ملفه لاحقاً)
+  if (role === "INVESTOR") {
+    await prisma.investorEntity.create({
+      data: { investorId: created.id, name: fullName, type: investorType },
+    });
   }
 
   await logActivity({

@@ -10,6 +10,7 @@ import { notifyAdmins } from "@/lib/notify";
 import { putObject } from "@/lib/storage";
 import { buildNcndaHtml } from "@/lib/ncnda";
 import { toVersion } from "@/lib/opportunity";
+import { isInvestorProfileComplete, type Ans } from "@/lib/investor-form";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
 
@@ -31,6 +32,19 @@ export async function requestInterest(
   });
   if (!user || user.accountStatus !== "ACTIVE") {
     return { ok: false, error: t(locale, "err.accountPendingInterest") };
+  }
+
+  // يجب اكتمال ملف التوثيق قبل طلب الاهتمام
+  const entity = await prisma.investorEntity.findFirst({
+    where: { investorId: session.userId },
+    orderBy: { createdAt: "asc" },
+    select: { profile: true },
+  });
+  const ans = (entity?.profile && typeof entity.profile === "object" && !Array.isArray(entity.profile)
+    ? entity.profile
+    : {}) as Ans;
+  if (!isInvestorProfileComplete(ans)) {
+    return { ok: false, error: t(locale, "err.profileIncomplete") };
   }
 
   const opp = await prisma.opportunity.findUnique({

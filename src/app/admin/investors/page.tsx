@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Badge from "@/components/Badge";
 import UserActions from "./UserActions";
@@ -45,7 +46,15 @@ export default async function InvestorsPage() {
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-t border-gray-100 hover:bg-gray-50">
-                <td className="p-3 font-medium">{u.fullName}</td>
+                <td className="p-3 font-medium">
+                  {u.role === "INVESTOR" ? (
+                    <Link href={`/admin/investors/${u.id}`} className="text-navy hover:text-gold hover:underline">
+                      {u.fullName}
+                    </Link>
+                  ) : (
+                    u.fullName
+                  )}
+                </td>
                 <td className="p-3 text-gray-600">
                   {u.role === "INVESTOR" ? t(locale, "role.investor") : t(locale, "role.owner")}
                 </td>

@@ -8,11 +8,19 @@ const initialState: RegisterState = {};
 export default function RegisterForm({
   action,
   locale,
+  showInvestorType = false,
 }: {
   action: (prev: RegisterState, formData: FormData) => Promise<RegisterState>;
   locale: Locale;
+  showInvestorType?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  const typeOptions: { v: string; key: string }[] = [
+    { v: "individual", key: "reg.typeIndividual" },
+    { v: "company", key: "reg.typeCompany" },
+    { v: "fund", key: "reg.typeFund" },
+  ];
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -90,6 +98,31 @@ export default function RegisterForm({
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-right focus:outline-none focus:border-baraka"
         />
       </div>
+
+      {showInvestorType && (
+        <div>
+          <span className="block text-sm text-gray-700 mb-1.5">
+            {t(locale, "reg.investorType")}
+          </span>
+          <div className="grid grid-cols-3 gap-2">
+            {typeOptions.map((o, i) => (
+              <label
+                key={o.v}
+                className="relative flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 px-2 py-2 text-sm text-gray-700 transition hover:border-baraka has-[:checked]:border-baraka has-[:checked]:bg-baraka-light has-[:checked]:font-semibold has-[:checked]:text-baraka-dark"
+              >
+                <input
+                  type="radio"
+                  name="investorType"
+                  value={o.v}
+                  defaultChecked={i === 0}
+                  className="sr-only"
+                />
+                {t(locale, o.key)}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       {state?.error && (
         <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg p-3">
