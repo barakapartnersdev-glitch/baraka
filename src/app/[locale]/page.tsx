@@ -8,6 +8,7 @@ import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
 import { getDestinationCards, destPath } from "@/lib/destinations";
 import { destUi } from "@/lib/dest-i18n";
+import HomeQuickForm from "./HomeQuickForm";
 
 export const dynamic = "force-dynamic";
 
@@ -567,6 +568,13 @@ export default async function Home() {
               <Link href="/register/owner" className="inline-flex items-center justify-center rounded-xl bg-navy px-7 py-4 text-base font-bold text-white transition hover:bg-navy-600">{c.ctaBtn2}</Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ===== تواصل سريع (CRM) ===== */}
+      <section className="bg-baraka-light/30 py-20 sm:py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <HomeQuickForm locale={locale} />
         </div>
       </section>
 
