@@ -23,7 +23,8 @@ export type AuditAction =
   | "USER_APPROVED"
   | "USER_SUSPENDED"
   | "USER_REACTIVATED"
-  | "INVESTOR_PROFILE_SUBMITTED";
+  | "INVESTOR_PROFILE_SUBMITTED"
+  | "PASSWORD_RESET";
 
 export async function logActivity(params: {
   actorId: string;

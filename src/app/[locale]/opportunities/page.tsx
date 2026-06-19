@@ -5,9 +5,26 @@ import OpportunityCard, { type OpportunityCardData } from "@/components/Opportun
 import { toVersion } from "@/lib/opportunity";
 import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { t, localeHref } from "@/lib/i18n";
+import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  return pageMetadata({
+    locale,
+    path: "/opportunities",
+    title: `${t(locale, "opps.title")} | Baraka Partners`,
+    description: t(locale, "opps.sub"),
+  });
+}
 
 function fmtRange(min: bigint | null, max: bigint | null, cur: string) {
   if (!min && !max) return null;

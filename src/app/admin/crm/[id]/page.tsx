@@ -17,6 +17,7 @@ import AddNote from "./AddNote";
 import LeadReadOnMount from "./LeadReadOnMount";
 import ScheduleFollowup from "./ScheduleFollowup";
 import MarkDoneButton from "../MarkDoneButton";
+import LeadFiles from "./LeadFiles";
 
 export const dynamic = "force-dynamic";
 
@@ -168,6 +169,9 @@ export default async function CrmLeadDetail({
               {lead.message || <span className="text-gray-400">{tc(locale, "detail.noMessage")}</span>}
             </p>
           </section>
+
+          {/* الملفات المرفقة */}
+          <LeadFiles leadId={lead.id} locale={locale} />
 
           {/* الملاحظات والمتابعة */}
           <section className="rounded-xl border border-gray-200 bg-white p-4">

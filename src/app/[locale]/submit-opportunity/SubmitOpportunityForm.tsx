@@ -6,6 +6,7 @@ import { OWNER_SENDER_ROLES, PROJECT_SECTORS, FEASIBILITY_OPTS, LICENSING_OPTS }
 import type { Locale } from "@/lib/i18n";
 import { submitOpportunityLead } from "./actions";
 import type { LeadFormState } from "@/lib/crm-submit";
+import { tf } from "@/lib/file-i18n";
 
 const initial: LeadFormState = {};
 
@@ -108,6 +109,22 @@ export default function SubmitOpportunityForm({ locale }: { locale: Locale }) {
       <div>
         <label htmlFor="so-desc" className="block text-sm text-gray-700 mb-1">{tc(locale, "submitOpp.desc")}</label>
         <textarea id="so-desc" name="message" rows={5} className={inputCls} />
+      </div>
+
+      {/* رفع ملفات (PDF / Word / Excel / صور) — يلتقطها submitLead تلقائياً */}
+      <div>
+        <label htmlFor="so-files" className="block text-sm text-gray-700 mb-1">
+          {tf(locale, "attach")} <span className="text-gray-400">{tc(locale, "field.optional")}</span>
+        </label>
+        <input
+          id="so-files"
+          name="files"
+          type="file"
+          multiple
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.webp"
+          className="w-full text-sm text-gray-600 file:mr-2 file:rounded-lg file:border-0 file:bg-baraka-light file:px-3 file:py-2 file:text-baraka-dark"
+        />
+        <p className="mt-1 text-xs text-gray-400">{tf(locale, "attachHint")}</p>
       </div>
 
       <label className="flex items-start gap-2 text-sm text-gray-700">

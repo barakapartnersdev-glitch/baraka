@@ -16,10 +16,12 @@ import {
   SENDER_ROLES,
   PREFERRED_CONTACTS,
 } from "@/lib/crm";
+import { processLeadFiles } from "@/lib/crm-files";
 
 export interface LeadFormState {
   ok?: boolean;
   error?: string;
+  leadId?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -187,5 +189,17 @@ export async function submitLead(opts: {
     });
   }
 
-  return { ok: true };
+  // 11) مرفقات الملفات إن وُجدت — أي نموذج فيه <input name="files"> (أفضل جهد)
+  const files = formData
+    .getAll("files")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  if (files.length > 0) {
+    try {
+      await processLeadFiles(leadId, files, locale);
+    } catch (e) {
+      console.error("[crm-submit] تعذّر معالجة المرفقات:", e);
+    }
+  }
+
+  return { ok: true, leadId };
 }

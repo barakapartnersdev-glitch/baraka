@@ -6,6 +6,7 @@ import "server-only";
 import { createHash } from "crypto";
 import { headers } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { dir, type Locale } from "@/lib/i18n";
 
 const PURPOSE = "pwreset";
 const TTL_SECONDS = 60 * 60; // ساعة واحدة
@@ -80,4 +81,30 @@ export async function passwordResetUrl(token: string): Promise<string> {
   }
   if (!base) base = "http://localhost:3000";
   return `${base}/reset-password?token=${encodeURIComponent(token)}`;
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// قالب بريد إعادة التعيين — زرّ مع الرابط، يحترم اتجاه اللغة. مشترك بين النموذج
+// العام (نسيت كلمة المرور) وإجراء الإدارة (إرسال رابط للوكيل).
+export function resetEmailHtml(
+  locale: Locale,
+  fullName: string,
+  body: string,
+  url: string,
+  cta: string
+): string {
+  const d = dir(locale);
+  const align = d === "rtl" ? "right" : "left";
+  return `<!doctype html><html dir="${d}"><body style="margin:0;background:#f5f6f8;font-family:Tahoma,Arial,sans-serif;color:#1f2733">
+  <div style="max-width:520px;margin:0 auto;padding:24px">
+    <div style="background:#fff;border:1px solid #e6e8ec;border-radius:14px;padding:28px;text-align:${align}">
+      <p style="font-weight:700;margin:0 0 12px">${escapeHtml(fullName)}</p>
+      <p style="line-height:1.7;margin:0 0 20px">${escapeHtml(body)}</p>
+      <a href="${url}" style="display:inline-block;background:#1f6b54;color:#fff;text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:700">${escapeHtml(cta)}</a>
+      <p style="font-size:12px;color:#8a93a3;margin:20px 0 0;word-break:break-all">${url}</p>
+    </div>
+  </div></body></html>`;
 }

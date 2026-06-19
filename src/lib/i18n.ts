@@ -21,6 +21,7 @@ export const NON_LOCALIZED_PREFIXES = [
   "/agent",
   "/login",
   "/register",
+  "/reset-password",
   "/api",
   "/auth",
 ] as const;

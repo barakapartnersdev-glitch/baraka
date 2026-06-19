@@ -10,6 +10,10 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { notify, notifyAdmins } from "@/lib/notify";
 import { storeAgentUpload } from "@/lib/agent-files";
+import { emailConfigured, sendEmail } from "@/lib/email";
+import { getLocale } from "@/lib/i18n-server";
+import { resetUi } from "@/lib/reset-i18n";
+import { createPasswordResetToken, passwordResetUrl, resetEmailHtml } from "@/lib/password-reset";
 import { AGENT_STATUSES, AGENT_CONTRACT_STATUSES, SUBMISSION_STATUSES } from "@/lib/agent";
 
 export interface ActionState {
@@ -113,8 +117,32 @@ export async function saveAgentNotes(id: string, notes: string): Promise<ActionS
 // ===== المرحلة 2: العقد / الحساب / الأصول / المراسلات =====
 // ============================================================
 
-function tempPassword(): string {
-  return randomBytes(9).toString("base64").replace(/[+/=]/g, "").slice(0, 12) + "7b";
+// بريد + رابط تعيين كلمة المرور لمستخدم وكيل (مشترك بين فتح الحساب وإعادة الإرسال).
+// يعيد الرابط دائماً (ليتمكّن المسؤول من نسخه عند تعطّل البريد) + هل أُرسل بريد.
+async function issueAgentPasswordLink(
+  userId: string,
+  passwordHash: string,
+  email: string,
+  fullName: string
+): Promise<{ resetLink: string; emailSent: boolean }> {
+  const token = await createPasswordResetToken(userId, passwordHash);
+  const resetLink = await passwordResetUrl(token);
+  let emailSent = false;
+  if (emailConfigured()) {
+    try {
+      const locale = await getLocale();
+      const rui = resetUi(locale);
+      await sendEmail({
+        to: email,
+        subject: rui.emailSubject,
+        html: resetEmailHtml(locale, fullName, rui.emailBody, resetLink, rui.emailCta),
+      });
+      emailSent = true;
+    } catch (e) {
+      console.error("[asset-agents] تعذّر إرسال بريد تعيين كلمة المرور:", e);
+    }
+  }
+  return { resetLink, emailSent };
 }
 
 async function latestAgentContract(applicationId: string) {
@@ -172,8 +200,9 @@ export async function uploadAgentSignedContract(_prev: ActionState, formData: Fo
 export interface CreateAgentAccountState {
   ok: boolean;
   error?: string;
-  tempPassword?: string;
   email?: string;
+  resetLink?: string;
+  emailSent?: boolean;
 }
 
 export async function createAgentAccount(applicationId: string): Promise<CreateAgentAccountState> {
@@ -185,8 +214,8 @@ export async function createAgentAccount(applicationId: string): Promise<CreateA
   const existing = await prisma.user.findUnique({ where: { email: app.email }, select: { id: true } });
   if (existing) return { ok: false, error: "email_taken" };
 
-  const password = tempPassword();
-  const passwordHash = await bcrypt.hash(password, 10);
+  // كلمة مرور أولية عشوائية غير قابلة للتخمين — لا تُعرض؛ يعيّن الوكيل كلمته عبر الرابط.
+  const passwordHash = await bcrypt.hash(randomBytes(24).toString("hex"), 10);
   const user = await prisma.user.create({
     data: { email: app.email, fullName: app.fullName, phone: app.phone, role: "ASSET_OWNER_AGENT", accountStatus: "ACTIVE", passwordHash },
     select: { id: true },
@@ -196,14 +225,38 @@ export async function createAgentAccount(applicationId: string): Promise<CreateA
     data: { userId: user.id, applicationId: app.id, status: "active", startDate: new Date(), assignedManagerId: app.assignedToId },
   });
   await logAgent(session.userId, applicationId, "AGENT_ACCOUNT_CREATED", { userId: user.id });
+
+  // رابط تعيين كلمة المرور (يحلّ محلّ كلمة المرور المؤقتة)
+  const { resetLink, emailSent } = await issueAgentPasswordLink(user.id, passwordHash, app.email, app.fullName);
+
   await notify({
     userId: user.id,
     type: "ASSET_AGENT_ACCOUNT_CREATED",
-    message: "تم فتح حساب وكيل أصحاب الأصول الخاص بك. يمكنك تسجيل الدخول الآن.",
+    message: "تم فتح حساب وكيل أصحاب الأصول الخاص بك. عيّن كلمة مرورك عبر الرابط المُرسَل ثم سجّل الدخول.",
     link: "/agent",
   });
   revalidate(applicationId);
-  return { ok: true, tempPassword: password, email: app.email };
+  return { ok: true, email: app.email, resetLink, emailSent };
+}
+
+// إعادة إرسال رابط تعيين/إعادة كلمة المرور لحساب وكيل قائم.
+export interface AgentResetLinkState {
+  ok: boolean;
+  error?: string;
+  resetLink?: string;
+  emailSent?: boolean;
+}
+
+export async function sendAgentPasswordResetLink(applicationId: string): Promise<AgentResetLinkState> {
+  const session = await requireRole("ADMIN");
+  const app = await prisma.assetAgentApplication.findUnique({
+    where: { id: applicationId },
+    select: { userId: true, email: true, fullName: true, user: { select: { passwordHash: true } } },
+  });
+  if (!app?.userId || !app.user) return { ok: false, error: "no_account" };
+  const { resetLink, emailSent } = await issueAgentPasswordLink(app.userId, app.user.passwordHash, app.email, app.fullName);
+  await logAgent(session.userId, applicationId, "AGENT_RESET_LINK_SENT", { emailSent });
+  return { ok: true, resetLink, emailSent };
 }
 
 export async function suspendAgentAccount(applicationId: string, suspend: boolean): Promise<ActionState> {

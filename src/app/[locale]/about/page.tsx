@@ -1,9 +1,24 @@
 import PublicHeader from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import { getLocale } from "@/lib/i18n-server";
-import { t } from "@/lib/i18n";
+import { t, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { pageMetadata, clampDescription } from "@/lib/seo";
+import type { Metadata } from "next";
 
-export const metadata = { title: "من نحن — شركاء البركة" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  return pageMetadata({
+    locale,
+    path: "/about",
+    title: `${t(locale, "about.title")} | Baraka Partners`,
+    description: clampDescription(t(locale, "about.body1")),
+  });
+}
 
 export default async function AboutPage() {
   const locale = await getLocale();

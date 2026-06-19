@@ -10,6 +10,7 @@ import {
   setAgentContractStatus,
   uploadAgentSignedContract,
   suspendAgentAccount,
+  sendAgentPasswordResetLink,
   type ActionState,
 } from "../actions";
 
@@ -35,7 +36,7 @@ export default function AgentManage({
 }) {
   const [pending, start] = useTransition();
   const [err, setErr] = useState<string | null>(null);
-  const [created, setCreated] = useState<{ tempPassword: string; email: string } | null>(null);
+  const [linkInfo, setLinkInfo] = useState<{ email?: string; resetLink: string; emailSent: boolean } | null>(null);
   const [upState, upAction, upPending] = useActionState(uploadAgentSignedContract, { ok: false } as ActionState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -94,27 +95,8 @@ export default function AgentManage({
       {/* الحساب */}
       <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
         <h3 className="font-bold text-baraka-dark text-sm">{tg(locale, "admin.createAccount")}</h3>
-        {created ? (
-          <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm">
-            <p className="font-bold text-green-800 mb-2">{tg(locale, "admin.accountCreatedTitle")}</p>
-            <p className="text-xs text-gray-500">{tg(locale, "admin.accountEmail")}</p>
-            <p className="font-mono text-gray-800 mb-2" dir="ltr">{created.email}</p>
-            <p className="text-xs text-gray-500">{tg(locale, "admin.tempPassword")}</p>
-            <p className="font-mono text-base font-bold text-baraka-dark select-all" dir="ltr">{created.tempPassword}</p>
-          </div>
-        ) : hasAccount ? (
-          <>
-            <p className="text-sm text-green-700">{tg(locale, "admin.accountExists")}</p>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => run(() => suspendAgentAccount(id, accountActive))}
-              className={`text-xs border rounded-lg px-3 py-1.5 disabled:opacity-60 ${accountActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-green-200 text-green-700 hover:bg-green-50"}`}
-            >
-              {accountActive ? tg(locale, "dash.acc.suspended") : tg(locale, "dash.acc.active")}
-            </button>
-          </>
-        ) : (
+
+        {!hasAccount && !linkInfo ? (
           <button
             type="button"
             disabled={pending}
@@ -124,13 +106,61 @@ export default function AgentManage({
               start(async () => {
                 const r = await createAgentAccount(id);
                 if (!r.ok) setErr(r.error === "need_contracted" ? tg(locale, "admin.needContracted") : r.error ?? tg(locale, "common.actionFailed"));
-                else setCreated({ tempPassword: r.tempPassword!, email: r.email! });
+                else setLinkInfo({ email: r.email, resetLink: r.resetLink!, emailSent: !!r.emailSent });
               });
             }}
             className="w-full bg-baraka text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-baraka-dark transition disabled:opacity-60"
           >
             {tg(locale, "admin.createAccount")}
           </button>
+        ) : (
+          <>
+            {hasAccount && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-green-700">{tg(locale, "admin.accountExists")}</span>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => run(() => suspendAgentAccount(id, accountActive))}
+                  className={`text-xs border rounded-lg px-3 py-1.5 disabled:opacity-60 ${accountActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-green-200 text-green-700 hover:bg-green-50"}`}
+                >
+                  {accountActive ? tg(locale, "dash.acc.suspended") : tg(locale, "dash.acc.active")}
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    setErr(null);
+                    start(async () => {
+                      const r = await sendAgentPasswordResetLink(id);
+                      if (!r.ok) setErr(r.error ?? tg(locale, "common.actionFailed"));
+                      else setLinkInfo({ resetLink: r.resetLink!, emailSent: !!r.emailSent });
+                    });
+                  }}
+                  className="text-xs border border-baraka/40 text-baraka rounded-lg px-3 py-1.5 hover:bg-baraka-light disabled:opacity-60"
+                >
+                  {pending ? tg(locale, "admin.sendingLink") : tg(locale, "admin.sendResetLink")}
+                </button>
+              </div>
+            )}
+
+            {linkInfo && (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm">
+                <p className="font-bold text-green-800 mb-2">{tg(locale, "admin.accountCreatedTitle")}</p>
+                {linkInfo.email && (
+                  <>
+                    <p className="text-xs text-gray-500">{tg(locale, "admin.accountEmail")}</p>
+                    <p className="font-mono text-gray-800 mb-2" dir="ltr">{linkInfo.email}</p>
+                  </>
+                )}
+                <p className="text-xs text-gray-500">{tg(locale, "admin.resetLinkLabel")}</p>
+                <p className="font-mono text-xs text-baraka-dark select-all break-all" dir="ltr">{linkInfo.resetLink}</p>
+                <p className="mt-2 text-xs text-gray-600">
+                  {linkInfo.emailSent ? tg(locale, "admin.emailSentNote") : tg(locale, "admin.emailManualNote")}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -11,7 +11,12 @@ const M: Record<string, Tri> = {
   "admin.accountCreatedTitle": { ar: "تم فتح الحساب", en: "Account created", tr: "Hesap oluşturuldu" },
   "admin.tempPassword": { ar: "كلمة مرور مؤقتة (انسخها وأرسلها للوكيل — تظهر مرة واحدة)", en: "Temporary password (copy & send to the agent — shown once)", tr: "Geçici şifre (kopyalayıp temsilciye gönderin — bir kez gösterilir)" },
   "admin.accountEmail": { ar: "بريد الدخول", en: "Login email", tr: "Giriş e-postası" },
-  "admin.confirmCreate": { ar: "سيتم إنشاء حساب وكيل بكلمة مرور مؤقتة. متابعة؟", en: "An agent account will be created with a temporary password. Continue?", tr: "Geçici şifreyle bir temsilci hesabı oluşturulacak. Devam?" },
+  "admin.confirmCreate": { ar: "سيتم إنشاء حساب وكيل وإرسال رابط لتعيين كلمة المرور. متابعة؟", en: "An agent account will be created and a password-setup link issued. Continue?", tr: "Bir temsilci hesabı oluşturulacak ve şifre belirleme bağlantısı verilecek. Devam?" },
+  "admin.resetLinkLabel": { ar: "رابط تعيين كلمة المرور (صالح لساعة — انسخه وسلّمه للوكيل)", en: "Password-setup link (valid 1h — copy & send to the agent)", tr: "Şifre belirleme bağlantısı (1s geçerli — kopyalayıp temsilciye gönderin)" },
+  "admin.emailSentNote": { ar: "✓ أُرسل بريد بالرابط إلى الوكيل.", en: "✓ A link email was sent to the agent.", tr: "✓ Temsilciye bağlantı e-postası gönderildi." },
+  "admin.emailManualNote": { ar: "البريد غير مُفعّل — انسخ الرابط أعلاه وسلّمه للوكيل.", en: "Email is off — copy the link above and send it to the agent.", tr: "E-posta kapalı — yukarıdaki bağlantıyı kopyalayıp temsilciye gönderin." },
+  "admin.sendResetLink": { ar: "إرسال رابط تعيين كلمة المرور", en: "Send password-setup link", tr: "Şifre belirleme bağlantısı gönder" },
+  "admin.sendingLink": { ar: "جارٍ الإرسال...", en: "Sending...", tr: "Gönderiliyor..." },
   "common.actionFailed": { ar: "تعذّر تنفيذ الإجراء.", en: "Action failed.", tr: "İşlem başarısız." },
 
   // ===== العقد (الإدارة) =====

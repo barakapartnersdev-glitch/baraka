@@ -3,7 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
 import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
-import { localeHref, shouldLocalizePath } from "@/lib/i18n";
+import { localeHref, shouldLocalizePath, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { pageMetadata, clampDescription, organizationLd, websiteLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
+import type { Metadata } from "next";
 import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
 import { getDestinationCards, destPath } from "@/lib/destinations";
@@ -274,6 +277,22 @@ const C = {
   },
 } as const;
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  const c = C[locale] ?? C.ar;
+  return pageMetadata({
+    locale,
+    path: "",
+    title: `${c.brand} | ${c.heroTag}`,
+    description: clampDescription(c.heroLead),
+  });
+}
+
 export default async function Home() {
   const locale = await getLocale();
   const c = C[locale] ?? C.ar;
@@ -287,6 +306,7 @@ export default async function Home() {
   } as const)[locale];
   // يُسبِق روابط المحتوى العام بادئة اللغة؛ روابط البوّابات/المصادقة تبقى كما هي.
   const lh = (p: string) => (shouldLocalizePath(p) ? localeHref(locale, p) : p);
+  const homeLd = [organizationLd(), websiteLd()];
 
   const opps = await prisma.opportunity.findMany({
     where: { state: "PUBLISHED" },
@@ -313,6 +333,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#f6f7f9] text-[#1a2433]">
+      <JsonLd data={homeLd} />
       {/* ===== Header ===== */}
       <header className="sticky top-0 z-50 border-b border-gold/20 bg-navy/90 backdrop-blur">
         <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
