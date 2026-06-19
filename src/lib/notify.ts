@@ -29,6 +29,14 @@ const SUBJECTS: Record<NotificationType, string> = {
   AMBASSADOR_NEW_MESSAGE: "رسالة داخلية جديدة",
   AMBASSADOR_NEW_REFERRAL: "ترشيح مستثمر جديد من سفير",
   AMBASSADOR_REFERRAL_STATUS_CHANGED: "تحديث حالة ترشيح مستثمر",
+  ASSET_AGENT_APPLICATION_RECEIVED: "طلب وكيل صاحب أصل جديد",
+  ASSET_AGENT_STATUS_CHANGED: "تحديث حالة طلب الوكالة",
+  ASSET_AGENT_CONTRACT_SENT: "عقد الوكالة جاهز للتوقيع",
+  ASSET_AGENT_CONTRACT_SIGNED: "تم توقيع عقد الوكالة",
+  ASSET_AGENT_ACCOUNT_CREATED: "تم فتح حساب وكيل صاحب الأصل",
+  ASSET_AGENT_NEW_MESSAGE: "رسالة داخلية جديدة",
+  ASSET_AGENT_NEW_ASSET: "أصل/فرصة جديدة من وكيل",
+  ASSET_AGENT_ASSET_STATUS_CHANGED: "تحديث حالة أصل مقدّم",
 };
 
 // إشعار مستخدم واحد (+ بريد إن كان مُفعّلاً). أفضل جهد: لا يرمي للأعلى.

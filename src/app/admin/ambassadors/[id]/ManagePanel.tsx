@@ -1,6 +1,6 @@
 "use client";
 // لوحة التحكّم بطلب السفير: الحالة، التقييم، الإسناد، وإضافة ملاحظة داخلية.
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ta } from "@/lib/ambassador-i18n";
 import { ALL_AMB_STATUSES } from "@/lib/ambassador-form";
@@ -9,6 +9,7 @@ import {
   setAmbassadorScore,
   assignAmbassador,
   addAmbassadorNote,
+  recomputeAmbassadorScore,
 } from "../actions";
 
 type Admin = { id: string; fullName: string };
@@ -35,6 +36,11 @@ export default function ManagePanel({
   const [error, setError] = useState<string | null>(null);
   const [scoreVal, setScoreVal] = useState(String(score));
   const [note, setNote] = useState("");
+
+  // مزامنة حقل التقييم بعد إعادة الحساب التلقائي (revalidate يحدّث prop score)
+  useEffect(() => {
+    setScoreVal(String(score));
+  }, [score]);
 
   function run(fn: () => Promise<{ ok: boolean; error?: string }>, after?: () => void) {
     setError(null);
@@ -89,6 +95,14 @@ export default function ManagePanel({
             {ta(locale, "admin.action.save")}
           </button>
         </div>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => run(() => recomputeAmbassadorScore(id))}
+          className="mt-2 text-xs text-baraka hover:underline disabled:opacity-60"
+        >
+          {ta(locale, "admin.action.autoScore")}
+        </button>
       </div>
 
       {/* الإسناد */}

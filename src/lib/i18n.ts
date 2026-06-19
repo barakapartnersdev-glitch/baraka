@@ -18,6 +18,7 @@ export const NON_LOCALIZED_PREFIXES = [
   "/owner",
   "/investor",
   "/ambassador",
+  "/agent",
   "/login",
   "/register",
   "/api",

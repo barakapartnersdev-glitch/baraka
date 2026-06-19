@@ -2,13 +2,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/auth";
+import { requirePageCapability, getAdminRole } from "@/lib/admin-guard";
+import { roleHasCapability, type Capability } from "@/lib/admin-roles";
 import Badge from "@/components/Badge";
 import { getLocale } from "@/lib/i18n-server";
 import { type Locale } from "@/lib/i18n";
 import { ta } from "@/lib/ambassador-i18n";
 import { AMB_STATUS_TONE, asStringArray } from "@/lib/ambassador-form";
+import { esignConfigured } from "@/lib/esign";
 import ManagePanel from "./ManagePanel";
+import CreateAccount from "./CreateAccount";
+import ContractPanel from "./ContractPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +36,9 @@ export default async function AmbassadorDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole("ADMIN");
+  const session = await requirePageCapability("view");
+  const adminRole = await getAdminRole(session.userId);
+  const can = (c: Capability) => roleHasCapability(adminRole, c);
   const locale = await getLocale();
   const { id } = await params;
 
@@ -41,9 +47,13 @@ export default async function AmbassadorDetailPage({
     include: {
       assignedTo: { select: { fullName: true } },
       files: { orderBy: { createdAt: "asc" } },
+      account: { select: { id: true } },
+      contracts: { orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
   if (!app) notFound();
+  const contract = app.contracts[0] ?? null;
+  const fmtDt = (d: Date | null) => (d ? d.toISOString().slice(0, 16).replace("T", " ") : null);
 
   const [admins, logs] = await Promise.all([
     prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true, fullName: true } }),
@@ -183,17 +193,40 @@ export default async function AmbassadorDetailPage({
 
         {/* عمود الإدارة */}
         <div className="lg:col-span-1">
-          <div className="bg-white border border-gray-200 rounded-xl p-5 sticky top-20">
-            <h2 className="font-bold text-baraka-dark mb-4">{t("admin.detail.admin")}</h2>
-            <ManagePanel
-              id={app.id}
-              locale={locale}
-              status={app.status}
-              score={app.score}
-              assigneeId={app.assignedToId}
-              admins={admins}
-            />
-          </div>
+          {(can("review") || can("account")) && (
+            <div className="bg-white border border-gray-200 rounded-xl p-5 sticky top-20">
+              <h2 className="font-bold text-baraka-dark mb-4">{t("admin.detail.admin")}</h2>
+              {can("review") && (
+                <ManagePanel
+                  id={app.id}
+                  locale={locale}
+                  status={app.status}
+                  score={app.score}
+                  assigneeId={app.assignedToId}
+                  admins={admins}
+                />
+              )}
+              {can("account") && (
+                <div className={can("review") ? "mt-4 pt-4 border-t border-gray-100" : ""}>
+                  <CreateAccount id={app.id} locale={locale} hasAccount={!!app.account} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {can("contract") && (
+            <div className="bg-white border border-gray-200 rounded-xl p-5 mt-6">
+              <h2 className="font-bold text-baraka-dark mb-4">{t("contract.title")}</h2>
+              <ContractPanel
+                id={app.id}
+                locale={locale}
+                status={contract?.status ?? null}
+                sentAt={fmtDt(contract?.sentAt ?? null)}
+                signedAt={fmtDt(contract?.signedAt ?? null)}
+                esignConfigured={esignConfigured()}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

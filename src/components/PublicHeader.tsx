@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref } from "@/lib/i18n";
 import { ta } from "@/lib/ambassador-i18n";
+import { agentUi } from "@/lib/agent-i18n";
 import LocaleMenu from "@/components/LocaleMenu";
 
 export default async function PublicHeader() {
@@ -24,6 +25,7 @@ export default async function PublicHeader() {
           <Link href={localeHref(locale, "/opportunities")} className="transition hover:text-gold">{t(locale, "nav.opportunities")}</Link>
           <Link href={localeHref(locale, "/how-it-works")} className="transition hover:text-gold">{t(locale, "nav.how")}</Link>
           <Link href={localeHref(locale, "/investment-ambassadors")} className="transition hover:text-gold">{ta(locale, "nav.ambassadors")}</Link>
+          <Link href={localeHref(locale, "/asset-owner-agents")} className="transition hover:text-gold">{agentUi(locale).navLabel}</Link>
           <Link href={localeHref(locale, "/about")} className="transition hover:text-gold">{t(locale, "nav.about")}</Link>
           <Link href={localeHref(locale, "/contact")} className="transition hover:text-gold">{t(locale, "nav.contact")}</Link>
         </nav>

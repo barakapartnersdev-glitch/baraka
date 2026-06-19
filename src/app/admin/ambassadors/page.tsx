@@ -2,7 +2,8 @@
 import Link from "next/link";
 import type { Prisma, AmbassadorAppStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireRole } from "@/lib/auth";
+import { requirePageCapability, getAdminRole } from "@/lib/admin-guard";
+import { roleHasCapability } from "@/lib/admin-roles";
 import Badge from "@/components/Badge";
 import { getLocale } from "@/lib/i18n-server";
 import { ta } from "@/lib/ambassador-i18n";
@@ -25,7 +26,8 @@ export default async function AmbassadorsListPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requireRole("ADMIN");
+  const session = await requirePageCapability("view");
+  const canStaff = roleHasCapability(await getAdminRole(session.userId), "staff");
   const locale = await getLocale();
   const sp = await searchParams;
 
@@ -62,9 +64,30 @@ export default async function AmbassadorsListPage({
           <h1 className="text-2xl font-bold mb-1">{ta(locale, "admin.title")}</h1>
           <p className="text-gray-500 text-sm">{ta(locale, "admin.subtitle")}</p>
         </div>
-        <span className="text-sm text-gray-600">
-          {ta(locale, "admin.title")}: <span className="font-bold text-navy">{total}</span>
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap gap-2 justify-end">
+            <Link href="/admin/ambassadors/referrals" className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+              {ta(locale, "admin.referrals.title")}
+            </Link>
+            <Link href="/admin/ambassadors/messages" className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+              {ta(locale, "admin.messages.title")}
+            </Link>
+            <Link href="/admin/ambassadors/reports" className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+              {ta(locale, "nav.reports")}
+            </Link>
+            <Link href="/admin/ambassadors/templates" className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+              {ta(locale, "nav.templates")}
+            </Link>
+            {canStaff && (
+              <Link href="/admin/ambassadors/staff" className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition">
+                {ta(locale, "nav.staff")}
+              </Link>
+            )}
+          </div>
+          <span className="text-sm text-gray-600">
+            {ta(locale, "admin.title")}: <span className="font-bold text-navy">{total}</span>
+          </span>
+        </div>
       </div>
 
       {/* الفلاتر (GET) */}

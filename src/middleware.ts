@@ -19,11 +19,12 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
 // الدور المطلوب حسب بادئة المسار
 function requiredRole(
   pathname: string
-): "ADMIN" | "PROJECT_OWNER" | "INVESTOR" | "AMBASSADOR" | null {
+): "ADMIN" | "PROJECT_OWNER" | "INVESTOR" | "AMBASSADOR" | "ASSET_OWNER_AGENT" | null {
   if (pathname.startsWith("/admin")) return "ADMIN";
   if (pathname.startsWith("/owner")) return "PROJECT_OWNER";
   if (pathname.startsWith("/investor")) return "INVESTOR";
   if (pathname.startsWith("/ambassador")) return "AMBASSADOR";
+  if (pathname.startsWith("/agent")) return "ASSET_OWNER_AGENT";
   return null;
 }
 

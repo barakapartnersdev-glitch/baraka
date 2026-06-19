@@ -23,6 +23,11 @@ const items: NavItem[] = [
     icon: "M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21l2.3-7.4-6-4.6h7.6z",
     labels: { ar: "سفراء الاستثمار", en: "Investment Ambassadors", tr: "Yatırım Elçileri", zh: "投资大使" },
   },
+  {
+    href: "/admin/asset-agents",
+    icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+    labels: { ar: "وكلاء أصحاب الأصول", en: "Asset Owner Agents", tr: "Varlık Sahibi Temsilcileri", zh: "资产所有者代理" },
+  },
   { href: "/admin/investors", key: "sidebar.users", icon: "M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" },
 ];
 

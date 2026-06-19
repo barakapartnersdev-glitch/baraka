@@ -2,6 +2,7 @@ import PublicHeader from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
+import ContactForm from "./ContactForm";
 
 export const metadata = { title: "تواصل معنا — شركاء البركة" };
 
@@ -28,6 +29,10 @@ export default async function ContactPage() {
           >
             {t(locale, "contact.cta")}
           </a>
+        </div>
+
+        <div className="mt-6">
+          <ContactForm locale={locale} />
         </div>
       </main>
       <Footer />

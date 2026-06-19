@@ -1,7 +1,12 @@
 // تعريفات نموذج سفير الاستثمار — قوائم القيم الموحّدة وحالات الطلب ومساعدات.
 // مصدر موحّد يستخدمه النموذج العام (AmbassadorForm) وإجراء الإرسال ولوحة الإدارة.
 // القيم أكواد ثابتة تُخزَّن؛ التسميات تأتي من ambassador-i18n عبر ta().
-import type { AmbassadorAppStatus } from "@prisma/client";
+import type {
+  AmbassadorAppStatus,
+  ReferralStatus,
+  AmbassadorMessageStatus,
+  AmbassadorContractStatus,
+} from "@prisma/client";
 
 // ===== قوائم خيارات النموذج (القيمة = كود ثابت، التسمية: opt.<group>.<value>) =====
 export const WORK_TYPES = ["individual", "company", "consulting_office", "brokerage", "other"] as const;
@@ -56,6 +61,85 @@ export const REQUIRED_CONSENTS = [
   { field: "noRepresentation", column: "noRepresentationAck", labelKey: "c.noRepresentation" },
   { field: "contact", column: "contactConsent", labelKey: "c.contact" },
 ] as const;
+
+// ===== خيارات ترشيح المستثمر (بوّابة السفير) =====
+export const REF_INVESTOR_TYPES = [
+  "individual",
+  "company",
+  "fund",
+  "family_office",
+  "holding",
+  "government",
+  "other",
+] as const;
+export const REF_RELATIONSHIP = ["direct", "via_third_party", "initial", "prior_contact"] as const;
+export const REF_SERIOUSNESS = ["high", "medium", "low"] as const;
+export const REF_CONSENT = ["yes", "no", "needs_confirmation"] as const;
+
+export const ALL_REFERRAL_STATUSES: ReferralStatus[] = [
+  "NEW",
+  "UNDER_REVIEW",
+  "NEEDS_INFO",
+  "PRE_QUALIFIED",
+  "NOT_QUALIFIED",
+  "INVESTOR_CONTACTED",
+  "AWAITING_INVESTOR",
+  "MEETING_SCHEDULED",
+  "NEGOTIATING",
+  "CLOSED_WON",
+  "CLOSED_LOST",
+  "ARCHIVED",
+];
+
+export const REF_STATUS_TONE: Record<string, string> = {
+  NEW: "blue",
+  UNDER_REVIEW: "blue",
+  NEEDS_INFO: "amber",
+  PRE_QUALIFIED: "teal",
+  NOT_QUALIFIED: "gray",
+  INVESTOR_CONTACTED: "teal",
+  AWAITING_INVESTOR: "amber",
+  MEETING_SCHEDULED: "teal",
+  NEGOTIATING: "blue",
+  CLOSED_WON: "green",
+  CLOSED_LOST: "gray",
+  ARCHIVED: "gray",
+};
+
+export const ALL_MESSAGE_STATUSES: AmbassadorMessageStatus[] = ["NEW", "IN_PROGRESS", "REPLIED", "CLOSED"];
+export const MSG_STATUS_TONE: Record<string, string> = {
+  NEW: "blue",
+  IN_PROGRESS: "amber",
+  REPLIED: "green",
+  CLOSED: "gray",
+};
+export const MESSAGE_TYPES = [
+  "general",
+  "new_investor",
+  "file_followup",
+  "clarification",
+  "technical",
+  "other",
+] as const;
+
+export const ALL_CONTRACT_STATUSES: AmbassadorContractStatus[] = [
+  "NOT_SENT",
+  "SENT",
+  "OPENED",
+  "AWAITING_SIGNATURE",
+  "SIGNED",
+  "REJECTED",
+  "EXPIRED",
+];
+export const CONTRACT_STATUS_TONE: Record<string, string> = {
+  NOT_SENT: "gray",
+  SENT: "blue",
+  OPENED: "blue",
+  AWAITING_SIGNATURE: "amber",
+  SIGNED: "green",
+  REJECTED: "red",
+  EXPIRED: "gray",
+};
 
 // ===== حالات الطلب: الترتيب واللون (التسمية من القاموس status.*) =====
 export const ALL_AMB_STATUSES: AmbassadorAppStatus[] = [

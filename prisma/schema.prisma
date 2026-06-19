@@ -20,6 +20,17 @@ enum UserRole {
   PROJECT_OWNER // صاحب المشروع
   INVESTOR // المستثمر
   AMBASSADOR // سفير استثمار (يرشّح مستثمرين بعد اعتماد الإدارة وتوقيع العقد)
+  ASSET_OWNER_AGENT // وكيل صاحب الأصل (يُفعَّل بعد اعتماد طلبه)
+}
+
+// دور فرعي داخل الإدارة (يُطبَّق فقط على role=ADMIN) — يحدّد الصلاحيات الدقيقة.
+// null يُعامَل كـ SUPER_ADMIN (توافق رجعي مع نموذج الأدمن الموحّد السابق).
+enum AdminRole {
+  SUPER_ADMIN // كل الصلاحيات
+  ADMIN // مراجعة الطلبات والترشيحات والرسائل والتقارير
+  AMBASSADOR_MANAGER // إدارة السفراء والترشيحات والرسائل
+  LEGAL_MANAGER // العقود والتوقيع
+  STAFF // اطّلاع محدود
 }
 
 enum AccountStatus {
@@ -35,6 +46,7 @@ model User {
   fullName      String
   phone         String?
   role          UserRole
+  adminRole     AdminRole? // دور فرعي للإدارة (لمستخدمي ADMIN فقط)
   accountStatus AccountStatus @default(PENDING_EMAIL)
   passwordHash  String
   createdAt     DateTime      @default(now())
@@ -69,6 +81,16 @@ model User {
   ambFilesUploaded        AmbassadorFile[]         @relation("AmbFileUploader")
   ambActivityAsSubject    AmbassadorActivityLog[]  @relation("AmbActivitySubject")
   ambActivityAsActor      AmbassadorActivityLog[]  @relation("AmbActivityActor")
+
+  // وكلاء أصحاب الأصول
+  assetAgentAppsAssigned    AssetAgentApplication[]    @relation("AssetAgentAppAssignee")
+  assetAgentApplication     AssetAgentApplication?     @relation("AssetAgentUser")
+  assetAgentAccount         AssetAgentAccount?         @relation("AssetAgentAccountUser")
+  assetAgentAccountsManaged AssetAgentAccount[]        @relation("AssetAgentAccountManager")
+  assetAgentSubmissions     AssetAgentSubmittedAsset[] @relation("AssetAgentSubmitter")
+  assetAgentSubsAssigned    AssetAgentSubmittedAsset[] @relation("AssetAgentSubAssignee")
+  assetAgentMessages        AssetAgentMessage[]        @relation("AssetAgentMsgAgent")
+  assetAgentMsgReplies      AssetAgentMessageReply[]
 
   @@index([role])
   @@index([accountStatus])
@@ -153,6 +175,7 @@ model Opportunity {
   files        OpportunityFile[]
   interests    Interest[]
   crmLeads     CrmLead[] // طلبات الاهتمام العامة (CRM) المرتبطة بهذه الفرصة
+  assetAgentSubmission AssetAgentSubmittedAsset? @relation("AssetAgentConvertedOpp") // أصل وكيل حُوِّل لهذه الفرصة
 
   // وجهة الاستثمار المرتبطة (اختياري) — تُعرض الفرصة ضمن صفحة الدولة المطابقة
   destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
@@ -249,6 +272,15 @@ enum NotificationType {
   AMBASSADOR_NEW_MESSAGE // للطرف الآخر: رسالة داخلية جديدة
   AMBASSADOR_NEW_REFERRAL // لمدير السفراء: ترشيح مستثمر جديد
   AMBASSADOR_REFERRAL_STATUS_CHANGED // للسفير: تحديث حالة ترشيح
+  // ===== وكلاء أصحاب الأصول =====
+  ASSET_AGENT_APPLICATION_RECEIVED // للإدارة: طلب وكيل جديد
+  ASSET_AGENT_STATUS_CHANGED // للمتقدّم/الوكيل: تغيّرت حالة طلبه
+  ASSET_AGENT_CONTRACT_SENT // للمتقدّم: أُرسل العقد للتوقيع
+  ASSET_AGENT_CONTRACT_SIGNED // للإدارة: تم توقيع العقد
+  ASSET_AGENT_ACCOUNT_CREATED // للوكيل: فُتح حسابه
+  ASSET_AGENT_NEW_MESSAGE // للطرف الآخر: رسالة داخلية جديدة
+  ASSET_AGENT_NEW_ASSET // للإدارة: أصل/فرصة جديدة من وكيل
+  ASSET_AGENT_ASSET_STATUS_CHANGED // للوكيل: تحديث حالة أصل مقدّم
 }
 
 model Notification {
@@ -896,4 +928,305 @@ model AmbassadorActivityLog {
   @@index([ambassadorUserId])
   @@index([relatedEntityType, relatedEntityId])
   @@index([createdAt])
+}
+
+// ============================================================
+// ===== وكلاء أصحاب الأصول (Asset Owner Agents) =====
+// توأم بنيوي لميزة السفراء — للوكلاء الذين يمثّلون أصحاب الأصول. هجرة إضافية.
+// ============================================================
+
+enum AssetAgentAppStatus {
+  NEW // جديد
+  UNDER_REVIEW // قيد المراجعة
+  NEEDS_INFO // بحاجة إلى معلومات إضافية
+  PRE_QUALIFIED // مؤهَّل مبدئياً
+  REJECTED // مرفوض
+  AWAITING_CONTRACT // بانتظار توقيع العقد
+  CONTRACTED // تم التعاقد
+  ACTIVE // حساب مفعّل
+  SUSPENDED // موقوف
+}
+
+// طلب الانضمام كوكيل لصاحب أصل (النموذج العام)
+model AssetAgentApplication {
+  id String @id @default(cuid())
+
+  // ----- بيانات شخصية وتواصل -----
+  fullName          String
+  nationality       String?
+  country           String? // دولة الإقامة
+  city              String?
+  phone             String
+  whatsapp          String?
+  email             String
+  preferredLanguage String  @default("ar") // ar / tr / en
+
+  // ----- الصفة المهنية -----
+  professionalType      String?
+  professionalTypeOther String?
+
+  // ----- نوع العلاقة بأصحاب الأصول -----
+  relationshipType      String?
+  relationshipTypeOther String?
+
+  // ----- التغطية -----
+  coveredAssetTypes      Json?
+  coveredAssetTypesOther String?
+  coveredRegions         Json?
+  coveredRegionsOther    String?
+
+  // ----- الخبرة -----
+  experienceYears       String?
+  experienceDescription String?
+  hasPreviousDeals      String? // yes / no
+  previousDeals         String?
+
+  // ----- القدرة على توفير المعلومات (yes/no) -----
+  canProvideInfo      String?
+  canContactOwner     String?
+  canArrangeMeeting   String?
+  canProvideDocuments String?
+  ownerWantsDeal      String?
+  hasOwnerPermission  String?
+
+  // ----- روابط مهنية -----
+  linkedinUrl String?
+  websiteUrl  String?
+  companyUrl  String?
+
+  // ----- الإقرارات الإلزامية -----
+  infoAccuracyAck     Boolean @default(false)
+  noRepresentationAck Boolean @default(false)
+  privacyAccepted     Boolean @default(false)
+  contactConsent      Boolean @default(false)
+  ownerConsentAck     Boolean @default(false)
+
+  // ----- إدارة / حوكمة -----
+  status          AssetAgentAppStatus @default(NEW)
+  score           Int                 @default(0)
+  assignedTo      User?               @relation("AssetAgentAppAssignee", fields: [assignedToId], references: [id])
+  assignedToId    String?
+  adminNotes      String?
+  rejectionReason String?
+  lastContactAt   DateTime?
+
+  // ----- مصدر / لغة / تقني -----
+  source       String  @default("asset_owner_agents_page")
+  languageCode String  @default("ar")
+  ipAddress    String?
+  userAgent    String?
+
+  // ----- ربط الحساب (المرحلة 2) -----
+  userId String? @unique // يُملأ عند تفعيل الحساب
+  user   User?   @relation("AssetAgentUser", fields: [userId], references: [id])
+
+  files     AssetAgentFile[]
+  contracts AssetAgentContract[]
+  account   AssetAgentAccount?
+  messages  AssetAgentMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([country])
+  @@index([assignedToId])
+  @@index([createdAt])
+}
+
+// ملفات طلب الوكيل (سرّية — للإدارة فقط)
+model AssetAgentFile {
+  id            String                @id @default(cuid())
+  application   AssetAgentApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+
+  // ربط اختياري بأصل مقدّم (المرحلة 2) + معرّف الوكيل لملفات «ملفاتي»
+  submittedAsset   AssetAgentSubmittedAsset? @relation(fields: [submittedAssetId], references: [id], onDelete: Cascade)
+  submittedAssetId String?
+  agentUserId      String?
+
+  fileName     String
+  storageKey   String // مرجع تخزين آمن — لا يُخدَم مباشرة
+  fileType     String?
+  fileSize     Int?
+  fileCategory String? // cv / company_profile / id / authorization / supporting / asset_doc / contract / contract_signed
+  visibility   String  @default("admin_only")
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId])
+  @@index([submittedAssetId])
+  @@index([agentUserId])
+}
+
+// ===== وكلاء أصحاب الأصول — المرحلة 2 (الحساب/العقد/الأصول/المراسلات) =====
+
+enum AssetSubmissionStatus {
+  NEW_SUBMISSION // جديد
+  UNDER_REVIEW // قيد المراجعة
+  NEEDS_INFO // بحاجة معلومات
+  PRE_QUALIFIED // مؤهَّل مبدئياً
+  NOT_QUALIFIED // غير مؤهَّل
+  APPROVED // معتمد (جاهز للتحويل)
+  CONVERTED // حُوِّل إلى فرصة استثمارية
+  REJECTED // مرفوض
+  ARCHIVED // مؤرشف
+}
+
+enum AssetAgentContractStatus {
+  NOT_SENT
+  SENT
+  OPENED
+  AWAITING_SIGNATURE
+  SIGNED
+  REJECTED
+  EXPIRED
+}
+
+enum AssetAgentMessageStatus {
+  NEW
+  IN_PROGRESS
+  REPLIED
+  CLOSED
+}
+
+// عقد الوكالة (مرآة AmbassadorContract)
+model AssetAgentContract {
+  id            String                @id @default(cuid())
+  application   AssetAgentApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+
+  account AssetAgentAccount? @relation("AssetAgentAccountContract")
+
+  status         AssetAgentContractStatus @default(NOT_SENT)
+  contractPdfKey String?
+  signedPdfKey   String?
+  sentAt         DateTime?
+  openedAt       DateTime?
+  signedAt       DateTime?
+  expiresAt      DateTime?
+
+  signingProvider     String?
+  externalSignatureId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([status])
+}
+
+// حساب الوكيل المعتمد (مرآة AmbassadorAccount)
+model AssetAgentAccount {
+  id     String @id @default(cuid())
+  user   User   @relation("AssetAgentAccountUser", fields: [userId], references: [id])
+  userId String @unique
+
+  application   AssetAgentApplication @relation(fields: [applicationId], references: [id])
+  applicationId String                @unique
+
+  status    String    @default("active") // active / suspended / closed
+  startDate DateTime?
+
+  allowedAssetTypes Json?
+  allowedRegions    Json?
+
+  assignedManager   User?   @relation("AssetAgentAccountManager", fields: [assignedManagerId], references: [id])
+  assignedManagerId String?
+
+  contract   AssetAgentContract? @relation("AssetAgentAccountContract", fields: [contractId], references: [id])
+  contractId String?             @unique
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// أصل/فرصة يقدّمها الوكيل (مرآة AmbassadorReferral — للأصول)
+model AssetAgentSubmittedAsset {
+  id          String @id @default(cuid())
+  agentUser   User   @relation("AssetAgentSubmitter", fields: [agentUserId], references: [id])
+  agentUserId String
+
+  title            String
+  country          String?
+  city             String?
+  assetType        String? // كود من ASSET_TYPES
+  assetStatus      String? // operating / distressed / needs_financing / for_sale / for_partnership / for_development
+  shortDescription String?
+  estimatedValue   String?
+  requiredFinancing String?
+  offerType         String? // sale / partnership / financing / operation / restructuring
+
+  agentRelationshipToOwner String?
+  hasOwnerPermission       String? // yes / no
+  hasOwnershipDocuments    String? // yes / no
+  canArrangeOwnerMeeting   String? // yes / no
+  additionalNotes          String?
+
+  status       AssetSubmissionStatus @default(NEW_SUBMISSION)
+  assignedTo   User?                 @relation("AssetAgentSubAssignee", fields: [assignedToId], references: [id])
+  assignedToId String?
+  adminNotes   String?
+  rejectionReason String?
+
+  // ربط بالفرصة بعد التحويل
+  convertedOpportunity   Opportunity? @relation("AssetAgentConvertedOpp", fields: [convertedOpportunityId], references: [id], onDelete: SetNull)
+  convertedOpportunityId String?      @unique
+
+  files AssetAgentFile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentUserId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdAt])
+}
+
+// رسالة داخلية بين الوكيل والإدارة (مرآة AmbassadorMessage)
+model AssetAgentMessage {
+  id            String                 @id @default(cuid())
+  application   AssetAgentApplication? @relation(fields: [applicationId], references: [id])
+  applicationId String?
+
+  agentUser   User?   @relation("AssetAgentMsgAgent", fields: [agentUserId], references: [id])
+  agentUserId String?
+
+  relatedSubmittedAssetId String?
+
+  subject     String
+  messageType String                  @default("general")
+  status      AssetAgentMessageStatus @default(NEW)
+  createdById String?
+
+  replies AssetAgentMessageReply[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([agentUserId])
+  @@index([status])
+}
+
+// رد على محادثة (مرآة AmbassadorMessageReply)
+model AssetAgentMessageReply {
+  id        String            @id @default(cuid())
+  message   AssetAgentMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String
+
+  sender       User?   @relation(fields: [senderUserId], references: [id])
+  senderUserId String?
+  senderRole   String? // agent / admin (لقطة وقت الإرسال)
+
+  body String
+
+  createdAt DateTime @default(now())
+
+  @@index([messageId])
 }

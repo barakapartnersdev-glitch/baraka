@@ -16,6 +16,7 @@ const HOME_BY_ROLE: Record<Role, string> = {
   PROJECT_OWNER: "/owner",
   INVESTOR: "/investor",
   AMBASSADOR: "/ambassador",
+  ASSET_OWNER_AGENT: "/agent", // بوّابة الوكيل (المرحلة 2)؛ لا حسابات وكلاء بعد
 };
 
 export async function login(

@@ -3,6 +3,8 @@ import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref } from "@/lib/i18n";
 import { getDestinationCards, destPath } from "@/lib/destinations";
 import { destUi } from "@/lib/dest-i18n";
+import { ta } from "@/lib/ambassador-i18n";
+import { agentUi } from "@/lib/agent-i18n";
 
 export default async function Footer() {
   const locale = await getLocale();
@@ -34,6 +36,8 @@ export default async function Footer() {
             <ul className="flex flex-col gap-2.5 text-sm">
               <li><Link href={localeHref(locale, "/opportunities")} className="transition hover:text-gold">{t(locale, "nav.opportunities")}</Link></li>
               <li><Link href={localeHref(locale, "/how-it-works")} className="transition hover:text-gold">{t(locale, "nav.how")}</Link></li>
+              <li><Link href={localeHref(locale, "/investment-ambassadors")} className="transition hover:text-gold">{ta(locale, "nav.ambassadors")}</Link></li>
+              <li><Link href={localeHref(locale, "/asset-owner-agents")} className="transition hover:text-gold">{agentUi(locale).navLabel}</Link></li>
               <li><Link href="/register" className="transition hover:text-gold">{t(locale, "nav.register")}</Link></li>
               <li><Link href="/login" className="transition hover:text-gold">{t(locale, "nav.login")}</Link></li>
             </ul>
