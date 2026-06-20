@@ -135,9 +135,19 @@ const WHY_ICONS = [
   </svg>,
 ];
 
-// صورة افتراضية للواجهة (تُستخدَم إن لم تُضبَط صورة الدولة في قاعدة البيانات)
+// صورة افتراضية محايدة (احتياطية فقط — لكل دولة معلَمها الخاص أدناه، ولا تُستخدَم صورة دولة لأخرى)
 const HERO_DEFAULT =
-  "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1600&q=70";
+  "https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=1600&q=70";
+
+// صورة معلَم مشهور لكل دولة (ملفات محلية في public/destinations) — أولويتها أدنى من صورة الإدارة
+const HERO_BY_COUNTRY: Record<string, string> = {
+  turkey: "/destinations/turkey.jpg",          // آيا صوفيا
+  syria: "/destinations/syria.jpg",            // الجامع الأموي بدمشق
+  "european-union": "/destinations/european-union.jpg", // الكولوسيوم
+  cyprus: "/destinations/cyprus.jpg",          // صخرة أفروديت
+  egypt: "/destinations/egypt.jpg",            // أهرامات الجيزة
+  jordan: "/destinations/jordan.jpg",          // البتراء
+};
 
 // صور دائرية للقطاعات — تُسنَد بالترتيب (محايدة لغويّاً). الترتيب يلائم تركيا افتراضياً.
 const SECTOR_PHOTOS = [
@@ -225,7 +235,7 @@ export default async function DestinationPage({
   ];
   if (faqs.length) ld.push(faqPageLd(faqs));
 
-  const heroImage = dest.featuredImage || HERO_DEFAULT;
+  const heroImage = dest.featuredImage || HERO_BY_COUNTRY[dest.countryKey] || HERO_DEFAULT;
   const btnGold =
     "inline-flex items-center justify-center rounded-xl bg-gradient-to-br from-gold to-gold-soft px-6 py-3 text-sm font-bold text-navy transition hover:-translate-y-px hover:brightness-110";
   const btnGhost =
