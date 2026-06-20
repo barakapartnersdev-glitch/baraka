@@ -14,6 +14,8 @@ import { emailConfigured, sendEmail } from "@/lib/email";
 import { getLocale } from "@/lib/i18n-server";
 import { resetUi } from "@/lib/reset-i18n";
 import { createPasswordResetToken, passwordResetUrl, resetEmailHtml } from "@/lib/password-reset";
+import { esignConfigured, getEsignAdapter, getEsignProvider } from "@/lib/esign";
+import { getObjectBuffer } from "@/lib/storage";
 import { AGENT_STATUSES, AGENT_CONTRACT_STATUSES, SUBMISSION_STATUSES } from "@/lib/agent";
 
 export interface ActionState {
@@ -152,13 +154,53 @@ async function latestAgentContract(applicationId: string) {
 // --- العقد ---
 export async function sendAgentContract(applicationId: string): Promise<ActionState> {
   const session = await requireRole("ADMIN");
-  const app = await prisma.assetAgentApplication.findUnique({ where: { id: applicationId }, select: { id: true } });
+  const app = await prisma.assetAgentApplication.findUnique({
+    where: { id: applicationId },
+    select: { id: true, fullName: true, email: true },
+  });
   if (!app) return { ok: false, error: "not_found" };
   const c = await latestAgentContract(applicationId);
-  if (c) await prisma.assetAgentContract.update({ where: { id: c.id }, data: { status: "SENT", sentAt: c.sentAt ?? new Date() } });
-  else await prisma.assetAgentContract.create({ data: { applicationId, status: "SENT", sentAt: new Date() } });
+
+  // إرسال عبر مزوّد التوقيع الإلكتروني (Zoho Sign) إن كان مهيّأً ووُجد ملف العقد المرفوع.
+  // غير ذلك يبقى المسار اليدوي كما هو (رفع نسخة موقّعة لاحقاً).
+  let externalId: string | null = null;
+  let signingProvider: string | null = null;
+  if (esignConfigured() && c?.contractPdfKey) {
+    try {
+      const { buffer } = await getObjectBuffer(c.contractPdfKey);
+      const r = await getEsignAdapter().send({
+        contractId: c.id,
+        signerName: app.fullName,
+        signerEmail: app.email,
+        documentName: `عقد وكالة - ${app.fullName}`,
+        documentBase64: buffer.toString("base64"),
+        fileName: "agency-contract.pdf",
+      });
+      if (r.ok && r.externalId) {
+        externalId = r.externalId;
+        signingProvider = getEsignProvider();
+      } else {
+        console.error("[asset-agents] فشل إرسال العقد عبر التوقيع الإلكتروني:", r.error);
+      }
+    } catch (e) {
+      console.error("[asset-agents] خطأ في إرسال العقد عبر التوقيع الإلكتروني:", e);
+    }
+  }
+
+  if (c) {
+    await prisma.assetAgentContract.update({
+      where: { id: c.id },
+      data: {
+        status: "SENT",
+        sentAt: c.sentAt ?? new Date(),
+        ...(externalId ? { externalSignatureId: externalId, signingProvider } : {}),
+      },
+    });
+  } else {
+    await prisma.assetAgentContract.create({ data: { applicationId, status: "SENT", sentAt: new Date() } });
+  }
   await prisma.assetAgentApplication.update({ where: { id: applicationId }, data: { status: "AWAITING_CONTRACT", lastContactAt: new Date() } });
-  await logAgent(session.userId, applicationId, "AGENT_CONTRACT_SENT");
+  await logAgent(session.userId, applicationId, "AGENT_CONTRACT_SENT", { esign: !!externalId });
   revalidate(applicationId);
   return { ok: true };
 }
