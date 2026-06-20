@@ -30,6 +30,23 @@ export function absUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+// ===== أعلام الدول =====
+// أعلام رسمية كملفات SVG محلية (public/destinations/flags) — مصدر واحد تستخدمه صفحة
+// المحور وصفحة الدولة معاً. علم سوريا هنا هو العلم الجديد (2025): أخضر/أبيض/أسود بثلاث
+// نجمات حمراء — بديلاً عن رمز العلم (emoji) الذي لا يزال يعرض العلم القديم لدى كل المنصّات.
+const FLAG_SRC: Record<string, string> = {
+  turkey: "/destinations/flags/tr.svg",
+  syria: "/destinations/flags/sy.svg",
+  "european-union": "/destinations/flags/eu.svg",
+  cyprus: "/destinations/flags/cy.svg",
+  egypt: "/destinations/flags/eg.svg",
+  jordan: "/destinations/flags/jo.svg",
+};
+
+export function flagSrc(countryKey: string): string | null {
+  return FLAG_SRC[countryKey] ?? null;
+}
+
 // ===== مُحوّلات آمنة لأعمدة JSON =====
 export type FaqEntry = { q: string; a: string };
 

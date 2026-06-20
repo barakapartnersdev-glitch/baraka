@@ -17,6 +17,7 @@ import {
   destPath,
   hubPath,
   absUrl,
+  flagSrc,
   strArr,
   faqArr,
   buildLanguageAlternates,
@@ -288,7 +289,15 @@ export default async function DestinationPage({
             </nav>
 
             <div className="mb-5 flex flex-wrap items-center gap-3">
-              {dest.flagEmoji && <span className="text-4xl leading-none">{dest.flagEmoji}</span>}
+              {flagSrc(dest.countryKey) ? (
+                <span
+                  className="h-7 w-11 rounded-[3px] bg-cover bg-center shadow ring-1 ring-white/25"
+                  style={{ backgroundImage: `url(${flagSrc(dest.countryKey)})` }}
+                  aria-hidden="true"
+                />
+              ) : (
+                dest.flagEmoji && <span className="text-4xl leading-none">{dest.flagEmoji}</span>
+              )}
               {dest.region && (
                 <span className="rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-gold-soft backdrop-blur">
                   {dest.region}
