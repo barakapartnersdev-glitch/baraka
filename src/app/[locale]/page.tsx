@@ -9,7 +9,7 @@ import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 import LocaleMenu from "@/components/LocaleMenu";
 import Faq from "@/components/Faq";
-import { getDestinationCards, destPath } from "@/lib/destinations";
+import { getDestinationCards, destPath, flagSrc } from "@/lib/destinations";
 import { destUi } from "@/lib/dest-i18n";
 import HomeQuickForm from "./HomeQuickForm";
 
@@ -519,8 +519,16 @@ export default async function Home() {
                   href={destPath(locale, tr.slug)}
                   className="group flex items-center gap-4 rounded-2xl border border-[#e6e9ef] bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-gold hover:shadow-[0_18px_44px_rgba(10,31,60,.08)]"
                 >
-                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-navy text-3xl">
-                    {dest.flagEmoji ?? "🌍"}
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-navy">
+                    {flagSrc(dest.countryKey) ? (
+                      <span
+                        className="h-7 w-10 rounded-[3px] bg-cover bg-center shadow-sm ring-1 ring-white/20"
+                        style={{ backgroundImage: `url(${flagSrc(dest.countryKey)})` }}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <span className="text-3xl">{dest.flagEmoji ?? "🌍"}</span>
+                    )}
                   </span>
                   <span className="min-w-0">
                     <span className="block font-extrabold text-navy group-hover:text-baraka">{tr.h1Title}</span>
