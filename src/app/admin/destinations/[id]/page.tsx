@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { DestinationTranslation } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { LOCALES, type Locale } from "@/lib/i18n";
-import { destPath } from "@/lib/destinations";
+import { destPath, flagSrc } from "@/lib/destinations";
 import {
   updateDestinationGeneral,
   saveTranslation,
@@ -210,8 +210,14 @@ export default async function EditDestination({
       <Link href="/admin/destinations" className="text-sm text-gray-500 hover:text-baraka">
         → كل الوجهات
       </Link>
-      <h1 className="mb-1 mt-3 text-2xl font-bold">
-        {dest.flagEmoji ? `${dest.flagEmoji} ` : ""}
+      <h1 className="mb-1 mt-3 flex items-center gap-2.5 text-2xl font-bold">
+        {flagSrc(dest.countryKey) && (
+          <span
+            className="inline-block h-5 w-7 shrink-0 rounded-[3px] bg-cover bg-center ring-1 ring-black/10"
+            style={{ backgroundImage: `url(${flagSrc(dest.countryKey)})` }}
+            aria-hidden="true"
+          />
+        )}
         {dest.countryKey}
       </h1>
       <p className="mb-6 text-sm text-gray-500">حرّر البيانات العامة، ومحتوى وSEO كل لغة، واربط الفرص المنشورة.</p>

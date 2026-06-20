@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { flagSrc } from "@/lib/destinations";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +58,18 @@ export default async function DestinationLeads() {
                     {l.createdAt.toLocaleDateString("en-GB")}
                   </td>
                   <td className="whitespace-nowrap p-3">
-                    {l.destination ? `${l.destination.flagEmoji ?? ""} ${l.destination.countryKey}` : "—"}
+                    {l.destination ? (
+                      <span className="inline-flex items-center gap-2">
+                        {flagSrc(l.destination.countryKey) && (
+                          <span
+                            className="inline-block h-3.5 w-5 shrink-0 rounded-[2px] bg-cover bg-center ring-1 ring-black/10"
+                            style={{ backgroundImage: `url(${flagSrc(l.destination.countryKey)})` }}
+                            aria-hidden="true"
+                          />
+                        )}
+                        {l.destination.countryKey}
+                      </span>
+                    ) : "—"}
                   </td>
                   <td className="p-3">
                     <div className="font-medium">{l.fullName}</div>
