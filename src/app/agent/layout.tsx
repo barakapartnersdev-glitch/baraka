@@ -12,6 +12,7 @@ import { tg } from "@/lib/agent-portal-i18n";
 const NAV = [
   { href: "/agent", key: "portal.nav.dashboard" },
   { href: "/agent/assets", key: "portal.nav.assets" },
+  { href: "/agent/stats", key: "portal.nav.stats" },
   { href: "/agent/messages", key: "portal.nav.messages" },
   { href: "/agent/profile", key: "portal.nav.profile" },
 ];

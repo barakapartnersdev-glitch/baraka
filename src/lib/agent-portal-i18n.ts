@@ -62,6 +62,23 @@ const M: Record<string, Tri> = {
   },
   "dash.quickAsset": { ar: "تقديم أصل جديد", en: "Submit a new asset", tr: "Yeni varlık gönder" },
 
+  // ===== لوحة الإحصائيات (المرحلة 3) =====
+  "portal.nav.stats": { ar: "الإحصائيات", en: "Stats", tr: "İstatistikler" },
+  "stats.title": { ar: "إحصائيات الأداء", en: "Performance", tr: "Performans" },
+  "stats.sub": { ar: "نظرة شاملة على أصولك المقدّمة وتحويلها ومراسلاتك.", en: "An overview of your submitted assets, conversions, and messages.", tr: "Gönderdiğiniz varlıklara, dönüşümlere ve mesajlara genel bakış." },
+  "stats.byStatus": { ar: "الأصول حسب الحالة", en: "Assets by status", tr: "Duruma göre varlıklar" },
+  "stats.byOffer": { ar: "الأصول حسب نوع العرض", en: "Assets by offer type", tr: "Teklif türüne göre varlıklar" },
+  "stats.submitted": { ar: "مقدَّمة", en: "Submitted", tr: "Gönderilen" },
+  "stats.approved": { ar: "معتمدة", en: "Approved", tr: "Onaylanan" },
+  "stats.converted": { ar: "محوّلة إلى فرص", en: "Converted", tr: "Dönüştürülen" },
+  "stats.conversionRate": { ar: "نسبة التحويل", en: "Conversion rate", tr: "Dönüşüm oranı" },
+  "stats.threadsTotal": { ar: "إجمالي المحادثات", en: "Total threads", tr: "Toplam konu" },
+  "stats.threadsOpen": { ar: "محادثات مفتوحة", en: "Open threads", tr: "Açık konular" },
+  "stats.tenure": { ar: "مدة التعاون", en: "Tenure", tr: "Süre" },
+  "stats.days": { ar: "يوم", en: "days", tr: "gün" },
+  "stats.contractStatus": { ar: "حالة العقد", en: "Contract status", tr: "Sözleşme durumu" },
+  "stats.empty": { ar: "لا توجد بيانات كافية بعد. ابدأ بتقديم أصلك الأول.", en: "Not enough data yet. Start by submitting your first asset.", tr: "Henüz yeterli veri yok. İlk varlığınızı göndererek başlayın." },
+
   // ===== أصولي =====
   "assets.title": { ar: "أصولي", en: "My Assets", tr: "Varlıklarım" },
   "assets.subtitle": { ar: "الأصول/الفرص التي قدّمتها وحالتها.", en: "The assets/opportunities you submitted and their status.", tr: "Gönderdiğiniz varlıklar/fırsatlar ve durumları." },
