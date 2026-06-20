@@ -5,6 +5,7 @@ import { getLocale } from "@/lib/i18n-server";
 import { dir } from "@/lib/i18n";
 import { AnalyticsScripts, GtmNoScript, analyticsEnabled } from "@/components/Analytics";
 import ConsentBanner from "@/components/ConsentBanner";
+import DirSync from "@/components/DirSync";
 
 const GOOGLE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION?.trim();
 
@@ -25,6 +26,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir(locale)}>
       <body>
+        <DirSync fallbackLocale={locale} />
         <GtmNoScript />
         <AnalyticsScripts />
         {children}
