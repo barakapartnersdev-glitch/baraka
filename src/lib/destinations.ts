@@ -112,6 +112,24 @@ export async function getDestinationBySlug(
   }
 }
 
+// إيجاد وجهة عبر slug في أي لغة — للسماح بإعادة التوجيه إلى slug اللغة الحالية
+// (مثلاً عند تبديل اللغة وبقاء slug لغة أخرى في الرابط، فتُصبح الصفحة «غير موجودة»).
+export async function findDestinationByAnySlug(
+  slug: string
+): Promise<DestWithTranslations | null> {
+  try {
+    const trx = await prisma.destinationTranslation.findFirst({
+      where: { slug },
+      include: { destination: { include: { translations: true } } },
+    });
+    if (!trx || !trx.destination.isActive) return null;
+    return trx.destination;
+  } catch (e) {
+    console.error("[destinations] findDestinationByAnySlug:", e);
+    return null;
+  }
+}
+
 // الفرص المنشورة المرتبطة بوجهة (لقسم «فرص متاحة في هذه الدولة»).
 export async function getDestinationOpportunities(destinationId: string) {
   try {

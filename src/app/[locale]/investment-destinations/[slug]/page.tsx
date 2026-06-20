@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PublicHeader from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import Faq from "@/components/Faq";
@@ -12,6 +12,7 @@ import { isLocale, localeHref, type Locale } from "@/lib/i18n";
 import { destUi } from "@/lib/dest-i18n";
 import {
   getDestinationBySlug,
+  findDestinationByAnySlug,
   getDestinationOpportunities,
   destPath,
   hubPath,
@@ -206,7 +207,13 @@ export default async function DestinationPage({
   const locale = rawLocale as Locale;
 
   const tr = await getDestinationBySlug(locale, slug);
-  if (!tr) notFound();
+  if (!tr) {
+    // قد يكون الـslug بلغة أخرى (مثلاً عند تبديل اللغة) → أعِد التوجيه إلى slug اللغة الحالية
+    const dest = await findDestinationByAnySlug(slug);
+    const localized = dest?.translations.find((t) => t.locale === locale);
+    if (localized) redirect(destPath(locale, localized.slug));
+    notFound();
+  }
 
   const ui = destUi(locale);
   const dest = tr.destination;

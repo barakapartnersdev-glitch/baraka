@@ -21,8 +21,18 @@ export default function LocaleMenu({ locale }: { locale: Locale }) {
     const { locale: pathLocale } = parseLocaleFromPath(pathname);
     start(async () => {
       if (pathLocale) {
-        // صفحة عامة مُسبَقة بلغة → بدّل بادئة اللغة في الرابط
-        router.push(localeHref(code, pathname));
+        // إن وُجد رابط بديل (hreflang) للّغة الهدف — كصفحات الوجهات ذات الـslug المترجَم —
+        // فاستخدمه ليصل المستخدم إلى الـslug الصحيح؛ وإلا بدّل بادئة اللغة فقط.
+        let target = localeHref(code, pathname);
+        try {
+          const alt = document
+            .querySelector(`link[rel="alternate"][hreflang="${code}"]`)
+            ?.getAttribute("href");
+          if (alt) target = new URL(alt, window.location.origin).pathname;
+        } catch {
+          /* fallback to prefix swap */
+        }
+        router.push(target);
       } else {
         // بوّابة/مصادقة (بلا لغة في الرابط) → بدّل عبر الكوكي
         await setLocale(code);
