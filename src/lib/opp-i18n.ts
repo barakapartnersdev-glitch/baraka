@@ -16,6 +16,7 @@ export const SECTOR_I18N: Record<string, TriLang> = {
   "ثروة حيوانية": { en: "Livestock", zh: "畜牧业", tr: "Hayvancılık" },
   "زراعة ذكية": { en: "Smart agriculture", zh: "智慧农业", tr: "Akıllı tarım" },
   "تقنية حيوية": { en: "Biotechnology", zh: "生物技术", tr: "Biyoteknoloji" },
+  "عقارات وتطوير": { en: "Real estate & development", zh: "房地产与开发", tr: "Gayrimenkul ve geliştirme" },
 };
 
 export const COUNTRY_I18N: Record<string, TriLang> = {
@@ -29,6 +30,7 @@ export const COUNTRY_I18N: Record<string, TriLang> = {
   "مصر": { en: "Egypt", zh: "埃及", tr: "Mısır" },
   "عُمان": { en: "Oman", zh: "阿曼", tr: "Umman" },
   "تركيا": { en: "Turkey", zh: "土耳其", tr: "Türkiye" },
+  "رومانيا": { en: "Romania", zh: "罗马尼亚", tr: "Romanya" },
 };
 
 type TitleSummary = { title: string; summary: string };
@@ -84,6 +86,23 @@ const TITLE_I18N: Record<string, Record<"en" | "zh" | "tr", TitleSummary>> = {
     en: { title: "Biotech research laboratory", summary: "A biotech R&D center with a specialized scientific team and products under registration." },
     zh: { title: "生物技术研究实验室", summary: "拥有专业科研团队、产品注册中的生物技术研发中心。" },
     tr: { title: "Biyoteknoloji araştırma laboratuvarı", summary: "Uzman bilimsel ekibe ve tescil aşamasındaki ürünlere sahip biyoteknoloji Ar-Ge merkezi." },
+  },
+  "موقع تطوير استراتيجي متعدد الاستخدامات — منطقة كونستانتسا، رومانيا": {
+    en: {
+      title: "Strategic Mixed-Use Development Site — Constanța Region, Romania",
+      summary:
+        "A high-value, flexible-use development site in Romania's Greater Constanța region — a gateway to the EU and Schengen area. Scalable from 64,330 to 132,700 sqm, licensed for residential, commercial, hospitality, data centers, and logistics/industrial uses, at the nexus of the Middle Corridor and Pan-European Corridor IV.",
+    },
+    zh: {
+      title: "战略性混合用途开发用地 — 罗马尼亚康斯坦察地区",
+      summary:
+        "位于罗马尼亚大康斯坦察地区的高价值、灵活用途开发用地，是通往欧盟和申根区的门户。面积可从 64,330 平方米扩展至 132,700 平方米，可用于住宅、商业、酒店、数据中心及物流/工业，地处中间走廊与泛欧第四走廊交汇处。",
+    },
+    tr: {
+      title: "Stratejik Karma Kullanımlı Geliştirme Arazisi — Köstence Bölgesi, Romanya",
+      summary:
+        "Romanya'nın Büyük Köstence bölgesinde, AB ve Schengen'e açılan kapıda yüksek değerli, esnek kullanımlı bir geliştirme arazisi. 64.330–132.700 m² arası ölçeklenebilir; konut, ticaret, konaklama, veri merkezleri ve lojistik/sanayi için lisanslı; Orta Koridor ile Pan-Avrupa IV. Koridoru'nun kesişiminde.",
+    },
   },
 };
 
