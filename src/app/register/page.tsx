@@ -6,8 +6,12 @@ import { registerInvestor } from "./actions";
 import { getLocale } from "@/lib/i18n-server";
 import { t, dir } from "@/lib/i18n";
 import { registerX } from "@/lib/register-extra";
+import type { Metadata } from "next";
 
-export const metadata = { title: "تسجيل مستثمر جديد — شركاء البركة" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return { title: `${t(locale, "reg.investorTitle")} | Baraka Partners` };
+}
 
 export default async function RegisterPage() {
   const locale = await getLocale();

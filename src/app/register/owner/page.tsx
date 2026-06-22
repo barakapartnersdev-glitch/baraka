@@ -6,8 +6,12 @@ import { registerOwner } from "../actions";
 import { getLocale } from "@/lib/i18n-server";
 import { t, dir } from "@/lib/i18n";
 import { ownerRegisterX } from "@/lib/register-owner-extra";
+import type { Metadata } from "next";
 
-export const metadata = { title: "تسجيل صاحب مشروع — شركاء البركة" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  return { title: `${t(locale, "reg.ownerTitle")} | Baraka Partners` };
+}
 
 export default async function RegisterOwnerPage() {
   const locale = await getLocale();
