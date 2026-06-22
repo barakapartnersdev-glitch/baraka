@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createDestination } from "../actions";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 export const dynamic = "force-dynamic";
 
@@ -54,12 +55,11 @@ export default async function NewDestination({
               <input name="flagEmoji" placeholder="🇹🇷" className={inputCls} />
             </div>
             <div>
-              <label className={labelCls}>صورة رئيسية (رابط)</label>
-              <input name="featuredImage" dir="ltr" className={inputCls} />
-            </div>
-            <div>
               <label className={labelCls}>ترتيب العرض</label>
               <input name="displayOrder" type="number" defaultValue={0} className={inputCls} />
+            </div>
+            <div className="sm:col-span-2">
+              <ImageUploadField name="featuredImage" label="صورة الهيرو الرئيسية للدولة" folder="destinations" />
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-5 text-sm">

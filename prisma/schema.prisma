@@ -171,6 +171,16 @@ model Opportunity {
   investmentMax BigInt?
   currency      String  @default("USD")
 
+  // اسم المدينة (يُعرض في البطاقات وصفحة الدولة) — يُدخله الأدمن بالعربية
+  city String?
+
+  // ترجمات النسخة العامة المولّدة بالذكاء الاصطناعي للغات الأربع.
+  // الشكل: { en|zh|tr: { displayTitle, summary, highlights, details, sector, country, city } }
+  translations Json?
+
+  // أُنشئت ونُشرت مباشرة من لوحة الإدارة (تمييزاً عن فرص أصحاب المشاريع)
+  createdByAdmin Boolean @default(false)
+
   missingItems MissingItem[]
   files        OpportunityFile[]
   interests    Interest[]

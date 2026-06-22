@@ -3,7 +3,7 @@ import PublicHeader from "@/components/PublicHeader";
 import Footer from "@/components/Footer";
 import OpportunityCard, { type OpportunityCardData } from "@/components/OpportunityCard";
 import { toVersion } from "@/lib/opportunity";
-import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
+import { localizeOppVersion, localizeOppSector, localizeOppCountry, parseOppTranslations } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
@@ -43,10 +43,12 @@ export default async function PublicOpportunities() {
       id: true,
       sector: true,
       country: true,
+      city: true,
       currency: true,
       investmentMin: true,
       investmentMax: true,
       publicVersion: true,
+      translations: true,
     },
   });
 
@@ -64,15 +66,16 @@ export default async function PublicOpportunities() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {opps.map((o) => {
-              const pv = localizeVersion(toVersion(o.publicVersion), locale);
-              const localSector = localizeTerm(SECTOR_I18N, o.sector, locale);
+              const tr = parseOppTranslations(o.translations);
+              const pv = localizeOppVersion(toVersion(o.publicVersion), tr, locale);
+              const localSector = localizeOppSector(o.sector, tr, locale);
               const data: OpportunityCardData = {
                 id: o.id,
                 href: localeHref(locale, `/opportunities/${o.id}`),
                 title: pv?.displayTitle || `${t(locale, "opp.inSector")} ${localSector}`,
                 summary: pv?.summary,
                 sector: localSector,
-                country: localizeTerm(COUNTRY_I18N, o.country, locale),
+                country: localizeOppCountry(o.country, tr, locale),
                 range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
                 imageUrl: pv?.imageUrl ?? null,
               };

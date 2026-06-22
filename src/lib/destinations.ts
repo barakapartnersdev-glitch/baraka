@@ -158,10 +158,12 @@ export async function getDestinationOpportunities(destinationId: string) {
         id: true,
         sector: true,
         country: true,
+        city: true,
         currency: true,
         investmentMin: true,
         investmentMax: true,
         publicVersion: true,
+        translations: true,
       },
     });
   } catch (e) {

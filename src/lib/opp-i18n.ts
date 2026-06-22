@@ -613,3 +613,89 @@ export function localizeVersion(
     ...(tr.details ? { details: tr.details } : {}),
   };
 }
+
+// ===== ترجمات قاعدة البيانات (المولّدة بالذكاء الاصطناعي) =====
+// الفرص المنشأة من لوحة الإدارة تخزّن ترجماتها في العمود Opportunity.translations
+// بهذا الشكل: { en|zh|tr: { displayTitle, summary, highlights, details, sector, country, city } }.
+// الدوال التالية تفضّل ترجمة قاعدة البيانات، وإلا تعود لخرائط الكود (للفرص المزروعة).
+
+export interface OppLocFields {
+  displayTitle?: string;
+  summary?: string;
+  highlights?: string;
+  details?: string;
+  sector?: string;
+  country?: string;
+  city?: string;
+}
+
+export type OppTranslations = Partial<Record<"en" | "zh" | "tr", OppLocFields>>;
+
+// تحويل آمن لقيمة JSON إلى OppTranslations.
+export function parseOppTranslations(value: unknown): OppTranslations | null {
+  if (!value || typeof value !== "object") return null;
+  return value as OppTranslations;
+}
+
+function dbFields(
+  translations: OppTranslations | null | undefined,
+  locale: Locale
+): OppLocFields | null {
+  if (!translations || locale === "ar") return null;
+  const node = translations[locale];
+  return node && typeof node === "object" ? node : null;
+}
+
+// النسخة العامة مترجمة: تفضّل ترجمة قاعدة البيانات ثم خريطة الكود ثم العربية كما هي.
+export function localizeOppVersion(
+  pv: VersionData | null,
+  translations: OppTranslations | null | undefined,
+  locale: Locale
+): VersionData | null {
+  if (!pv || locale === "ar") return pv;
+  const db = dbFields(translations, locale);
+  if (db && (db.displayTitle || db.summary || db.highlights || db.details)) {
+    return {
+      ...pv,
+      ...(db.displayTitle ? { displayTitle: db.displayTitle } : {}),
+      ...(db.summary ? { summary: db.summary } : {}),
+      ...(db.highlights ? { highlights: db.highlights } : {}),
+      ...(db.details ? { details: db.details } : {}),
+    };
+  }
+  // عودة لخريطة الكود (الفرص المزروعة)
+  return localizeVersion(pv, locale);
+}
+
+export function localizeOppSector(
+  sector: string,
+  translations: OppTranslations | null | undefined,
+  locale: Locale
+): string {
+  if (locale === "ar") return sector;
+  const db = dbFields(translations, locale);
+  if (db?.sector) return db.sector;
+  return localizeTerm(SECTOR_I18N, sector, locale);
+}
+
+export function localizeOppCountry(
+  country: string,
+  translations: OppTranslations | null | undefined,
+  locale: Locale
+): string {
+  if (locale === "ar") return country;
+  const db = dbFields(translations, locale);
+  if (db?.country) return db.country;
+  return localizeTerm(COUNTRY_I18N, country, locale);
+}
+
+export function localizeOppCity(
+  city: string | null | undefined,
+  translations: OppTranslations | null | undefined,
+  locale: Locale
+): string | null {
+  if (!city) return null;
+  if (locale === "ar") return city;
+  const db = dbFields(translations, locale);
+  return db?.city || city;
+}

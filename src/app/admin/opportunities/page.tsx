@@ -23,8 +23,18 @@ export default async function OpportunitiesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1">{t(locale, "oppsList.title")}</h1>
-      <p className="text-gray-500 text-sm mb-6">{t(locale, "oppsList.sub")}</p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold mb-1">{t(locale, "oppsList.title")}</h1>
+          <p className="text-gray-500 text-sm">{t(locale, "oppsList.sub")}</p>
+        </div>
+        <Link
+          href="/admin/opportunities/new"
+          className="shrink-0 rounded-lg bg-baraka px-4 py-2 text-sm font-bold text-white hover:bg-baraka-dark"
+        >
+          + فرصة جديدة (نشر فوري)
+        </Link>
+      </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
@@ -43,6 +53,11 @@ export default async function OpportunitiesPage() {
               <tr key={o.id} className="border-t border-gray-100 hover:bg-gray-50">
                 <td className="p-3 font-medium">
                   <Link href={`/admin/opportunities/${o.id}`} className="hover:text-baraka">{o.title}</Link>
+                  {o.createdByAdmin && (
+                    <span className="mr-2 rounded bg-baraka-light px-1.5 py-0.5 text-[10px] text-baraka-dark align-middle">
+                      إدارة
+                    </span>
+                  )}
                   {o._count.missingItems > 0 && (
                     <span className="mr-2 text-xs text-amber-600">
                       ({o._count.missingItems} {t(locale, "items.missingShort")})
@@ -50,7 +65,10 @@ export default async function OpportunitiesPage() {
                   )}
                 </td>
                 <td className="p-3 text-gray-600">{o.sector}</td>
-                <td className="p-3 text-gray-600">{o.country}</td>
+                <td className="p-3 text-gray-600">
+                  {o.country}
+                  {o.city && <span className="text-gray-400"> · {o.city}</span>}
+                </td>
                 <td className="p-3 text-gray-600 text-xs">{fmt(o.investmentMin, o.investmentMax, o.currency)}</td>
                 <td className="p-3"><Badge {...oppBadge(locale, o.state)} /></td>
                 <td className="p-3 text-gray-600">{o._count.interests || "—"}</td>

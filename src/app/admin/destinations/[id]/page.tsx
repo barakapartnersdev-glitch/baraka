@@ -4,6 +4,7 @@ import type { DestinationTranslation } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { LOCALES, type Locale } from "@/lib/i18n";
 import { destPath, flagSrc } from "@/lib/destinations";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 import {
   updateDestinationGeneral,
   saveTranslation,
@@ -236,8 +237,15 @@ export default async function EditDestination({
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="المنطقة" name="region" value={dest.region} />
           <Field label="رمز العلم (إيموجي)" name="flagEmoji" value={dest.flagEmoji} />
-          <Field label="صورة رئيسية (رابط)" name="featuredImage" value={dest.featuredImage} dir="ltr" />
           <Field label="ترتيب العرض" name="displayOrder" value={String(dest.displayOrder)} type="number" />
+          <div className="sm:col-span-2">
+            <ImageUploadField
+              name="featuredImage"
+              label="صورة الهيرو الرئيسية للدولة"
+              folder="destinations"
+              initialUrl={dest.featuredImage}
+            />
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-5 text-sm">
           <label className="flex items-center gap-2"><input type="checkbox" name="isActive" defaultChecked={dest.isActive} /> مفعّلة</label>

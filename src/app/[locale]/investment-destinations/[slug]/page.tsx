@@ -7,7 +7,7 @@ import Faq from "@/components/Faq";
 import OpportunityCard, { type OpportunityCardData } from "@/components/OpportunityCard";
 import DestinationLeadForm from "./DestinationLeadForm";
 import { toVersion } from "@/lib/opportunity";
-import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
+import { localizeOppVersion, localizeOppSector, localizeOppCountry, parseOppTranslations } from "@/lib/opp-i18n";
 import { isLocale, localeHref, type Locale } from "@/lib/i18n";
 import { destUi } from "@/lib/dest-i18n";
 import {
@@ -407,15 +407,16 @@ export default async function DestinationPage({
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {opps.map((o) => {
-                  const pv = localizeVersion(toVersion(o.publicVersion), locale);
-                  const localSector = localizeTerm(SECTOR_I18N, o.sector, locale);
+                  const otr = parseOppTranslations(o.translations);
+                  const pv = localizeOppVersion(toVersion(o.publicVersion), otr, locale);
+                  const localSector = localizeOppSector(o.sector, otr, locale);
                   const data: OpportunityCardData = {
                     id: o.id,
                     href: localeHref(locale, `/opportunities/${o.id}`),
                     title: pv?.displayTitle || `${localSector}`,
                     summary: pv?.summary,
                     sector: localSector,
-                    country: localizeTerm(COUNTRY_I18N, o.country, locale),
+                    country: localizeOppCountry(o.country, otr, locale),
                     range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
                     imageUrl: pv?.imageUrl ?? null,
                   };

@@ -8,10 +8,11 @@ import OpportunityGallery from "@/components/OpportunityGallery";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
-import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
+import { localizeOppVersion, localizeOppSector, localizeOppCountry, localizeOppCity, parseOppTranslations } from "@/lib/opp-i18n";
 import { pageMetadata, clampDescription, opportunityLd, organizationLd, breadcrumbLd, absUrl } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import Footer from "@/components/Footer";
+import ShareButton from "@/components/ShareButton";
 import InterestLeadForm from "./InterestLeadForm";
 
 export const dynamic = "force-dynamic";
@@ -25,14 +26,15 @@ export async function generateMetadata({
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const opp = await prisma.opportunity.findFirst({
     where: { id, state: "PUBLISHED" },
-    select: { sector: true, country: true, publicVersion: true },
+    select: { sector: true, country: true, publicVersion: true, translations: true },
   });
   if (!opp) {
     return { title: "Baraka Partners", robots: { index: false, follow: false } };
   }
-  const pv = localizeVersion(toVersion(opp.publicVersion), locale);
-  const sector = localizeTerm(SECTOR_I18N, opp.sector, locale);
-  const country = localizeTerm(COUNTRY_I18N, opp.country, locale);
+  const tr = parseOppTranslations(opp.translations);
+  const pv = localizeOppVersion(toVersion(opp.publicVersion), tr, locale);
+  const sector = localizeOppSector(opp.sector, tr, locale);
+  const country = localizeOppCountry(opp.country, tr, locale);
   const title = pv?.displayTitle || `${t(locale, "opp.inSector")} ${sector}`;
   const description = clampDescription(
     pv?.summary || `${title} — ${sector} · ${country}`
@@ -61,18 +63,23 @@ export default async function PublicOpportunityDetail({
       id: true,
       sector: true,
       country: true,
+      city: true,
       currency: true,
       investmentMin: true,
       investmentMax: true,
       publicVersion: true,
+      translations: true,
       publishedAt: true,
     },
   });
   if (!opp) notFound();
 
   // النسخة العامة مترجمة حسب لغة الزائر (العنوان/الملخّص/النقاط/التفاصيل)
-  const pv = localizeVersion(toVersion(opp.publicVersion), locale);
-  const title = pv?.displayTitle || `${t(locale, "opp.inSector")} ${opp.sector}`;
+  const tr = parseOppTranslations(opp.translations);
+  const pv = localizeOppVersion(toVersion(opp.publicVersion), tr, locale);
+  const localSector = localizeOppSector(opp.sector, tr, locale);
+  const localCountry = localizeOppCountry(opp.country, tr, locale);
+  const title = pv?.displayTitle || `${t(locale, "opp.inSector")} ${localSector}`;
   const range =
     opp.investmentMin || opp.investmentMax
       ? `${opp.investmentMin ? Number(opp.investmentMin).toLocaleString("en-US") : "?"} – ${
@@ -93,8 +100,8 @@ export default async function PublicOpportunityDetail({
       title: lpv?.displayTitle || title,
       description: lpv?.summary,
       url,
-      sector: localizeTerm(SECTOR_I18N, opp.sector, locale),
-      country: localizeTerm(COUNTRY_I18N, opp.country, locale),
+      sector: localSector,
+      country: localCountry,
       image: lpv?.imageUrl ?? null,
       priceMin: opp.investmentMin ? Number(opp.investmentMin) : null,
       priceMax: opp.investmentMax ? Number(opp.investmentMax) : null,
@@ -108,13 +115,21 @@ export default async function PublicOpportunityDetail({
       <JsonLd data={jsonLd} />
       <PublicHeader />
       <main className="max-w-3xl mx-auto p-6 md:p-8">
-        <Link href={localeHref(locale, "/opportunities")} className="text-sm text-baraka hover:underline">
-          {t(locale, "opp.back")}
-        </Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link href={localeHref(locale, "/opportunities")} className="text-sm text-baraka hover:underline">
+            {t(locale, "opp.back")}
+          </Link>
+          <ShareButton url={url} title={title} locale={locale} />
+        </div>
         <h1 className="text-2xl font-bold mt-2 mb-2">{title}</h1>
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{localizeTerm(SECTOR_I18N, opp.sector, locale)}</span>
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{localizeTerm(COUNTRY_I18N, opp.country, locale)}</span>
+          <span className="bg-gray-100 px-2 py-0.5 rounded">{localSector}</span>
+          <span className="bg-gray-100 px-2 py-0.5 rounded">{localCountry}</span>
+          {opp.city && (
+            <span className="bg-gray-100 px-2 py-0.5 rounded">
+              {localizeOppCity(opp.city, tr, locale)}
+            </span>
+          )}
           {range && (
             <span className="bg-baraka-light text-baraka-dark px-2 py-0.5 rounded">
               {range}

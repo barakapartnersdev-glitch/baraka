@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { toVersion } from "@/lib/opportunity";
-import { localizeVersion, localizeTerm, SECTOR_I18N, COUNTRY_I18N } from "@/lib/opp-i18n";
+import { localizeOppVersion, localizeOppSector, localizeOppCountry, parseOppTranslations } from "@/lib/opp-i18n";
 import { getLocale } from "@/lib/i18n-server";
 import { localeHref, shouldLocalizePath, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { pageMetadata, clampDescription, organizationLd, websiteLd } from "@/lib/seo";
@@ -312,16 +312,18 @@ export default async function Home() {
     where: { state: "PUBLISHED" },
     orderBy: { publishedAt: "desc" },
     take: 3,
-    select: { id: true, sector: true, country: true, currency: true, investmentMin: true, investmentMax: true, publicVersion: true },
+    select: { id: true, sector: true, country: true, currency: true, investmentMin: true, investmentMax: true, publicVersion: true, translations: true },
   });
   const featured = opps.map((o) => {
-    const pv = localizeVersion(toVersion(o.publicVersion), locale);
+    const otr = parseOppTranslations(o.translations);
+    const pv = localizeOppVersion(toVersion(o.publicVersion), otr, locale);
+    const localSector = localizeOppSector(o.sector, otr, locale);
     return {
       id: o.id,
-      title: pv?.displayTitle || localizeTerm(SECTOR_I18N, o.sector, locale),
+      title: pv?.displayTitle || localSector,
       summary: pv?.summary || "",
-      sector: localizeTerm(SECTOR_I18N, o.sector, locale),
-      country: localizeTerm(COUNTRY_I18N, o.country, locale),
+      sector: localSector,
+      country: localizeOppCountry(o.country, otr, locale),
       range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
       imageUrl: pv?.imageUrl ?? null,
     };
