@@ -65,7 +65,7 @@ export default async function InvestmentAmbassadorsPage() {
         {/* HERO */}
         <section className="relative min-h-[92vh] overflow-hidden">
           <div className="absolute inset-0">
-            <img src="/ambassadors/hero.jpg" alt={t("hx.badge")} className="h-full w-full object-cover object-top" />
+            <img src="/ambassadors/hero2.jpg" alt={t("hx.badge")} className="h-full w-full object-cover object-center" />
             <div className={`absolute inset-0 ${heroGrad} from-black/92 via-black/70 to-black/30`} />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(215,181,109,0.36),transparent_28%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.10),transparent_30%)]" />
           </div>
