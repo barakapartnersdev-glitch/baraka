@@ -42,7 +42,7 @@ const C = {
     brandSub: "BARAKA PARTNERS",
     heroTag: "منصة استثمارية تديرها شركة عهد البركة",
     heroH1a: "نربط", heroH1gold: "رأس المال الدولي", heroH1b: "بالفرص الحقيقية المدروسة",
-    heroLead: "منصة وسيطة موثوقة تجمع بين المستثمرين الجادين من مختلف الدول وأصحاب المشاريع والأصول الواعدة — ضمن إطار من الشفافية والحوكمة والسرية، لتحقيق المنفعة المشتركة لجميع الشركاء.",
+    heroLead: "منصة استثمار وتشغيل تربط رأس المال الجاد بالفرص الواعدة في عدة دول وقطاعات، وتدعم المستثمرين وأصحاب المشاريع عبر مسار منظم يشمل هيكلة الشراكات، إدارة المشاريع، وتوفير مشغلين محترفين قادرين على نقل الخبرة وتحويل الفرص إلى مشاريع قابلة للنمو والتنفيذ.",
     heroBtn1: "أنا مستثمر — استعرض الفرص", heroBtn2: "لديّ فرصة أو أصل استثماري",
     trust: [
       { n: "+8", l: "قطاعات استثمارية" },
@@ -94,7 +94,7 @@ const C = {
     brandSub: "BARAKA PARTNERS",
     heroTag: "An investment platform managed by Ahd Al-Baraka",
     heroH1a: "Connecting", heroH1gold: "global capital", heroH1b: "to vetted, real opportunities",
-    heroLead: "A trusted intermediary platform bringing together serious investors from many countries with promising project owners and assets — within a framework of transparency, governance, and confidentiality, for the shared benefit of all partners.",
+    heroLead: "An investment and operations platform that connects serious capital with promising opportunities across multiple countries and sectors, and supports investors and project owners through a structured process spanning partnership structuring, project management, and the provision of professional operators capable of transferring expertise and turning opportunities into scalable, executable projects.",
     heroBtn1: "I'm an investor — browse opportunities", heroBtn2: "I have an opportunity or asset",
     trust: [
       { n: "8+", l: "Investment sectors" },
@@ -146,7 +146,7 @@ const C = {
     brandSub: "BARAKA PARTNERS",
     heroTag: "由 Ahd Al-Baraka 公司运营的投资平台",
     heroH1a: "连接", heroH1gold: "国际资本", heroH1b: "与经过审核的真实机会",
-    heroLead: "一个值得信赖的中介平台，汇聚来自各国的认真投资者与有潜力的项目方和资产——在透明、治理与保密的框架内，为所有合作伙伴创造共同价值。",
+    heroLead: "一个投资与运营平台，将有诚意的资本与多个国家和行业中富有前景的机会对接，并通过规范化的流程为投资者和项目方提供支持——涵盖合作架构设计、项目管理，以及引入能够传递经验、将机会转化为可成长、可落地项目的专业运营方。",
     heroBtn1: "我是投资者 — 浏览机会", heroBtn2: "我有项目或投资资产",
     trust: [
       { n: "8+", l: "投资领域" },
@@ -198,7 +198,7 @@ const C = {
     brandSub: "BARAKA PARTNERS",
     heroTag: "Ahd Al-Baraka şirketi tarafından işletilen bir yatırım platformu",
     heroH1a: "Uluslararası sermayeyi", heroH1gold: "gerçek, incelenmiş fırsatlara", heroH1b: "bağlıyoruz",
-    heroLead: "Farklı ülkelerden ciddi yatırımcıları, gelecek vaat eden proje sahipleri ve varlıklarla bir araya getiren güvenilir bir aracı platform — şeffaflık, yönetişim ve gizlilik çerçevesinde, tüm ortakların ortak yararı için.",
+    heroLead: "Ciddi sermayeyi farklı ülke ve sektörlerdeki gelecek vaat eden fırsatlarla buluşturan; yatırımcıları ve proje sahiplerini ortaklık yapılandırması, proje yönetimi ve uzmanlık aktararak fırsatları büyümeye ve uygulamaya hazır projelere dönüştürebilen profesyonel işletmecilerin sağlanmasını kapsayan yapılandırılmış bir süreçle destekleyen bir yatırım ve işletme platformu.",
     heroBtn1: "Yatırımcıyım — fırsatları incele", heroBtn2: "Bir fırsatım ya da varlığım var",
     trust: [
       { n: "8+", l: "Yatırım sektörü" },

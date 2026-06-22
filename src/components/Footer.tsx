@@ -28,7 +28,6 @@ export default async function Footer() {
               </span>
             </div>
             <p className="mt-3.5 max-w-xs text-sm leading-relaxed">{t(locale, "footer.tagline")}</p>
-            <p className="mt-2 text-xs text-[#7e8aa0]">{t(locale, "footer.managedBy")}</p>
           </div>
 
           <div>
