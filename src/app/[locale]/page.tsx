@@ -303,7 +303,7 @@ export default async function Home() {
         {/* HERO */}
         <section className="relative min-h-[92vh] overflow-hidden">
           <div className="absolute inset-0">
-            <img src="/how-it-works/hero.jpg" alt="" className="h-full w-full object-cover" />
+            <img src="/home/hero.jpg" alt="" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-l from-black/95 via-black/72 to-black/30" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(215,181,109,0.36),transparent_28%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.10),transparent_30%)]" />
           </div>
