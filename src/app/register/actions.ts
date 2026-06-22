@@ -85,10 +85,23 @@ async function registerUser(
     return { error: t(locale, "err.emailTaken") };
   }
 
-  // للمستثمر: أنشئ كيانه الأساسي بنوعه المختار (يُستكمل ملفه لاحقاً)
+  // للمستثمر: أنشئ كيانه الأساسي بنوعه المختار + الدولة وتفضيلات المطابقة الأولية (تُستكمل لاحقاً)
   if (role === "INVESTOR") {
+    const country = String(formData.get("country") ?? "").trim() || null;
+    const investmentRange = String(formData.get("investmentRange") ?? "").trim();
+    const preferredSector = String(formData.get("preferredSector") ?? "").trim();
+    const profile =
+      investmentRange || preferredSector
+        ? { investmentRange: investmentRange || null, preferredSector: preferredSector || null }
+        : undefined;
     await prisma.investorEntity.create({
-      data: { investorId: created.id, name: fullName, type: investorType },
+      data: {
+        investorId: created.id,
+        name: fullName,
+        type: investorType,
+        country,
+        ...(profile ? { profile } : {}),
+      },
     });
   }
 
