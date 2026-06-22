@@ -27,7 +27,6 @@ export async function generateMetadata({
 export default async function ContactPage() {
   const locale = await getLocale();
   const cx = contactX(locale);
-  const email = t(locale, "contact.email");
   const d = dir(locale);
   // التدرّج الداكن يبدأ من جهة النص (يمين في RTL، يسار في LTR) ليبقى مقروءاً.
   const heroGrad = d === "rtl" ? "bg-gradient-to-l" : "bg-gradient-to-r";
@@ -94,7 +93,7 @@ export default async function ContactPage() {
           <aside className="lg:sticky lg:top-8">
             <div className="overflow-hidden rounded-[2.8rem] bg-[#171717] text-white shadow-2xl">
               <div className="relative h-80">
-                <img src="/contact/side.jpg" alt="" loading="lazy" className="h-full w-full object-cover" />
+                <img src="/contact/side2.jpg" alt="" loading="lazy" className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
                 <div className="absolute bottom-7 right-7 left-7">
                   <h2 className="text-3xl font-black text-white">{cx.sideTitle}</h2>
@@ -110,12 +109,6 @@ export default async function ContactPage() {
                       <span className="leading-7 text-white/80">{item}</span>
                     </div>
                   ))}
-                </div>
-                <div className="mt-7 border-t border-white/10 pt-6">
-                  <p className="text-sm text-white/60">{cx.sideEmailLabel}</p>
-                  <a href={`mailto:${email}`} dir="ltr" className="mt-1 inline-block text-lg font-black text-[#d7b56d] hover:underline">
-                    {email}
-                  </a>
                 </div>
               </div>
             </div>
