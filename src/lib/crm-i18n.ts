@@ -117,6 +117,12 @@ const M: Record<string, Quad> = {
     tr: "Lütfen bir telefon veya WhatsApp numarası girin.",
     zh: "请输入电话或 WhatsApp 号码。",
   },
+  "err.required": {
+    ar: "يرجى تعبئة جميع الحقول الإلزامية.",
+    en: "Please complete all required fields.",
+    tr: "Lütfen tüm zorunlu alanları doldurun.",
+    zh: "请填写所有必填字段。",
+  },
   "err.privacy": {
     ar: "يجب الموافقة على سياسة الخصوصية للمتابعة.",
     en: "You must accept the privacy policy to continue.",

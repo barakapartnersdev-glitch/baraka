@@ -1,6 +1,6 @@
 "use client";
 // نموذج التواصل العام — متعدّد اللغات، يحفظ الرسالة كـ CrmLead في لوحة الإدارة.
-// التصميم فاخر (كريمي/ذهبي) لكن المنطق وأسماء الحقول والإرسال كما هي دون تغيير.
+// التصميم فاخر (كريمي/ذهبي)؛ جميع الحقول إلزامية. المنطق وأسماء الحقول والإرسال كما هي.
 import { useActionState } from "react";
 import { tc } from "@/lib/crm-i18n";
 import { tcc, REQUEST_TYPES } from "@/lib/contact-i18n";
@@ -16,6 +16,7 @@ const labelCls = "mb-2 block text-sm font-bold text-[#333]";
 
 export default function ContactForm({ locale }: { locale: Locale }) {
   const [state, formAction, pending] = useActionState(submitContactLead, initial);
+  const req = <span className="text-red-500"> *</span>;
 
   if (state.ok) {
     return (
@@ -41,30 +42,26 @@ export default function ContactForm({ locale }: { locale: Locale }) {
 
       <div className="grid gap-5 md:grid-cols-2">
         <div>
-          <label htmlFor="c-name" className={labelCls}>{tc(locale, "field.fullName")}</label>
+          <label htmlFor="c-name" className={labelCls}>{tc(locale, "field.fullName")}{req}</label>
           <input id="c-name" name="fullName" type="text" required autoComplete="name" className={inputCls} />
         </div>
         <div>
-          <label htmlFor="c-email" className={labelCls}>{tc(locale, "field.email")}</label>
+          <label htmlFor="c-email" className={labelCls}>{tc(locale, "field.email")}{req}</label>
           <input id="c-email" name="email" type="email" required dir="ltr" autoComplete="email" className={inputCls} />
         </div>
         <div>
-          <label htmlFor="c-phone" className={labelCls}>
-            {tc(locale, "field.phone")} <span className="font-normal text-[#999]">{tc(locale, "field.optional")}</span>
-          </label>
-          <input id="c-phone" name="phone" type="tel" dir="ltr" autoComplete="tel" className={inputCls} />
+          <label htmlFor="c-phone" className={labelCls}>{tc(locale, "field.phone")}{req}</label>
+          <input id="c-phone" name="phone" type="tel" required dir="ltr" autoComplete="tel" className={inputCls} />
         </div>
         <div>
-          <label htmlFor="c-country" className={labelCls}>
-            {tc(locale, "field.country")} <span className="font-normal text-[#999]">{tc(locale, "field.optional")}</span>
-          </label>
-          <input id="c-country" name="country" type="text" autoComplete="country-name" className={inputCls} />
+          <label htmlFor="c-country" className={labelCls}>{tc(locale, "field.country")}{req}</label>
+          <input id="c-country" name="country" type="text" required autoComplete="country-name" className={inputCls} />
         </div>
       </div>
 
       <div className="mt-5">
-        <label htmlFor="c-rt" className={labelCls}>{tcc(locale, "field.requestType")}</label>
-        <select id="c-rt" name="requestType" defaultValue="general" className={inputCls}>
+        <label htmlFor="c-rt" className={labelCls}>{tcc(locale, "field.requestType")}{req}</label>
+        <select id="c-rt" name="requestType" required defaultValue="general" className={inputCls}>
           {REQUEST_TYPES.map((rt) => (
             <option key={rt} value={rt}>
               {tcc(locale, `rt.${rt}`)}
@@ -74,7 +71,7 @@ export default function ContactForm({ locale }: { locale: Locale }) {
       </div>
 
       <div className="mt-5">
-        <label htmlFor="c-msg" className={labelCls}>{tc(locale, "field.message")}</label>
+        <label htmlFor="c-msg" className={labelCls}>{tc(locale, "field.message")}{req}</label>
         <textarea id="c-msg" name="message" rows={6} required className={inputCls} />
       </div>
 
@@ -85,7 +82,7 @@ export default function ContactForm({ locale }: { locale: Locale }) {
       <div className="mt-6 rounded-[2rem] bg-[#171717] p-6 text-white md:p-8">
         <label className="flex gap-3 leading-8 text-white/80">
           <input type="checkbox" name="privacy" value="1" required className="mt-2 shrink-0" />
-          <span>{tc(locale, "privacy.consent")}</span>
+          <span>{tc(locale, "privacy.consent")}{req}</span>
         </label>
         <button
           type="submit"
