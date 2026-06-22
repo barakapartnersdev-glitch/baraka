@@ -1,0 +1,340 @@
+/* تصميم عرض الفرصة الاستثمارية — كحلي/ذهبي فاخر، RTL/LTR عبر الخصائص المنطقية. */
+.showcase {
+  --gold: #c9a24b;
+  --gold-2: #e3c987;
+  --gold-3: #a6752f;
+  --line: rgba(201, 162, 75, 0.28);
+  --line-soft: rgba(255, 255, 255, 0.1);
+  --text: #f7f3ea;
+  --muted: #aeb8c7;
+  --panel: rgba(255, 255, 255, 0.05);
+  --shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+
+  position: relative;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 80% -5%, rgba(201, 162, 75, 0.18), transparent 34rem),
+    radial-gradient(circle at 0% 18%, rgba(201, 162, 75, 0.08), transparent 32rem),
+    linear-gradient(180deg, #081a33 0%, #0a1f3c 45%, #07182f 100%);
+}
+
+.wrap {
+  width: min(1160px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 26px 0 56px;
+}
+
+/* شريط علوي: رجوع + مشاركة */
+.utility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.back {
+  color: var(--muted);
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+.back:hover { color: var(--gold-2); }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+.content { min-width: 0; }
+
+.sidebar {
+  position: sticky;
+  top: 90px;
+}
+.sidebarHead {
+  color: var(--gold-2);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+.sidebarSub {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0 0 16px;
+}
+
+/* البطل (Hero) */
+.hero {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #0b1e3a;
+  min-height: 400px;
+  box-shadow: var(--shadow);
+}
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.95) contrast(1.03);
+}
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(201, 162, 75, 0.16), transparent 20rem),
+    linear-gradient(90deg, rgba(8, 24, 47, 0.25) 0%, rgba(8, 24, 47, 0.72) 48%, rgba(8, 24, 47, 0.95) 100%);
+}
+.heroBody {
+  position: relative;
+  z-index: 2;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: min(640px, 66%);
+  margin-inline-end: auto;
+  padding: 44px;
+  text-align: start;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gold-2);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.heroTitle {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 3.6vw, 50px);
+  line-height: 1.18;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.heroSummary {
+  margin: 0 0 24px;
+  color: rgba(247, 243, 234, 0.85);
+  line-height: 1.9;
+  font-size: 16px;
+  max-width: 600px;
+}
+.heroActions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* الأزرار */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #14233f;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #e9cf8e 0%, #c9a24b 52%, #a6752f 100%);
+  box-shadow: 0 14px 28px rgba(201, 162, 75, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+.btnPrimary:hover { filter: brightness(1.07); transform: translateY(-1px); }
+
+/* شريط المؤشّرات */
+.metricStrip {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 20px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  overflow: hidden;
+}
+.metric {
+  padding: 20px 14px;
+  border-inline-start: 1px solid var(--line-soft);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+.metric:first-child { border-inline-start: 0; }
+.metricIcon { font-size: 22px; line-height: 1; }
+.metricLabel { color: var(--gold); font-size: 12px; font-weight: 700; }
+.metricValue { color: #fff; font-size: 19px; font-weight: 900; line-height: 1.2; }
+
+/* الأقسام */
+.section { margin-top: 34px; }
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: clamp(20px, 2.4vw, 27px);
+  color: var(--text);
+}
+.sectionTitle::before {
+  content: "";
+  width: 42px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+.showcase[dir="ltr"] .sectionTitle::before {
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+.sectionNote { color: var(--muted); font-size: 13px; }
+
+/* بطاقات «لماذا هذه الفرصة» */
+.features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.featureCard {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
+  border-radius: 16px;
+  padding: 18px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.featureCard:hover { transform: translateY(-2px); border-color: rgba(201, 162, 75, 0.5); }
+.featureCheck {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #14233f;
+  background: linear-gradient(135deg, #e9cf8e, #c9a24b);
+  font-weight: 900;
+  font-size: 14px;
+}
+.featureText { color: #e9eef6; font-size: 14px; line-height: 1.8; margin: 0; }
+
+/* بطاقات مالية (كريمية) */
+.finance {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.financeCard {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(236, 226, 206, 0.97));
+  color: #20170d;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(201, 162, 75, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+.financeLabel { color: #7b5727; font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+.financeNum { font-size: clamp(20px, 2.5vw, 28px); font-weight: 900; line-height: 1.15; }
+
+/* تفاصيل نصية */
+.prose {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 18px;
+  padding: 22px 24px;
+  color: #dfe6f0;
+  line-height: 2;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+/* المعرض */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.galleryItem {
+  position: relative;
+  min-height: 180px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+.galleryItem::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.55));
+}
+
+/* ملاحظات */
+.disclosure {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+  border-radius: 18px;
+  padding: 18px 22px;
+  color: var(--muted);
+  line-height: 1.95;
+  font-size: 14px;
+}
+.disclosure ul { margin: 0; padding-inline-start: 20px; }
+.disclosure li { margin-bottom: 6px; }
+.disclosure li::marker { color: var(--gold); }
+
+/* شريط الدعوة للتواصل */
+.ctaBand {
+  margin-top: 34px;
+  border: 1px solid rgba(201, 162, 75, 0.6);
+  background:
+    radial-gradient(circle at 85% 50%, rgba(201, 162, 75, 0.18), transparent 20rem),
+    linear-gradient(135deg, rgba(201, 162, 75, 0.1), rgba(255, 255, 255, 0.025));
+  border-radius: 22px;
+  padding: 26px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+.ctaBand h2 { margin: 0 0 6px; font-size: clamp(20px, 2.6vw, 26px); color: #fff; }
+.ctaBand p { margin: 0; color: var(--muted); line-height: 1.8; font-size: 14px; }
+
+@media (max-width: 1040px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: relative; top: 0; order: 2; }
+  .content { order: 1; }
+  .metricStrip { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); grid-auto-columns: auto; }
+  .features, .finance, .gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .hero { min-height: auto; }
+  .heroMedia { position: relative; min-height: 220px; }
+  .heroBody { width: 100%; min-height: auto; padding: 24px 20px; }
+  .metricStrip { grid-template-columns: repeat(2, 1fr); }
+  .features, .finance, .gallery { grid-template-columns: 1fr; }
+  .metric { border-inline-start: 0; border-bottom: 1px solid var(--line-soft); }
+  .ctaBand { grid-template-columns: 1fr; text-align: center; }
+  .ctaBand .btnPrimary { justify-self: center; }
+}

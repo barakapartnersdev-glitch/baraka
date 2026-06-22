@@ -94,6 +94,8 @@ export interface VersionData {
   summary?: string;
   highlights?: string;
   details?: string;
+  paybackPeriod?: string; // فترة الاسترداد المتوقعة لرأس المال
+  annualReturn?: string; // العائد السنوي المتوقع
   imageUrl?: string; // غلاف اختياري تضبطه الإدارة (يجب ألا يكشف الهوية أو الموقع)
   gallery?: string[]; // صور معبّرة إضافية (محايدة لغوياً) — تُعرض في صفحة الفرصة؛ يجب ألا تكشف الهوية أو الموقع الدقيق
 }

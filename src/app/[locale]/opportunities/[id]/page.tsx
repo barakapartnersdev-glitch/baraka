@@ -1,14 +1,13 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PublicHeader from "@/components/PublicHeader";
-import VersionView from "@/components/VersionView";
-import OpportunityGallery from "@/components/OpportunityGallery";
+import OpportunityShowcase, { type ShowcaseData } from "@/components/OpportunityShowcase";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { localizeOppVersion, localizeOppSector, localizeOppCountry, localizeOppCity, parseOppTranslations } from "@/lib/opp-i18n";
+import { illustrativeImages } from "@/lib/sector-image";
 import { pageMetadata, clampDescription, opportunityLd, organizationLd, breadcrumbLd, absUrl } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import Footer from "@/components/Footer";
@@ -110,53 +109,37 @@ export default async function PublicOpportunityDetail({
     }),
   ];
 
+  // معرض الصور: صور الفرصة إن وُجدت، وإلا صور تعبيرية للقطاع (قسم خفيف دائم الظهور)
+  const hasGallery = !!(pv?.gallery && pv.gallery.length > 0);
+  const galleryImages = hasGallery ? pv!.gallery! : illustrativeImages(opp.sector);
+
+  const showcaseData: ShowcaseData = {
+    title,
+    summary: pv?.summary,
+    details: pv?.details,
+    highlights: pv?.highlights,
+    imageUrl: pv?.imageUrl ?? null,
+    gallery: galleryImages,
+    galleryIllustrative: !hasGallery,
+    sector: localSector,
+    country: localCountry,
+    city: opp.city ? localizeOppCity(opp.city, tr, locale) : null,
+    range,
+    annualReturn: pv?.annualReturn,
+    paybackPeriod: pv?.paybackPeriod,
+  };
+
   return (
     <div className="min-h-screen">
       <JsonLd data={jsonLd} />
       <PublicHeader />
-      <main className="max-w-3xl mx-auto p-6 md:p-8">
-        <div className="flex items-center justify-between gap-3">
-          <Link href={localeHref(locale, "/opportunities")} className="text-sm text-baraka hover:underline">
-            {t(locale, "opp.back")}
-          </Link>
-          <ShareButton url={url} title={title} locale={locale} />
-        </div>
-        <h1 className="text-2xl font-bold mt-2 mb-2">{title}</h1>
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{localSector}</span>
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{localCountry}</span>
-          {opp.city && (
-            <span className="bg-gray-100 px-2 py-0.5 rounded">
-              {localizeOppCity(opp.city, tr, locale)}
-            </span>
-          )}
-          {range && (
-            <span className="bg-baraka-light text-baraka-dark px-2 py-0.5 rounded">
-              {range}
-            </span>
-          )}
-        </div>
-
-        {/* معرض صور معبّر (إن وُجد) — صور إقليمية حرّة الاستخدام، محايدة لغوياً */}
-        {pv?.gallery && pv.gallery.length > 0 && (
-          <OpportunityGallery images={pv.gallery} alt={lpv?.displayTitle || title} />
-        )}
-
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-          <VersionView data={pv} locale={locale} />
-        </div>
-
-        {/* نموذج طلب الاهتمام العام (CRM) — يلتقط المهتمين كـ leads في لوحة الإدارة */}
-        <InterestLeadForm opportunityId={opp.id} locale={locale} />
-
-        {/* تلميح للمستثمر المسجّل */}
-        <p className="mt-4 text-center text-xs text-gray-400">
-          {t(locale, "opp.loginPrompt")}{" "}
-          <Link href="/login" className="text-baraka hover:underline">
-            {t(locale, "home.login")}
-          </Link>
-        </p>
-      </main>
+      <OpportunityShowcase
+        locale={locale}
+        data={showcaseData}
+        backHref={localeHref(locale, "/opportunities")}
+        shareSlot={<ShareButton url={url} title={title} locale={locale} />}
+        leadSlot={<InterestLeadForm opportunityId={opp.id} locale={locale} />}
+      />
       <Footer />
     </div>
   );

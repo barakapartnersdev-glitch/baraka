@@ -16,6 +16,8 @@ export interface OppFields {
   summary?: string;
   highlights?: string; // أسطر متعددة (كل سطر نقطة) — تُحفظ فواصل الأسطر
   details?: string;
+  paybackPeriod?: string; // فترة الاسترداد المتوقعة لرأس المال
+  annualReturn?: string; // العائد السنوي المتوقع
   sector?: string;
   country?: string;
   city?: string;

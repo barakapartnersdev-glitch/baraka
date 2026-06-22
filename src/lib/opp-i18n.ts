@@ -624,6 +624,8 @@ export interface OppLocFields {
   summary?: string;
   highlights?: string;
   details?: string;
+  paybackPeriod?: string;
+  annualReturn?: string;
   sector?: string;
   country?: string;
   city?: string;
@@ -661,6 +663,8 @@ export function localizeOppVersion(
       ...(db.summary ? { summary: db.summary } : {}),
       ...(db.highlights ? { highlights: db.highlights } : {}),
       ...(db.details ? { details: db.details } : {}),
+      ...(db.paybackPeriod ? { paybackPeriod: db.paybackPeriod } : {}),
+      ...(db.annualReturn ? { annualReturn: db.annualReturn } : {}),
     };
   }
   // عودة لخريطة الكود (الفرص المزروعة)

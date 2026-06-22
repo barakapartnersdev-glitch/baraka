@@ -14,6 +14,8 @@ export interface OppDraft {
   summary?: string;
   highlights?: string;
   details?: string;
+  paybackPeriod?: string; // فترة الاسترداد المتوقعة لرأس المال
+  annualReturn?: string; // العائد السنوي المتوقع
   sector?: string;
   country?: string;
   city?: string;
@@ -52,6 +54,8 @@ function instructions(): string {
   "summary": "مقدمة استثمارية واضحة في فقرة (٣-٦ أسطر)",
   "highlights": "أبرز النقاط — كل نقطة في سطر مستقل",
   "details": "تفاصيل إضافية موسّعة عن الفرصة",
+  "paybackPeriod": "فترة الاسترداد المتوقعة لرأس المال (مثل: سنتان، 18 شهراً) — إن وُجدت",
+  "annualReturn": "العائد السنوي المتوقع (مثل: 15%، 20-25% سنوياً) — إن وُجد",
   "sector": "القطاع (مثل: تصنيع أغذية، عقارات وتطوير...)",
   "country": "الدولة",
   "city": "المدينة",
@@ -209,6 +213,8 @@ function normalize(obj: Record<string, unknown>): OppDraft {
     "summary",
     "highlights",
     "details",
+    "paybackPeriod",
+    "annualReturn",
     "sector",
     "country",
     "city",

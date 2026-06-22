@@ -47,6 +47,8 @@ export default function NewOpportunityForm({
     setField("summary", d.summary);
     setField("highlights", d.highlights);
     setField("details", d.details);
+    setField("paybackPeriod", d.paybackPeriod);
+    setField("annualReturn", d.annualReturn);
     setField("sector", d.sector);
     setField("country", d.country);
     setField("city", d.city);
@@ -245,9 +247,9 @@ export default function NewOpportunityForm({
         </div>
       </div>
 
-      {/* نطاق الاستثمار */}
+      {/* نطاق الاستثمار والعوائد */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 font-bold">نطاق الاستثمار</h2>
+        <h2 className="mb-4 font-bold">نطاق الاستثمار والعوائد</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label className={labelCls}>الحد الأدنى</label>
@@ -266,6 +268,14 @@ export default function NewOpportunityForm({
               <option value="SAR">SAR</option>
               <option value="AED">AED</option>
             </select>
+          </div>
+          <div>
+            <label className={labelCls}>العائد السنوي المتوقع</label>
+            <input name="annualReturn" className={inputCls} placeholder="مثال: 15% سنوياً" />
+          </div>
+          <div>
+            <label className={labelCls}>فترة الاسترداد المتوقعة لرأس المال</label>
+            <input name="paybackPeriod" className={inputCls} placeholder="مثال: سنتان" />
           </div>
         </div>
       </div>

@@ -82,6 +82,8 @@ export async function createAndPublishOpportunity(
   const summary = str(fd, "summary");
   const highlights = str(fd, "highlights");
   const details = str(fd, "details");
+  const paybackPeriod = str(fd, "paybackPeriod");
+  const annualReturn = str(fd, "annualReturn");
   const sector = str(fd, "sector");
   const country = str(fd, "country");
   const city = str(fd, "city");
@@ -118,6 +120,8 @@ export async function createAndPublishOpportunity(
     summary,
     ...(highlights ? { highlights } : {}),
     ...(details ? { details } : {}),
+    ...(paybackPeriod ? { paybackPeriod } : {}),
+    ...(annualReturn ? { annualReturn } : {}),
     imageUrl,
   };
 
@@ -127,6 +131,8 @@ export async function createAndPublishOpportunity(
     summary,
     ...(highlights ? { highlights } : {}),
     ...(details ? { details } : {}),
+    ...(paybackPeriod ? { paybackPeriod } : {}),
+    ...(annualReturn ? { annualReturn } : {}),
     sector,
     country,
     city,

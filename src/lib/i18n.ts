@@ -128,6 +128,8 @@ const ar: Dict = {
   "opp.overview": "نظرة عامة",
   "opp.loginPrompt": "سجّل الدخول كمستثمر للاطّلاع على تفاصيل أكثر وطلب الاهتمام.",
   "opp.inSector": "فرصة في قطاع",
+  "opp.annualReturn": "العائد السنوي المتوقع",
+  "opp.paybackPeriod": "فترة الاسترداد المتوقعة",
 
   // البوّابات
   "portal.investor": "بوابة المستثمر",
@@ -555,6 +557,8 @@ const en: Dict = {
   "opp.overview": "Overview",
   "opp.loginPrompt": "Sign in as an investor to view more details and express interest.",
   "opp.inSector": "Opportunity in",
+  "opp.annualReturn": "Expected annual return",
+  "opp.paybackPeriod": "Expected payback period",
 
   // portals
   "portal.investor": "Investor portal",
@@ -966,6 +970,8 @@ const zh: Dict = {
 "opp.overview": "概览",
 "opp.loginPrompt": "以投资者身份登录可查看更多详情并表达意向。",
 "opp.inSector": "所在行业",
+"opp.annualReturn": "预期年回报率",
+"opp.paybackPeriod": "预期回本周期",
 "portal.investor": "投资者门户",
 "portal.owner": "项目方门户",
 "portal.adminOrg": "阿赫德·巴拉卡",
@@ -1306,6 +1312,8 @@ const tr: Dict = {
 "opp.overview": "Genel bakış",
 "opp.loginPrompt": "Daha fazla ayrıntı görüntülemek ve ilgi bildirmek için yatırımcı olarak giriş yapın.",
 "opp.inSector": "Sektördeki fırsat:",
+"opp.annualReturn": "Beklenen yıllık getiri",
+"opp.paybackPeriod": "Beklenen geri ödeme süresi",
 "portal.investor": "Yatırımcı portalı",
 "portal.owner": "Proje sahibi portalı",
 "portal.adminOrg": "Ahd Al-Baraka",
