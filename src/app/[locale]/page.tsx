@@ -340,7 +340,7 @@ export default async function Home() {
         </section>
 
         {/* TWO TRACKS */}
-        <section className="mx-auto -mt-12 max-w-7xl px-6">
+        <section className="mx-auto -mt-4 max-w-7xl px-6">
           <div className="relative z-10 grid gap-8 lg:grid-cols-2">
             {[
               { title: c.invTitle, desc: c.invDesc, list: c.invList, btn: c.invBtn, href: "/register", img: TRACK_IMAGES[0], gold: false },
