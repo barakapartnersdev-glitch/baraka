@@ -42,6 +42,31 @@ const M: Record<string, Quad> = {
   "cta.how": { ar: "تعرّف على آلية العمل", en: "How It Works", tr: "Nasıl Çalışır", zh: "了解运作方式" },
   "cta.contact": { ar: "تواصل معنا", en: "Contact Us", tr: "Bize Ulaşın", zh: "联系我们" },
 
+  // ===== إطار التصميم الفاخر للصفحة العامة (هيرو/أقسام) =====
+  "hx.badge": { ar: "برنامج سفراء الاستثمار", en: "Investment Ambassadors Program", tr: "Yatırım Elçileri Programı", zh: "投资大使计划" },
+  "hx.heroGold": { ar: "حوّل علاقاتك إلى شراكة منظمة مع البركة بارتنرز", en: "Turn your relationships into an organized partnership with Baraka Partners", tr: "İlişkilerinizi Baraka Partners ile düzenli bir ortaklığa dönüştürün", zh: "将您的人脉转化为与 Baraka Partners 的有序合作" },
+  "hx.stat1t": { ar: "عقد رسمي", en: "Formal contract", tr: "Resmi sözleşme", zh: "正式合同" },
+  "hx.stat1s": { ar: "بعد القبول فقط", en: "After acceptance only", tr: "Yalnızca kabulden sonra", zh: "仅在录用后" },
+  "hx.stat2t": { ar: "حساب خاص", en: "Dedicated account", tr: "Özel hesap", zh: "专属账户" },
+  "hx.stat2s": { ar: "لمتابعة الترشيحات", en: "To track referrals", tr: "Yönlendirmeleri takip için", zh: "用于跟踪推荐" },
+  "hx.stat3t": { ar: "حماية الحقوق", en: "Rights protected", tr: "Haklar korunur", zh: "权益受保护" },
+  "hx.stat3s": { ar: "وفق ضوابط مكتوبة", en: "Per written rules", tr: "Yazılı kurallara göre", zh: "依书面规则" },
+  "hx.stat4t": { ar: "شبكة دولية", en: "Global network", tr: "Küresel ağ", zh: "国际网络" },
+  "hx.stat4s": { ar: "مستثمرون وشركات", en: "Investors & companies", tr: "Yatırımcılar ve şirketler", zh: "投资者与公司" },
+  "hx.whoCardTitle": { ar: "علاقات موثوقة، لا أسماء عشوائية", en: "Trusted relationships, not random names", tr: "Güvenilir ilişkiler, rastgele isimler değil", zh: "可信的关系，而非随机的名字" },
+  "hx.whoCardText": { ar: "السفير الحقيقي لا يرسل قوائم باردة؛ بل يفتح أبواباً لمستثمرين جادّين.", en: "A real ambassador doesn't send cold lists — they open doors to serious investors.", tr: "Gerçek bir elçi soğuk listeler göndermez; ciddi yatırımcılara kapılar açar.", zh: "真正的大使不会发送冷名单，而是为认真的投资者打开大门。" },
+  "hx.whoH2a": { ar: "ليس مندوب مبيعات.", en: "Not a salesperson.", tr: "Bir satış elemanı değil.", zh: "不是销售员。" },
+  "hx.whoH2b": { ar: "بل شريك علاقات استثمارية.", en: "An investment-relations partner.", tr: "Bir yatırım ilişkileri ortağı.", zh: "而是投资关系伙伴。" },
+  "hx.whoPara2": { ar: "يعمل السفير وفق عقد تعاون رسمي وضوابط واضحة لحماية جميع الأطراف، ولا يحق له تمثيل الشركة أو تقديم التزامات باسمها قبل اعتماده رسمياً.", en: "The ambassador works under a formal cooperation contract and clear rules that protect all parties, and may not represent the company or make commitments on its behalf before being officially approved.", tr: "Elçi, tüm tarafları koruyan resmi bir iş birliği sözleşmesi ve açık kurallar çerçevesinde çalışır; resmen onaylanmadan şirketi temsil edemez veya onun adına taahhütte bulunamaz.", zh: "大使在保护各方的正式合作合同和明确规则下工作，未经正式批准不得代表公司或以其名义作出承诺。" },
+  "hx.eligibleH2": { ar: "البرنامج مناسب لمن يمتلك علاقات استثمارية فعلية", en: "The program suits those with real investment relationships", tr: "Program, gerçek yatırım ilişkilerine sahip olanlara uygundur", zh: "本计划适合拥有真实投资人脉的人士" },
+  "hx.eligibleLead": { ar: "ليس كل شخص يصلح كسفير. المطلوب علاقات حقيقية، فهم استثماري، التزام مهني، وقدرة على فتح قنوات جادّة مع مستثمرين أو شركات.", en: "Not everyone fits as an ambassador. What's required: real relationships, investment understanding, professional commitment, and the ability to open serious channels with investors or companies.", tr: "Herkes elçi olamaz. Gereken: gerçek ilişkiler, yatırım anlayışı, mesleki bağlılık ve yatırımcılar veya şirketlerle ciddi kanallar açma yeteneği.", zh: "并非人人都适合担任大使。所需具备：真实的人脉、投资理解力、职业操守，以及与投资者或公司建立认真渠道的能力。" },
+  "hx.howH2": { ar: "من طلب الانضمام إلى حساب السفير", en: "From application to ambassador account", tr: "Başvurudan elçi hesabına", zh: "从申请到大使账户" },
+  "hx.howLead": { ar: "العلاقة لا تبدأ بمجرّد تعبئة النموذج؛ بل بعد المراجعة والقبول وتوقيع عقد التعاون.", en: "The relationship doesn't begin just by filling the form — only after review, acceptance, and signing the cooperation contract.", tr: "İlişki yalnızca formu doldurmakla başlamaz; ancak inceleme, kabul ve iş birliği sözleşmesinin imzalanmasından sonra başlar.", zh: "关系不会仅因填写表格而开始——只有在审核、录用并签署合作合同之后才开始。" },
+  "hx.respKicker": { ar: "حقوق ومسؤوليات واضحة", en: "Clear rights and responsibilities", tr: "Net hak ve sorumluluklar", zh: "明确的权利与责任" },
+  "hx.respH2": { ar: "العلاقة الناجحة تبدأ من وضوح الدور", en: "A successful relationship starts with role clarity", tr: "Başarılı bir ilişki, rol netliğiyle başlar", zh: "成功的合作始于角色的清晰" },
+  "hx.warnH2": { ar: "التقديم لا يعني القبول", en: "Applying does not mean acceptance", tr: "Başvurmak kabul anlamına gelmez", zh: "申请并不意味着录用" },
+  "hx.formKicker": { ar: "طلب الانضمام", en: "Join the program", tr: "Programa katılın", zh: "加入计划" },
+
   // ===== من هو سفير الاستثمار؟ =====
   "who.title": {
     ar: "من هو سفير الاستثمار؟",
