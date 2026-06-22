@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PublicHeader from "@/components/PublicHeader";
 import VersionView from "@/components/VersionView";
+import OpportunityGallery from "@/components/OpportunityGallery";
 import { toVersion } from "@/lib/opportunity";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
@@ -69,7 +70,8 @@ export default async function PublicOpportunityDetail({
   });
   if (!opp) notFound();
 
-  const pv = toVersion(opp.publicVersion);
+  // النسخة العامة مترجمة حسب لغة الزائر (العنوان/الملخّص/النقاط/التفاصيل)
+  const pv = localizeVersion(toVersion(opp.publicVersion), locale);
   const title = pv?.displayTitle || `${t(locale, "opp.inSector")} ${opp.sector}`;
   const range =
     opp.investmentMin || opp.investmentMax
@@ -79,7 +81,7 @@ export default async function PublicOpportunityDetail({
       : null;
 
   const url = absUrl(`/${locale}/opportunities/${opp.id}`);
-  const lpv = localizeVersion(toVersion(opp.publicVersion), locale);
+  const lpv = pv; // النسخة المترجمة نفسها (محسوبة أعلاه)
   const jsonLd = [
     organizationLd(),
     breadcrumbLd([
@@ -111,14 +113,19 @@ export default async function PublicOpportunityDetail({
         </Link>
         <h1 className="text-2xl font-bold mt-2 mb-2">{title}</h1>
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-6">
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{opp.sector}</span>
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{opp.country}</span>
+          <span className="bg-gray-100 px-2 py-0.5 rounded">{localizeTerm(SECTOR_I18N, opp.sector, locale)}</span>
+          <span className="bg-gray-100 px-2 py-0.5 rounded">{localizeTerm(COUNTRY_I18N, opp.country, locale)}</span>
           {range && (
             <span className="bg-baraka-light text-baraka-dark px-2 py-0.5 rounded">
               {range}
             </span>
           )}
         </div>
+
+        {/* معرض صور معبّر (إن وُجد) — صور إقليمية حرّة الاستخدام، محايدة لغوياً */}
+        {pv?.gallery && pv.gallery.length > 0 && (
+          <OpportunityGallery images={pv.gallery} alt={lpv?.displayTitle || title} />
+        )}
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
           <VersionView data={pv} locale={locale} />

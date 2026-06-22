@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panorama Hills — Investment Opportunity in Cyprus</title>
+<style>
+  :root{
+    --sea:#0a4d68; --sea-deep:#06303f; --azure:#1b7ea3; --sky:#bfe4ee;
+    --gold:#c9a24b; --gold-soft:#e7d3a1; --sand:#f6f1e7; --ink:#1d2b30;
+    --green:#3f7d4e; --line:rgba(255,255,255,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);background:var(--sand);line-height:1.7}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  h1,h2,h3{font-family:Georgia,'Times New Roman',serif;font-weight:600;letter-spacing:.2px}
+
+  /* HERO */
+  .hero{position:relative;min-height:92vh;display:flex;align-items:center;color:#fff;overflow:hidden}
+  .hero svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,48,63,.30),rgba(6,48,63,.55))}
+  .hero .inner{position:relative;z-index:2;padding:60px 0}
+  .eyebrow{display:inline-block;letter-spacing:4px;text-transform:uppercase;font-size:13px;color:var(--gold-soft);border:1px solid var(--line);padding:7px 16px;border-radius:40px;margin-bottom:24px}
+  .hero h1{font-size:clamp(40px,7vw,76px);line-height:1.05;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+  .hero p.lead{font-size:clamp(17px,2.4vw,22px);max-width:620px;margin-top:20px;color:#eef6f8}
+  .loc{margin-top:26px;font-size:15px;letter-spacing:1px;color:var(--gold-soft)}
+  .cta{display:inline-block;margin-top:34px;background:var(--gold);color:#21180a;padding:15px 34px;border-radius:6px;text-decoration:none;font-weight:700;letter-spacing:.5px;transition:.2s}
+  .cta:hover{background:var(--gold-soft);transform:translateY(-2px)}
+
+  /* SECTIONS */
+  section{padding:84px 0}
+  .tag{color:var(--azure);letter-spacing:3px;text-transform:uppercase;font-size:13px;font-weight:700}
+  h2{font-size:clamp(28px,4vw,40px);color:var(--sea-deep);margin:10px 0 22px}
+  .lead-p{font-size:18px;max-width:760px;color:#33474d}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-top:42px}
+  .card{background:#fff;border:1px solid #e9e1d2;border-radius:12px;padding:28px;box-shadow:0 10px 30px rgba(10,77,104,.06);transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(10,77,104,.12)}
+  .card .ic{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--azure),var(--sea));display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .card h3{font-size:20px;color:var(--sea-deep);margin-bottom:8px}
+  .card p{font-size:15px;color:#4a5b60}
+
+  .band{background:var(--sea-deep);color:#eaf4f7}
+  .band .tag{color:var(--gold-soft)}
+  .band h2{color:#fff}
+  .band .lead-p{color:#cfe2e8}
+  .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:40px}
+  .feat .n{font-family:Georgia,serif;font-size:40px;color:var(--gold);line-height:1}
+  .feat h3{color:#fff;font-size:18px;margin:10px 0 6px}
+  .feat p{color:#bcd4dc;font-size:14px}
+
+  .steps{counter-reset:s;margin-top:38px;display:grid;gap:18px}
+  .step{display:flex;gap:20px;align-items:flex-start;background:#fff;border:1px solid #e9e1d2;border-radius:12px;padding:24px 26px}
+  .step::before{counter-increment:s;content:counter(s);min-width:42px;height:42px;border-radius:50%;background:var(--gold);color:#21180a;font-weight:700;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .step h3{font-size:18px;color:var(--sea-deep)}
+  .step p{font-size:15px;color:#4a5b60}
+
+  .cta-band{background:linear-gradient(135deg,var(--azure),var(--sea-deep));color:#fff;text-align:center;border-radius:16px;padding:60px 30px;margin:60px auto}
+  .cta-band h2{color:#fff}
+  .cta-band p{color:#dcecf1;max-width:560px;margin:0 auto 10px}
+
+  footer{background:#06262f;color:#9fc0c9;font-size:13px;padding:40px 0}
+  footer .disc{font-size:12px;color:#6f969f;margin-top:14px;line-height:1.6}
+  .ribbon{height:5px;background:linear-gradient(90deg,var(--gold),var(--azure),var(--green))}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#9ed0e0"/><stop offset="1" stop-color="#dff0f5"/>
+      </linearGradient>
+      <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1b7ea3"/><stop offset="1" stop-color="#0a4d68"/>
+      </linearGradient>
+      <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#6fae6a"/><stop offset="1" stop-color="#3f7d4e"/>
+      </linearGradient>
+      <linearGradient id="hill2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a9c98a"/><stop offset="1" stop-color="#6fae6a"/>
+      </linearGradient>
+    </defs>
+    <rect width="1440" height="900" fill="url(#sky)"/>
+    <ellipse cx="1180" cy="150" rx="90" ry="90" fill="#fff" opacity=".55"/>
+    <path d="M0 360 Q360 320 720 350 T1440 340 V520 H0 Z" fill="url(#seaG)"/>
+    <path d="M0 360 Q220 300 520 330 T1000 320 Q1240 330 1440 300 V360 Q1080 380 720 360 T0 380 Z" fill="#2a6e7e" opacity=".5"/>
+    <path d="M0 470 Q300 380 640 430 Q980 480 1440 400 V900 H0 Z" fill="url(#hill2)"/>
+    <path d="M0 560 Q360 470 760 540 Q1080 600 1440 520 V900 H0 Z" fill="url(#hill1)"/>
+    <g fill="#2f5e3a" opacity=".85">
+      <path d="M610 540 l14 -70 14 70 z"/><path d="M660 560 l12 -64 12 64 z"/>
+      <path d="M720 555 l16 -80 16 80 z"/><path d="M780 575 l12 -60 12 60 z"/>
+    </g>
+  </svg>
+  <div class="veil"></div>
+  <div class="inner wrap">
+    <span class="eyebrow">Investment Opportunity · Cyprus</span>
+    <h1>Panorama Hills</h1>
+    <p class="lead">A hillside residential land development crowned with sweeping, uninterrupted Mediterranean sea views — fully permitted and title-secured, ready for value creation.</p>
+    <div class="loc">◆ Paphos Region · Chrysochous Bay · Near the Akamas Peninsula</div>
+    <a class="cta" href="#opportunity">Explore the Opportunity</a>
+  </div>
+</header>
+<div class="ribbon"></div>
+
+<section>
+  <div class="wrap">
+    <span class="tag">The Project</span>
+    <h2>Land with a view, and a clear path to value</h2>
+    <p class="lead-p">Panorama Hills is a residential land development set on an elevated green hillside in one of Cyprus's most scenic coastal regions. The site has been planned for division into serviced residential building plots, each positioned to capture panoramic views over the bay and the surrounding countryside. With its development permit and registered title already in place, the project offers a rare combination of a premier location and a de-risked legal foundation.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <span class="tag">Key Highlights</span>
+    <h2>Why this site stands apart</h2>
+    <div class="grid">
+      <div class="card" style="background:#0c3d4d;border-color:#14586c">
+        <div class="ic">▣</div>
+        <h3 style="color:#fff">Panoramic Sea Views</h3>
+        <p style="color:#bcd4dc">Elevated position with open, uninterrupted views across the bay and the green Mediterranean landscape.</p>
+      </div>
+      <div class="card" style="background:#0c3d4d;border-color:#14586c">
+        <div class="ic">✓</div>
+        <h3 style="color:#fff">Approved Subdivision Permit</h3>
+        <p style="color:#bcd4dc">The land carries an approved permit to be developed into residential building plots.</p>
+      </div>
+      <div class="card" style="background:#0c3d4d;border-color:#14586c">
+        <div class="ic">⬚</div>
+        <h3 style="color:#fff">Registered Title Deed</h3>
+        <p style="color:#bcd4dc">Clean, registered ownership — a secure and transparent legal foundation.</p>
+      </div>
+      <div class="card" style="background:#0c3d4d;border-color:#14586c">
+        <div class="ic">◈</div>
+        <h3 style="color:#fff">Defined Planning Zone</h3>
+        <p style="color:#bcd4dc">A clear planning classification governs permitted use and building density.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="tag">Why Cyprus</span>
+    <h2>A trusted Mediterranean gateway</h2>
+    <div class="feat">
+      <div><div class="n">EU</div><h3 style="color:var(--sea-deep)">European Union Member</h3><p style="color:#4a5b60">Stable legal framework, strong property rights, and freedom of movement within the EU.</p></div>
+      <div><div class="n">340+</div><h3 style="color:var(--sea-deep)">Days of Sunshine</h3><p style="color:#4a5b60">One of the Mediterranean's mildest climates, driving year-round tourism and lifestyle demand.</p></div>
+      <div><div class="n">EN</div><h3 style="color:var(--sea-deep)">English Widely Spoken</h3><p style="color:#4a5b60">English-friendly business and legal environment, simplifying cross-border investment.</p></div>
+      <div><div class="n">↗</div><h3 style="color:var(--sea-deep)">Resilient Property Market</h3><p style="color:#4a5b60">Sustained international demand for coastal land and homes across the island.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="opportunity">
+  <div class="wrap">
+    <span class="tag">The Opportunity</span>
+    <h2>How value is created</h2>
+    <p class="lead-p">Permitted, view-oriented land in a sought-after coastal region offers multiple paths to return: developing and selling serviced residential plots, building villas for sale or rental, or holding for capital appreciation as the region matures.</p>
+    <div class="steps" style="margin-top:40px">
+      <div class="step" style="background:#0c3d4d;border-color:#14586c"><div><h3 style="color:#fff">Secure & Service the Land</h3><p style="color:#bcd4dc">Leverage the existing permit and title to deliver fully serviced, ready-to-build residential plots.</p></div></div>
+      <div class="step" style="background:#0c3d4d;border-color:#14586c"><div><h3 style="color:#fff">Develop or Sell Plots</h3><p style="color:#bcd4dc">Offer premium view plots to end-buyers, or build villas to capture greater margin.</p></div></div>
+      <div class="step" style="background:#0c3d4d;border-color:#14586c"><div><h3 style="color:#fff">Grow with the Region</h3><p style="color:#bcd4dc">Benefit from rising coastal demand and the lasting appeal of a Mediterranean sea-view address.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="tag">Investment Readiness</span>
+    <h2>Built on solid ground</h2>
+    <p class="lead-p">This is not raw, untested land. The essentials that typically delay or derail a project are already resolved: ownership is registered, the development permit is approved, and the planning zone is defined. Investors can engage on a foundation that is transparent and ready to move forward.</p>
+    <div class="grid">
+      <div class="card"><div class="ic">①</div><h3>Title in place</h3><p>Registered ownership provides legal clarity and security.</p></div>
+      <div class="card"><div class="ic">②</div><h3>Permit approved</h3><p>The subdivision/development permit removes a key planning hurdle.</p></div>
+      <div class="card"><div class="ic">③</div><h3>Zone defined</h3><p>Permitted use and building parameters are already established.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="cta-band">
+    <span class="tag" style="color:var(--gold-soft)">Partner With Us</span>
+    <h2>Invest in a Mediterranean view</h2>
+    <p>Detailed project documentation, plot layouts and commercial terms are available to qualified investors under confidentiality.</p>
+    <a class="cta" href="#">Request the Investor Pack</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <strong style="color:#cfe2e8;font-size:15px">PANORAMA HILLS</strong> — Residential Land Development, Cyprus
+    <div class="disc">This document is a preliminary, non-binding overview prepared for general information only. It does not constitute an offer, investment advice, or a solicitation. Figures and features are indicative; locations are approximate. All project details, permits and commercial terms are subject to verification and formal documentation. Names, registration numbers and other sensitive details have been intentionally omitted.</div>
+  </div>
+</footer>
+
+</body>
+</html>

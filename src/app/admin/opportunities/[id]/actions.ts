@@ -92,8 +92,13 @@ export async function changeOpportunityState(
 function cleanVersion(data: VersionData): VersionData | null {
   const cleaned: VersionData = {};
   for (const [k, v] of Object.entries(data)) {
+    // الحقول المصفوفية (مثل gallery) تُحفظ كما هي ولا تخضع لتقليم النص
+    if (Array.isArray(v)) {
+      if (v.length > 0) cleaned.gallery = v as string[];
+      continue;
+    }
     const trimmed = String(v ?? "").trim();
-    if (trimmed) cleaned[k as keyof VersionData] = trimmed;
+    if (trimmed) (cleaned as Record<string, string>)[k] = trimmed;
   }
   return Object.keys(cleaned).length > 0 ? cleaned : null;
 }
