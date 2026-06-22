@@ -1,5 +1,6 @@
 "use client";
 // نموذج التواصل العام — متعدّد اللغات، يحفظ الرسالة كـ CrmLead في لوحة الإدارة.
+// التصميم فاخر (كريمي/ذهبي) لكن المنطق وأسماء الحقول والإرسال كما هي دون تغيير.
 import { useActionState } from "react";
 import { tc } from "@/lib/crm-i18n";
 import { tcc, REQUEST_TYPES } from "@/lib/contact-i18n";
@@ -10,101 +11,90 @@ import type { LeadFormState } from "@/lib/crm-submit";
 const initial: LeadFormState = {};
 
 const inputCls =
-  "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-start focus:outline-none focus:border-baraka";
+  "w-full rounded-2xl border border-[#e3d5bd] bg-white px-4 py-3.5 text-sm text-start outline-none transition focus:border-[#d7b56d]";
+const labelCls = "mb-2 block text-sm font-bold text-[#333]";
 
 export default function ContactForm({ locale }: { locale: Locale }) {
   const [state, formAction, pending] = useActionState(submitContactLead, initial);
 
   if (state.ok) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-        <div className="text-green-700 text-2xl mb-2">✓</div>
-        <p className="font-bold text-green-800 mb-1">{tc(locale, "success.title")}</p>
-        <p className="text-sm text-green-700 leading-relaxed">{tc(locale, "success.body")}</p>
+      <div className="rounded-[2.5rem] border border-green-200 bg-green-50 p-10 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-2xl text-white">✓</div>
+        <p className="text-xl font-black text-green-800">{tc(locale, "success.title")}</p>
+        <p className="mt-2 leading-8 text-green-700">{tc(locale, "success.body")}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6">
-      <h2 className="text-lg font-bold text-baraka-dark mb-1">{tcc(locale, "contact.formTitle")}</h2>
-      <p className="text-sm text-gray-500 mb-5">{tcc(locale, "contact.formSub")}</p>
+    <form action={formAction} className="rounded-[2.5rem] border border-[#e3d5bd] bg-white p-6 shadow-sm md:p-10">
+      {/* فخّ النحل */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
 
-      <form action={formAction} className="flex flex-col gap-4">
-        {/* فخّ النحل */}
-        <input
-          type="text"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          aria-hidden="true"
-          className="absolute -left-[9999px] h-0 w-0 opacity-0"
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="c-name" className="block text-sm text-gray-700 mb-1">
-              {tc(locale, "field.fullName")}
-            </label>
-            <input id="c-name" name="fullName" type="text" required autoComplete="name" className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor="c-email" className="block text-sm text-gray-700 mb-1">
-              {tc(locale, "field.email")}
-            </label>
-            <input id="c-email" name="email" type="email" required dir="ltr" autoComplete="email" className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor="c-phone" className="block text-sm text-gray-700 mb-1">
-              {tc(locale, "field.phone")} <span className="text-gray-400">{tc(locale, "field.optional")}</span>
-            </label>
-            <input id="c-phone" name="phone" type="tel" dir="ltr" autoComplete="tel" className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor="c-country" className="block text-sm text-gray-700 mb-1">
-              {tc(locale, "field.country")} <span className="text-gray-400">{tc(locale, "field.optional")}</span>
-            </label>
-            <input id="c-country" name="country" type="text" autoComplete="country-name" className={inputCls} />
-          </div>
-        </div>
-
+      <div className="grid gap-5 md:grid-cols-2">
         <div>
-          <label htmlFor="c-rt" className="block text-sm text-gray-700 mb-1">
-            {tcc(locale, "field.requestType")}
-          </label>
-          <select id="c-rt" name="requestType" defaultValue="general" className={inputCls}>
-            {REQUEST_TYPES.map((rt) => (
-              <option key={rt} value={rt}>
-                {tcc(locale, `rt.${rt}`)}
-              </option>
-            ))}
-          </select>
+          <label htmlFor="c-name" className={labelCls}>{tc(locale, "field.fullName")}</label>
+          <input id="c-name" name="fullName" type="text" required autoComplete="name" className={inputCls} />
         </div>
-
         <div>
-          <label htmlFor="c-msg" className="block text-sm text-gray-700 mb-1">
-            {tc(locale, "field.message")}
-          </label>
-          <textarea id="c-msg" name="message" rows={5} required className={inputCls} />
+          <label htmlFor="c-email" className={labelCls}>{tc(locale, "field.email")}</label>
+          <input id="c-email" name="email" type="email" required dir="ltr" autoComplete="email" className={inputCls} />
         </div>
+        <div>
+          <label htmlFor="c-phone" className={labelCls}>
+            {tc(locale, "field.phone")} <span className="font-normal text-[#999]">{tc(locale, "field.optional")}</span>
+          </label>
+          <input id="c-phone" name="phone" type="tel" dir="ltr" autoComplete="tel" className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor="c-country" className={labelCls}>
+            {tc(locale, "field.country")} <span className="font-normal text-[#999]">{tc(locale, "field.optional")}</span>
+          </label>
+          <input id="c-country" name="country" type="text" autoComplete="country-name" className={inputCls} />
+        </div>
+      </div>
 
-        <label className="flex items-start gap-2 text-sm text-gray-700">
-          <input type="checkbox" name="privacy" value="1" required className="mt-1 shrink-0" />
+      <div className="mt-5">
+        <label htmlFor="c-rt" className={labelCls}>{tcc(locale, "field.requestType")}</label>
+        <select id="c-rt" name="requestType" defaultValue="general" className={inputCls}>
+          {REQUEST_TYPES.map((rt) => (
+            <option key={rt} value={rt}>
+              {tcc(locale, `rt.${rt}`)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mt-5">
+        <label htmlFor="c-msg" className={labelCls}>{tc(locale, "field.message")}</label>
+        <textarea id="c-msg" name="message" rows={6} required className={inputCls} />
+      </div>
+
+      {state.error && (
+        <p className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">{state.error}</p>
+      )}
+
+      <div className="mt-6 rounded-[2rem] bg-[#171717] p-6 text-white md:p-8">
+        <label className="flex gap-3 leading-8 text-white/80">
+          <input type="checkbox" name="privacy" value="1" required className="mt-2 shrink-0" />
           <span>{tc(locale, "privacy.consent")}</span>
         </label>
-
-        {state.error && (
-          <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg p-3">{state.error}</p>
-        )}
-
         <button
           type="submit"
           disabled={pending}
-          className="bg-baraka text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-baraka-dark transition disabled:opacity-60 w-fit"
+          className="mt-7 w-full rounded-full bg-[#d7b56d] px-8 py-4 text-sm font-black text-[#171717] transition hover:-translate-y-1 hover:bg-[#e5c77d] disabled:translate-y-0 disabled:opacity-60"
         >
           {pending ? tc(locale, "submitting") : tc(locale, "submit")}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }
