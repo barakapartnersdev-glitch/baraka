@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/auth";
 import { logActivity } from "@/lib/audit";
 import { notifyAdmins } from "@/lib/notify";
+import { submitLead } from "@/lib/crm-submit";
 import { getLocale } from "@/lib/i18n-server";
 import { t } from "@/lib/i18n";
 
@@ -103,6 +104,42 @@ async function registerUser(
         ...(profile ? { profile } : {}),
       },
     });
+  }
+
+  // لصاحب المشروع/الأصل: التقط نبذة الفرصة كـ CrmLead لمراجعة الإدارة (أفضل جهد — لا يعطّل التسجيل)
+  if (role === "PROJECT_OWNER") {
+    try {
+      const g = (k: string) => String(formData.get(k) ?? "").trim();
+      const ownerLabels: Record<string, string> = {
+        project_owner: "صاحب مشروع",
+        asset_owner: "صاحب أصل",
+        authorized_representative: "ممثل مفوّض",
+      };
+      const ot = g("ownerType");
+      const lines = [
+        g("projectDescription"),
+        g("assetType") && `النوع: ${g("assetType")}`,
+        g("projectStage") && `المرحلة: ${g("projectStage")}`,
+        ot && `الصفة: ${ownerLabels[ot] ?? ot}`,
+        g("language") && `لغة التواصل: ${g("language")}`,
+      ].filter(Boolean);
+
+      const lead = new FormData();
+      lead.set("fullName", fullName);
+      lead.set("email", email);
+      if (phone) lead.set("phone", phone);
+      lead.set("country", g("country"));
+      lead.set("city", g("city"));
+      lead.set("projectSector", g("sector"));
+      lead.set("projectCountry", g("projectCountry"));
+      lead.set("projectCity", g("projectCity"));
+      lead.set("investmentBudget", g("investmentNeed"));
+      lead.set("message", lines.join("\n"));
+      lead.set("privacy", "1");
+      await submitLead({ leadType: "OPPORTUNITY_SUBMISSION", source: "SUBMIT_PAGE", formData: lead });
+    } catch (e) {
+      console.error("[register-owner] تعذّر حفظ نبذة الفرصة:", e);
+    }
   }
 
   await logActivity({
