@@ -9,3 +9,5 @@ node_modules
 
 # ملفّ توكِن Zoho (يحوي بيانات اعتماد — لا يُرفع إطلاقاً)
 zoho-token.mjs
+
+.vercel

@@ -2,11 +2,14 @@
 // نموذج إنشاء ونشر فرصة استثمارية من لوحة الإدارة (عربي).
 // يجمع الحقول + رابط الصورة المرفوعة، ثم يستدعي createAndPublishOpportunity
 // (التي تترجم بالذكاء الاصطناعي وتنشر). يعرض حالة «جارٍ الترجمة والنشر».
+// إضافةً لذلك: زر «تحليل ملف المشروع» يقرأ ملفاً (PDF/صورة/نص) بالذكاء الاصطناعي
+// ويملأ الحقول تلقائياً ليراجعها الأدمن قبل النشر.
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ImageUploadField from "@/components/admin/ImageUploadField";
-import { createAndPublishOpportunity } from "./actions";
+import { createAndPublishOpportunity, extractOpportunityFromFile } from "./actions";
+import type { OppDraft } from "@/lib/ai-extract";
 
 type DestOption = { id: string; label: string };
 
@@ -21,9 +24,67 @@ export default function NewOpportunityForm({
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
+  const [analyzing, startAnalyze] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [analyzeMsg, setAnalyzeMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [done, setDone] = useState<{ id: string; warning?: string } | null>(null);
+
+  // يضبط قيمة حقل غير مُتحكَّم به عبر مرجع النموذج.
+  function setField(name: string, value?: string) {
+    const el = formRef.current?.elements.namedItem(name) as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
+      | null;
+    if (el && value != null && value !== "") el.value = value;
+  }
+
+  // يملأ النموذج من مسوّدة الذكاء الاصطناعي.
+  function applyDraft(d: OppDraft) {
+    setField("displayTitle", d.displayTitle);
+    setField("summary", d.summary);
+    setField("highlights", d.highlights);
+    setField("details", d.details);
+    setField("sector", d.sector);
+    setField("country", d.country);
+    setField("city", d.city);
+    setField("investmentMin", d.investmentMin);
+    setField("investmentMax", d.investmentMax);
+    // العملة: لا تُضبط إلا إن كانت ضمن خيارات القائمة (تفادياً لإفراغها)
+    if (d.currency) {
+      const sel = formRef.current?.elements.namedItem("currency") as HTMLSelectElement | null;
+      if (sel && Array.from(sel.options).some((o) => o.value === d.currency)) {
+        sel.value = d.currency;
+      }
+    }
+    // محاولة مطابقة الوجهة حسب اسم الدولة
+    if (d.country) {
+      const match = destinations.find(
+        (x) => x.label.includes(d.country!) || d.country!.includes(x.label)
+      );
+      if (match) setField("destinationId", match.id);
+    }
+  }
+
+  function onAnalyze(file: File | undefined) {
+    if (!file) return;
+    setAnalyzeMsg(null);
+    setError(null);
+    const fd = new FormData();
+    fd.set("file", file);
+    startAnalyze(async () => {
+      const res = await extractOpportunityFromFile(fd);
+      if (res.ok && res.draft) {
+        applyDraft(res.draft);
+        setAnalyzeMsg({ ok: true, text: "تم تحليل الملف وتعبئة الحقول. راجِعها وعدّلها قبل النشر." });
+      } else {
+        setAnalyzeMsg({ ok: false, text: res.error ?? "تعذّر تحليل الملف." });
+      }
+      if (docInputRef.current) docInputRef.current.value = "";
+    });
+  }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +100,6 @@ export default function NewOpportunityForm({
         return;
       }
       if (res.warning) {
-        // نُشرت لكن مع تنبيه ترجمة — اعرض ملخّصاً مع رابط
         setDone({ id: res.id!, warning: res.warning });
       } else {
         router.push(`/admin/opportunities/${res.id}?ok=published`);
@@ -51,9 +111,7 @@ export default function NewOpportunityForm({
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
         <h2 className="mb-2 font-bold text-emerald-800">تم نشر الفرصة ✓</h2>
-        {done.warning && (
-          <p className="mb-4 text-sm text-amber-700">{done.warning}</p>
-        )}
+        {done.warning && <p className="mb-4 text-sm text-amber-700">{done.warning}</p>}
         <div className="flex gap-3">
           <Link
             href={`/admin/opportunities/${done.id}`}
@@ -74,6 +132,48 @@ export default function NewOpportunityForm({
 
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
+      {/* تحليل ملف المشروع بالذكاء الاصطناعي */}
+      <div className="rounded-2xl border-2 border-dashed border-baraka/40 bg-baraka-light/40 p-6">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-baraka text-white">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6M9 13l2 2 4-4" />
+            </svg>
+          </span>
+          <div className="flex-1">
+            <h2 className="font-bold">تحليل ملف المشروع بالذكاء الاصطناعي (اختياري)</h2>
+            <p className="mt-1 text-xs text-gray-600">
+              ارفع ملف المشروع (دراسة جدوى / عرض / مذكرة بصيغة PDF أو صورة أو نص) ليقرأه الذكاء
+              الاصطناعي ويملأ الحقول أدناه تلقائياً ببناء نص عرض مناسب. راجِع الحقول وعدّلها قبل النشر.
+            </p>
+            <input
+              ref={docInputRef}
+              type="file"
+              accept=".pdf,image/*,.txt,.md,.csv"
+              className="hidden"
+              onChange={(e) => onAnalyze(e.target.files?.[0])}
+            />
+            <button
+              type="button"
+              onClick={() => docInputRef.current?.click()}
+              disabled={analyzing}
+              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-baraka px-4 py-2 text-sm font-bold text-white hover:bg-baraka-dark disabled:opacity-60"
+            >
+              {analyzing ? "جارٍ قراءة الملف وتحليله..." : "رفع ملف المشروع وتحليله"}
+            </button>
+            {analyzing && (
+              <span className="mr-2 text-xs text-gray-500">قد يستغرق التحليل بضع ثوانٍ.</span>
+            )}
+            {analyzeMsg && (
+              <p className={`mt-2 text-xs ${analyzeMsg.ok ? "text-emerald-700" : "text-rose-700"}`}>
+                {analyzeMsg.text}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* الصورة */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <h2 className="mb-4 font-bold">صورة الفرصة</h2>

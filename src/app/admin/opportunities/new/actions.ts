@@ -8,12 +8,52 @@ import { requireRole } from "@/lib/auth";
 import { logActivity } from "@/lib/audit";
 import type { VersionData } from "@/lib/opportunity";
 import { translateOpportunity, type OppFields } from "@/lib/ai-translate";
+import {
+  analyzeProjectDocument,
+  MAX_DOC_BYTES,
+  UnsupportedFileError,
+  type OppDraft,
+} from "@/lib/ai-extract";
 
 export interface CreateResult {
   ok: boolean;
   id?: string;
   error?: string;
   warning?: string; // نُشرت لكن تعذّرت الترجمة الآلية
+}
+
+export interface ExtractResult {
+  ok: boolean;
+  draft?: OppDraft;
+  error?: string;
+}
+
+// تحليل ملف مشروع مرفوع بالذكاء الاصطناعي وإرجاع مسوّدة لتعبئة النموذج.
+export async function extractOpportunityFromFile(
+  fd: FormData
+): Promise<ExtractResult> {
+  await requireRole("ADMIN");
+  const file = fd.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: "لم يتم اختيار ملف." };
+  }
+  if (file.size > MAX_DOC_BYTES) {
+    return { ok: false, error: "حجم الملف يتجاوز 20 ميجابايت." };
+  }
+
+  try {
+    const draft = await analyzeProjectDocument(file);
+    if (!draft.displayTitle && !draft.summary) {
+      return { ok: false, error: "تعذّر استخراج معلومات كافية من الملف. جرّب ملفاً أوضح." };
+    }
+    return { ok: true, draft };
+  } catch (e) {
+    console.error("[extractOpportunity] failed:", e);
+    if (e instanceof UnsupportedFileError) {
+      return { ok: false, error: "نوع الملف غير مدعوم. المدعوم: PDF أو صورة أو ملف نصّي." };
+    }
+    return { ok: false, error: "تعذّر تحليل الملف. تأكّد أنه ملف واضح وحاول مجدداً." };
+  }
 }
 
 function str(fd: FormData, k: string): string {
