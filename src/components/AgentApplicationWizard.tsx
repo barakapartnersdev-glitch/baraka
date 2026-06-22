@@ -24,6 +24,7 @@ export default function AgentApplicationWizard({ locale }: { locale: Locale }) {
   const [done, setDone] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const hp = useRef<HTMLInputElement>(null); // مصيدة سبام
+  const wrapRef = useRef<HTMLDivElement>(null); // جذر النموذج للتمرير إليه عند تبديل الأقسام
 
   const total = pages.length;
   const page: FormPage = pages[step];
@@ -58,20 +59,27 @@ export default function AgentApplicationWizard({ locale }: { locale: Locale }) {
     return Object.keys(e).length === 0;
   }
 
+  // مرّر إلى بداية النموذج (لا إلى أعلى الصفحة) عند تبديل الأقسام أو ظهور خطأ.
+  // الهدف هو جذر النموذج؛ scroll-mt-24 يترك مساحة أسفل الترويسة الثابتة.
+  function scrollToFormTop() {
+    const el = wrapRef.current ?? document.getElementById("apply");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function next() {
     if (!validate(page)) {
       setMsg(ui.requiredError);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToFormTop();
       return;
     }
     setMsg(null);
     setStep((s) => Math.min(s + 1, total - 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToFormTop();
   }
   function back() {
     setMsg(null);
     setStep((s) => Math.max(0, s - 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToFormTop();
   }
 
   function addFiles() {
@@ -98,7 +106,7 @@ export default function AgentApplicationWizard({ locale }: { locale: Locale }) {
       if (!validate(pages[i])) {
         setStep(i);
         setMsg(i === pages.length - 1 ? ui.consentError : ui.requiredError);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        scrollToFormTop();
         return;
       }
     }
@@ -112,7 +120,7 @@ export default function AgentApplicationWizard({ locale }: { locale: Locale }) {
       const r = await submitAgentApplication(fd);
       if (r.ok) {
         setDone(true);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        scrollToFormTop();
       } else {
         setMsg(r.error ?? ui.genericError);
       }
@@ -134,7 +142,7 @@ export default function AgentApplicationWizard({ locale }: { locale: Locale }) {
   const onFiles = !!page.filesStep;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div ref={wrapRef} className="flex scroll-mt-24 flex-col gap-6">
       {/* شريط التقدّم */}
       <div>
         <div className="mb-2 flex items-center justify-between text-sm">
