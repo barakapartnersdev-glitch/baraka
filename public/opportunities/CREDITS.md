@@ -130,11 +130,9 @@ Free, commercially-usable images used as opportunity cover art. Hosted locally.
 - Use: Container shipping — export logistics (representative imagery; not the actual facility).
 
 ## damascus-airport-suburb.jpg  (Syria / Damascus airport residential suburb — hero & cover)
-- Source: Wikimedia Commons — "Row of modern apartment buildings at the Meuse river in the city of Liège"
-- Author: Choinowski
-- License: CC BY-SA 4.0 (attribution + share-alike)
-- Page: https://commons.wikimedia.org/wiki/File:Row_of_modern_apartment_buildings_at_the_Meuse_river_in_the_city_of_Li%C3%A8ge.jpg
-- Hero/cover for the Damascus airport-road residential-suburb opportunity — a row of modern multi-storey residential buildings (representative imagery; not the actual site).
+- Source: Official project concept render provided by the project owner (Ahd Al-Baraka).
+- License: Owned/provided by the client for use on this listing (not a stock image).
+- Hero/cover for the Damascus airport-road residential-suburb opportunity — photorealistic aerial render of the integrated community (central mosque, parks, mid-rise residential blocks, internal roads). Replaced an earlier stock photo that showed a waterfront, which does not apply to Damascus.
 
 ## damascus-airport-suburb-2.jpg  (Syria / Damascus airport residential suburb — gallery)
 - Source: Wikimedia Commons — "Apartment building- modern tower"
