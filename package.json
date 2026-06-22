@@ -25,6 +25,7 @@
     "db:seed:school-syria": "node prisma/seed-school-syria.mjs",
     "db:seed:murjan": "node prisma/seed-murjan.mjs",
     "db:seed:destinations": "node prisma/seed-destinations.mjs",
+    "db:seed:internal-templates": "node prisma/seed-internal-templates.mjs",
     "db:studio": "prisma studio"
   },
   "prisma": {

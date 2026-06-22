@@ -2,6 +2,8 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { getAccountStatus } from "@/lib/account";
 import { getBellData } from "@/lib/notify";
+import { countRecipientUnread } from "@/lib/internal-msg-server";
+import { tm } from "@/lib/internal-msg";
 import NotificationBell from "@/components/NotificationBell";
 import LocaleMenu from "@/components/LocaleMenu";
 import { logout } from "@/app/login/actions";
@@ -17,7 +19,10 @@ export default async function InvestorLayout({
   const locale = await getLocale();
   const status = await getAccountStatus(session.userId);
   const pending = status !== "ACTIVE";
-  const { count, items } = await getBellData(session.userId);
+  const [{ count, items }, unread] = await Promise.all([
+    getBellData(session.userId),
+    countRecipientUnread(session.userId),
+  ]);
 
   return (
     <div className="min-h-screen">
@@ -33,6 +38,12 @@ export default async function InvestorLayout({
             </span>
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
+            <Link href="/investor/inbox" className="relative text-sm font-medium text-[#cdd6e4] transition hover:text-gold">
+              {tm(locale, "portal.navInbox")}
+              {unread > 0 && (
+                <span className="ms-1 inline-flex items-center justify-center rounded-full bg-gold px-1.5 text-[10px] font-bold text-navy">{unread}</span>
+              )}
+            </Link>
             <LocaleMenu locale={locale} />
             <span className="hidden h-6 w-px bg-white/15 sm:block" aria-hidden="true" />
             <NotificationBell count={count} items={items} dark />

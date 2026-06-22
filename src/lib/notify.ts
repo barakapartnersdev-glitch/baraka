@@ -37,6 +37,7 @@ const SUBJECTS: Record<NotificationType, string> = {
   ASSET_AGENT_NEW_MESSAGE: "رسالة داخلية جديدة",
   ASSET_AGENT_NEW_ASSET: "أصل/فرصة جديدة من وكيل",
   ASSET_AGENT_ASSET_STATUS_CHANGED: "تحديث حالة أصل مقدّم",
+  INTERNAL_NEW_MESSAGE: "رسالة جديدة في صندوق المراسلات",
 };
 
 // إشعار مستخدم واحد (+ بريد إن كان مُفعّلاً). أفضل جهد: لا يرمي للأعلى.

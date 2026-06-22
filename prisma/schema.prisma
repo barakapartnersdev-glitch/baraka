@@ -92,6 +92,11 @@ model User {
   assetAgentMessages        AssetAgentMessage[]        @relation("AssetAgentMsgAgent")
   assetAgentMsgReplies      AssetAgentMessageReply[]
 
+  // المراسلة الداخلية الموحّدة (الإدارة ↔ المستلم)
+  internalThreadsReceived InternalThread[]  @relation("InternalThreadRecipient")
+  internalThreadsCreated  InternalThread[]  @relation("InternalThreadCreator")
+  internalMessagesSent    InternalMessage[] @relation("InternalMessageSender")
+
   @@index([role])
   @@index([accountStatus])
 }
@@ -291,6 +296,8 @@ enum NotificationType {
   ASSET_AGENT_NEW_MESSAGE // للطرف الآخر: رسالة داخلية جديدة
   ASSET_AGENT_NEW_ASSET // للإدارة: أصل/فرصة جديدة من وكيل
   ASSET_AGENT_ASSET_STATUS_CHANGED // للوكيل: تحديث حالة أصل مقدّم
+  // ===== المراسلة الداخلية الموحّدة (الإدارة ↔ كل الفئات) =====
+  INTERNAL_NEW_MESSAGE // للطرف الآخر: رسالة/رد جديد في صندوق الوارد من الإدارة
 }
 
 model Notification {
@@ -1239,4 +1246,82 @@ model AssetAgentMessageReply {
   createdAt DateTime @default(now())
 
   @@index([messageId])
+}
+
+// ============================================================
+// ===== المراسلة الداخلية الموحّدة (Internal Messaging) =====
+// مركز مراسلة داخل الإدارة يخاطب الفئات الأربع (سفير/وكيل/صاحب أصل/مستثمر)،
+// تُحفظ كاملةً داخل المنصّة، وتُرسَل نسخة بريد للمستلم. هجرة إضافية بالكامل.
+// ============================================================
+
+enum InternalThreadStatus {
+  OPEN // مفتوحة (بانتظار رد المستلم أو متابعة)
+  REPLIED // ردّ المستلم — بحاجة لاطّلاع الإدارة
+  CLOSED // مغلقة
+}
+
+// محادثة بين الإدارة ومستلم واحد (أيّ دور من الأدوار الأربعة)
+model InternalThread {
+  id String @id @default(cuid())
+
+  recipientUser   User   @relation("InternalThreadRecipient", fields: [recipientUserId], references: [id])
+  recipientUserId String
+  recipientRole   String // لقطة دور المستلم وقت الإنشاء: AMBASSADOR / ASSET_OWNER_AGENT / PROJECT_OWNER / INVESTOR
+
+  subject      String
+  category     String               @default("general") // general / documents / contract / meeting / notice / financial / other
+  languageCode String               @default("ar") // لغة المراسلة وعرض البريد
+  status       InternalThreadStatus @default(OPEN)
+
+  createdBy   User?   @relation("InternalThreadCreator", fields: [createdById], references: [id])
+  createdById String?
+
+  lastMessageAt   DateTime @default(now())
+  recipientUnread Boolean  @default(true) // لدى المستلم رسائل غير مقروءة
+  adminUnread     Boolean  @default(false) // لدى الإدارة ردود غير مقروءة
+  emailCopySent   Boolean  @default(false) // أُرسلت نسخة بريد عن هذه المحادثة (تدقيق)
+
+  messages InternalMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([recipientUserId])
+  @@index([recipientRole])
+  @@index([status])
+  @@index([lastMessageAt])
+}
+
+// رسالة/رد ضمن محادثة داخلية
+model InternalMessage {
+  id       String         @id @default(cuid())
+  thread   InternalThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId String
+
+  sender       User?   @relation("InternalMessageSender", fields: [senderUserId], references: [id])
+  senderUserId String?
+  senderRole   String // admin / recipient (لقطة وقت الإرسال)
+
+  body     String
+  emailedAt DateTime? // وقت إرسال نسخة البريد لهذه الرسالة (إن وُجدت)
+
+  createdAt DateTime @default(now())
+
+  @@index([threadId])
+}
+
+// قالب مراسلة داخلية (4 لغات لكل مفتاح) — يتجاوز القوالب المدمجة في الكود
+model InternalMessageTemplate {
+  id           String   @id @default(cuid())
+  templateKey  String // مثل: welcome / document_request / contract_followup / meeting_invite / general_notice
+  category     String   @default("general")
+  languageCode String // ar / en / tr / zh
+  subject      String
+  body         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([templateKey, languageCode])
+  @@index([languageCode])
 }

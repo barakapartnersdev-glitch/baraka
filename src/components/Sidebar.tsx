@@ -29,6 +29,11 @@ const items: NavItem[] = [
     labels: { ar: "وكلاء أصحاب الأصول", en: "Asset Owner Agents", tr: "Varlık Sahibi Temsilcileri", zh: "资产所有者代理" },
   },
   { href: "/admin/investors", key: "sidebar.users", icon: "M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" },
+  {
+    href: "/admin/messages",
+    icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6",
+    labels: { ar: "المراسلات الداخلية", en: "Internal Messaging", tr: "Dahili Mesajlaşma", zh: "内部消息" },
+  },
 ];
 
 export default function Sidebar({ locale }: { locale: Locale }) {

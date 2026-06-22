@@ -8,6 +8,8 @@ import LocaleMenu from "@/components/LocaleMenu";
 import { logout } from "@/app/login/actions";
 import { getLocale } from "@/lib/i18n-server";
 import { ta } from "@/lib/ambassador-i18n";
+import { tm } from "@/lib/internal-msg";
+import { countRecipientUnread } from "@/lib/internal-msg-server";
 
 const NAV = [
   { href: "/ambassador", key: "portal.nav.dashboard" },
@@ -20,9 +22,10 @@ const NAV = [
 export default async function AmbassadorLayout({ children }: { children: React.ReactNode }) {
   const session = await requireRole("AMBASSADOR");
   const locale = await getLocale();
-  const [{ count, items }, account] = await Promise.all([
+  const [{ count, items }, account, unread] = await Promise.all([
     getBellData(session.userId),
     getAmbassadorAccount(session.userId),
+    countRecipientUnread(session.userId),
   ]);
   const suspended = account != null && account.status !== "active";
 
@@ -61,6 +64,15 @@ export default async function AmbassadorLayout({ children }: { children: React.R
                 {ta(locale, it.key)}
               </Link>
             ))}
+            <Link
+              href="/ambassador/inbox"
+              className="relative whitespace-nowrap px-3 py-2.5 text-sm font-medium text-[#cdd6e4] transition hover:text-gold"
+            >
+              {tm(locale, "portal.navInbox")}
+              {unread > 0 && (
+                <span className="ms-1 inline-flex items-center justify-center rounded-full bg-gold px-1.5 text-[10px] font-bold text-navy">{unread}</span>
+              )}
+            </Link>
           </div>
         </nav>
       </header>
