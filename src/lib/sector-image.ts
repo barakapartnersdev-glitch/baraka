@@ -42,26 +42,20 @@ const SECTOR_RULES: { key: string; kw: string[] }[] = [
   { key: "industry", kw: ["صناع", "تصنيع", "industr", "manufactur", "sanayi", "imalat", "工业", "制造"] },
 ];
 
-// صور مكمّلة لكل قطاع لبناء صفّ تعبيري متنوّع (المطابق أولاً ثم صورتان مرتبطتان).
-const RELATED: Record<string, string[]> = {
-  reconstruction: ["reconstruction", "realestate", "industry"],
-  pharma: ["pharma", "healthcare", "technology"],
-  mining: ["mining", "industry", "exports"],
-  finance: ["finance", "technology", "industry"],
-  healthcare: ["healthcare", "pharma", "technology"],
-  shipping: ["shipping", "logistics", "exports"],
-  education: ["education", "technology", "realestate"],
-  exports: ["exports", "logistics", "industry"],
-  logistics: ["logistics", "shipping", "exports"],
-  technology: ["technology", "finance", "industry"],
-  energy: ["energy", "industry", "technology"],
-  agriculture: ["agriculture", "food", "exports"],
-  food: ["food", "agriculture", "exports"],
-  tourism: ["tourism", "realestate", "food"],
-  realestate: ["realestate", "reconstruction", "industry"],
-  industry: ["industry", "logistics", "exports"],
-  default: ["default", "industry", "exports"],
-};
+// صور حقيقية مُنتقاة حسب موضوع الفرصة (من public/opportunities) — مطابقة بكلمات مفتاحية
+// على القطاع + العنوان لاختيار صور وثيقة الصلة بالمجال بدل صور قطاع عامة عشوائية.
+// الترتيب مهمّ: الأكثر تحديداً أولاً.
+const TOPIC_IMAGES: { kw: string[]; imgs: string[] }[] = [
+  { kw: ["رخام", "حجر", "بلاط", "marble", "stone", "tile"], imgs: ["marble-quarry.jpg", "marble-slabs.jpg"] },
+  { kw: ["مقالع", "تعدين", "مناجم", "محاجر", "mining", "quarr"], imgs: ["marble-quarry.jpg", "marble-slabs.jpg"] },
+  { kw: ["حُمّص", "حمص", "طحينة", "hummus", "tahini", "chickpea"], imgs: ["hummus-tahini.jpg", "chickpeas.jpg", "sesame-seeds.jpg", "packaging-line.jpg"] },
+  { kw: ["مشروم", "فطر", "mushroom"], imgs: ["mushroom-oyster.jpg", "crispy-mushroom.jpg"] },
+  { kw: ["مدينة صناعية", "منطقة صناعية", "industrial city", "industrial zone", "murjan", "مرجان"], imgs: ["murjan-industrial-city.jpg", "murjan-development.jpg", "murjan-units.jpg"] },
+  { kw: ["مدرسة", "مدارس", "تعليم", "جامع", "school", "education", "campus"], imgs: ["school-campus.jpg", "school-auditorium.jpg"] },
+  { kw: ["سكني", "ضاحية", "إسكان", "عقار", "شقق", "residential", "suburb", "housing", "apartment", "real estate"], imgs: ["panorama-hills.jpg", "damascus-airport-suburb.jpg", "panorama-hills-2.jpg"] },
+  { kw: ["تصدير", "حاويات", "ميناء", "شحن", "export", "container", "port", "shipping"], imgs: ["export-containers.jpg", "packaging-line.jpg"] },
+  { kw: ["أغذية", "غذاء", "تعبئة", "تغليف", "food", "packaging", "beverage"], imgs: ["packaging-line.jpg", "export-containers.jpg"] },
+];
 
 function normSector(x: string): string {
   return x.replace(/İ/g, "I").toLowerCase();
@@ -80,9 +74,15 @@ export function sectorImage(sector: string): string {
   return SECTOR_IMAGES[matchKey(sector)] ?? SECTOR_IMAGES.default;
 }
 
-// مجموعة صور تعبيرية للقطاع (افتراضياً 3) — لعرض قسم صور خفيف عند غياب معرض الفرصة.
-export function illustrativeImages(sector: string, count = 3): string[] {
-  const key = matchKey(sector);
-  const keys = RELATED[key] ?? RELATED.default;
-  return keys.slice(0, count).map((k) => SECTOR_IMAGES[k] ?? SECTOR_IMAGES.default);
+// صور توضيحية مُنتقاة حسب موضوع الفرصة (يُمرَّر القطاع + العنوان) — صور حقيقية وثيقة
+// الصلة بالمجال من public/opportunities، وإلا صورة قطاع واحدة احتياطية محايدة.
+// تُستخدم لعرض قسم صور خفيف عند غياب معرض خاص بالفرصة.
+export function illustrativeImages(text: string, count = 4): string[] {
+  const s = normSector(text);
+  for (const t of TOPIC_IMAGES) {
+    if (t.kw.some((k) => s.includes(normSector(k)))) {
+      return t.imgs.slice(0, count).map((i) => `/opportunities/${i}`);
+    }
+  }
+  return [sectorImage(text)];
 }

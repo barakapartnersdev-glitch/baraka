@@ -109,9 +109,11 @@ export default async function PublicOpportunityDetail({
     }),
   ];
 
-  // معرض الصور: صور الفرصة إن وُجدت، وإلا صور تعبيرية للقطاع (قسم خفيف دائم الظهور)
+  // معرض الصور: صور الفرصة إن وُجدت، وإلا صور توضيحية حقيقية مُنتقاة حسب موضوع الفرصة
+  // (مطابقة على القطاع + العنوان العربي) — قسم خفيف دائم الظهور.
   const hasGallery = !!(pv?.gallery && pv.gallery.length > 0);
-  const galleryImages = hasGallery ? pv!.gallery! : illustrativeImages(opp.sector);
+  const matchText = `${opp.sector} ${toVersion(opp.publicVersion)?.displayTitle ?? ""}`;
+  const galleryImages = hasGallery ? pv!.gallery! : illustrativeImages(matchText);
 
   const showcaseData: ShowcaseData = {
     title,
