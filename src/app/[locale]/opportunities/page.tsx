@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import OpportunityCard, { type OpportunityCardData } from "@/components/OpportunityCard";
 import { toVersion } from "@/lib/opportunity";
 import { localizeOppVersion, localizeOppSector, localizeOppCountry, parseOppTranslations } from "@/lib/opp-i18n";
+import { coverOrIllustrative } from "@/lib/sector-image";
 import { getLocale } from "@/lib/i18n-server";
 import { t, localeHref, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
@@ -77,7 +78,10 @@ export default async function PublicOpportunities() {
                 sector: localSector,
                 country: localizeOppCountry(o.country, tr, locale),
                 range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
-                imageUrl: pv?.imageUrl ?? null,
+                imageUrl: coverOrIllustrative(
+                  pv?.imageUrl,
+                  `${o.sector} ${toVersion(o.publicVersion)?.displayTitle ?? ""}`
+                ),
               };
               return <OpportunityCard key={o.id} data={data} locale={locale} />;
             })}

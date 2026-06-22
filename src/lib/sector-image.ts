@@ -86,3 +86,13 @@ export function illustrativeImages(text: string, count = 4): string[] {
   }
   return [sectorImage(text)];
 }
+
+// صورة بطاقة الفرصة: غلافها الخاص إن وُجد، وإلا صورة واحدة وثيقة الصلة بالموضوع.
+// تضمن أن كل بطاقة فرصة في الموقع تحمل صورة ذات ارتباط بالمجال.
+export function coverOrIllustrative(
+  cover: string | null | undefined,
+  seedText: string
+): string {
+  if (cover) return cover;
+  return illustrativeImages(seedText, 1)[0];
+}

@@ -8,6 +8,7 @@ import OpportunityCard, { type OpportunityCardData } from "@/components/Opportun
 import DestinationLeadForm from "./DestinationLeadForm";
 import { toVersion } from "@/lib/opportunity";
 import { localizeOppVersion, localizeOppSector, localizeOppCountry, parseOppTranslations } from "@/lib/opp-i18n";
+import { coverOrIllustrative } from "@/lib/sector-image";
 import { isLocale, localeHref, type Locale } from "@/lib/i18n";
 import { destUi } from "@/lib/dest-i18n";
 import {
@@ -418,7 +419,10 @@ export default async function DestinationPage({
                     sector: localSector,
                     country: localizeOppCountry(o.country, otr, locale),
                     range: fmtRange(o.investmentMin, o.investmentMax, o.currency),
-                    imageUrl: pv?.imageUrl ?? null,
+                    imageUrl: coverOrIllustrative(
+                      pv?.imageUrl,
+                      `${o.sector} ${toVersion(o.publicVersion)?.displayTitle ?? ""}`
+                    ),
                   };
                   return <OpportunityCard key={o.id} data={data} locale={locale} />;
                 })}
