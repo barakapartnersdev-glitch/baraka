@@ -1,4 +1,4 @@
-// محتوى صفحة «من نحن» بأربع لغات (ar/en/tr/zh) — يُعرض بتصميم موحّد حسب اللغة.
+// محتوى صفحة «من نحن» بأربع لغات (ar/en/tr/zh). الصور ثابتة في public/about ولا تُترجَم.
 import type { Locale } from "@/lib/i18n";
 
 export interface AboutContent {
@@ -8,10 +8,8 @@ export interface AboutContent {
   heroIntro: string;
   ctaOpps: string;
   ctaContact: string;
-  cardKicker: string;
-  cardTitle: string;
-  stats: [string, string][];
-  countries: string[];
+  heroStats: [string, string][];
+  sectors: string[];
   introKicker: string;
   introTitle1: string;
   introTitle2: string;
@@ -19,26 +17,28 @@ export interface AboutContent {
   intro1: string;
   intro2: string;
   intro3: string;
-  pillarsKicker: string;
-  pillarsTitle: string;
-  pillars: { title: string; text: string }[];
-  marketsKicker: string;
-  marketsTitle: string;
-  marketsIntro: string;
-  markets: string[];
-  marketDesc: string;
+  countriesKicker: string;
+  countriesTitle: string;
+  countriesIntro: string;
+  countries: string[];
+  valueKicker: string;
+  valueTitle: string;
+  valueCards: { title: string; text: string }[];
+  opKicker: string;
+  opTitle: string;
+  opParas: string[];
+  opCardTitle: string;
+  opCardText: string;
   modelKicker: string;
   modelTitle: string;
   modelIntro: string;
   models: { title: string; text: string }[];
-  sectorsKicker: string;
-  sectorsTitle: string;
-  sectors: string[];
   processKicker: string;
   processTitle: string;
-  steps: { title: string; text: string }[];
+  process: string[];
   govKicker: string;
-  govTitle: string;
+  govTitle1: string;
+  govTitle2: string;
   govParas: string[];
   finalKicker: string;
   finalTitle: string;
@@ -48,70 +48,67 @@ export interface AboutContent {
 }
 
 const ar: AboutContent = {
-  heroBadge: "منصة استثمارية تديرها عهد البركة",
+  heroBadge: "تديرها عهد البركة للاستثمار والتطوير",
   heroTitle1: "البركة بارتنرز",
-  heroTitle2: "جسر الاستثمار والتشغيل بين الأسواق الواعدة ورأس المال الدولي",
+  heroTitle2: "منصة استثمار وتشغيل عابرة للحدود",
   heroIntro:
-    "منصة متخصصة في تنظيم الفرص الاستثمارية، استقطاب المستثمرين، ربط أصحاب الأصول والمشاريع بالشركات القادرة على التمويل أو التشغيل أو الإدارة، وبناء نماذج شراكة قابلة للتنفيذ في عدة دول وقطاعات.",
+    "نربط رأس المال، أصحاب الأصول، والشركات التشغيلية بفرص مدروسة في عدة دول وقطاعات، ونساعد على تحويل المشاريع الواعدة إلى مسارات استثمارية قابلة للتفاوض والتنفيذ.",
   ctaOpps: "استعرض الفرص الاستثمارية",
   ctaContact: "تواصل مع الإدارة",
-  cardKicker: "نطاق عمل عابر للحدود",
-  cardTitle: "فرص، مستثمرون، مشغلون، وشركاء تنفيذ في أسواق متعددة",
-  stats: [
-    ["عدة دول", "نطاق نشاط واستقطاب"],
-    ["+8", "قطاعات استثمارية"],
-    ["حوكمة", "وسرية متدرجة"],
-    ["إدارة", "وتشغيل مشاريع"],
+  heroStats: [
+    ["عدة دول", "نطاق استقطاب واستثمار"],
+    ["قطاعات متعددة", "عقار، صناعة، زراعة، لوجستيات"],
+    ["إدارة وتشغيل", "فرق ومشغلون وشركاء خبرة"],
+    ["سرية وحوكمة", "عرض متدرج وحماية للأطراف"],
   ],
-  countries: ["تركيا", "سوريا", "مصر", "الأردن", "قبرص", "الاتحاد الأوروبي"],
+  sectors: ["التطوير العقاري", "الصناعة والتشغيل", "الزراعة والإنتاج", "اللوجستيات والتجارة"],
   introKicker: "من نحن",
   introTitle1: "لسنا منصة عرض فرص فقط.",
   introTitle2: "نحن منصة تنظيم واستقطاب وتشغيل.",
   brand: "البركة بارتنرز Baraka Partners",
   intro1:
-    " هي منصة استثمارية وتطويرية تعمل تحت مظلة عهد البركة للاستثمار والتطوير، وتهدف إلى تحويل الفرص غير المنظمة إلى ملفات استثمارية قابلة للدراسة والتفاوض والتنفيذ.",
+    " هي منصة استثمارية وتطويرية تديرها عهد البركة، تعمل على تنظيم الفرص الاستثمارية، استقطاب المستثمرين، وربط أصحاب المشاريع والأصول بالشركات القادرة على التمويل، الإدارة، التشغيل أو الشراكة.",
   intro2:
-    "نعمل على ربط أصحاب المشاريع والأصول بالمستثمرين الجادين، وشركات التنفيذ، والمشغلين، وأصحاب الخبرة الصناعية والتجارية، ضمن إطار يحترم السرية، يحمي الأطراف، ويمنح كل فرصة هيكلًا مناسبًا حسب طبيعتها وحجمها.",
+    "لا نعمل كوسيط تقليدي يجمع فرصًا عشوائية. نقوم بفرز أولي، مراجعة جدية المشروع، تنظيم الملف، ثم عرضه على المستثمر أو المشغل المناسب بطريقة تحفظ السرية وتحترم مصالح جميع الأطراف.",
   intro3:
     "نشاطنا لا يقتصر على سوريا، رغم أهميتها ضمن محاور عملنا، بل يمتد إلى عدة دول وأسواق واعدة، مع التركيز على الفرص التي تحتاج إلى رأس مال، إدارة، تشغيل، أو توسع إقليمي ودولي.",
-  pillarsKicker: "دورنا في الصفقة",
-  pillarsTitle: "من الفكرة إلى الاستثمار، ومن الاستثمار إلى التشغيل",
-  pillars: [
-    { title: "تنظيم الفرص", text: "نفرز المشاريع، نراجع جديتها، ونحوّل البيانات الأولية إلى ملف استثماري قابل للعرض." },
-    { title: "استقطاب المستثمرين", text: "نفتح قنوات مع مستثمرين وشركات من عدة دول، ونطابق الفرصة مع رأس المال المناسب." },
-    { title: "إدارة المشاريع", text: "من خلال فرق عمل مؤهلة، نستطيع المساهمة في إدارة ومتابعة المشاريع في قطاعات متعددة." },
-    { title: "التشغيل والشراكات", text: "نربط المشاريع بمشغلين وأصحاب مصانع وخبرات عملية لديهم الرغبة في التوسع ونقل خبرتهم إلى مواقع جديدة." },
-  ],
-  marketsKicker: "نطاق دولي متوسع",
-  marketsTitle: "نعمل حيث توجد الفرصة، لا حيث توجد الحدود فقط",
-  marketsIntro:
+  countriesKicker: "نطاق دولي متوسع",
+  countriesTitle: "نعمل حيث توجد الفرصة، لا حيث توجد الحدود فقط",
+  countriesIntro:
     "تمتد أعمال البركة بارتنرز إلى أسواق متعددة، مع اهتمام خاص بالدول التي تمتلك أصولًا ومشاريع قابلة للنمو، لكنها تحتاج إلى تنظيم، تمويل، إدارة، أو شريك تشغيل محترف.",
-  markets: ["تركيا", "سوريا", "مصر", "الأردن", "قبرص", "الاتحاد الأوروبي", "الأسواق العربية", "شركاء دوليون"],
-  marketDesc: "فرص استثمارية، تشغيلية، أو شراكات توسع حسب جاهزية السوق والمشروع.",
-  modelKicker: "نموذج العمل",
-  modelTitle: "نموذج مرن حسب طبيعة كل مشروع",
-  modelIntro:
-    "لا نفرض قالبًا واحدًا على كل صفقة. كل مشروع له حجم مختلف، مخاطرة مختلفة، وحاجة مختلفة. لذلك يتم تحديد دور عهد البركة بالتفاوض بين الأطراف.",
-  models: [
-    { title: "أتعاب نجاح", text: "في بعض الحالات تتقاضى عهد البركة أتعاب نجاح عند إتمام الاستثمار أو إغلاق الصفقة بين المستثمر وصاحب المشروع." },
-    { title: "حصة مقابل الإدارة أو التطوير", text: "في حالات أخرى يمكن أن تدخل عهد البركة بحصة متفق عليها مقابل الإدارة، التطوير، التشغيل، تنظيم الشراكة، أو متابعة المشروع." },
-    { title: "اتفاق حسب الحالة", text: "يتم تحديد النموذج النهائي بين الأطراف حسب حجم المشروع، نوع الاستثمار، مستوى الجهد المطلوب، المخاطر، وطبيعة الدور التشغيلي أو الإداري." },
+  countries: ["تركيا", "سوريا", "مصر", "الأردن", "قبرص", "الاتحاد الأوروبي", "الأسواق العربية", "شركاء دوليون"],
+  valueKicker: "قيمة تتجاوز الوساطة",
+  valueTitle: "من الفكرة إلى الاستثمار، ومن الاستثمار إلى التشغيل",
+  valueCards: [
+    { title: "تنظيم الفرص", text: "نحوّل الفرص غير المنظمة إلى ملفات استثمارية واضحة، قابلة للدراسة والتفاوض." },
+    { title: "استقطاب المستثمرين", text: "نربط المشاريع بالمستثمرين والشركات القادرة على التمويل أو الشراكة أو التوسع." },
+    { title: "إدارة المشاريع", text: "نمارس دورًا إضافيًا عبر فرق عمل مؤهلة لمتابعة وإدارة المشاريع في قطاعات متعددة." },
+    { title: "التشغيل ونقل الخبرة", text: "نربط المشاريع بمشغلين وأصحاب مصانع وخبرات عملية قادرة على الدخول بعقود تشغيل محلية أو عالمية." },
   ],
-  sectorsKicker: "قطاعات متعددة",
-  sectorsTitle: "نعمل على فرص إنتاجية، عقارية، خدمية، وتشغيلية",
-  sectors: ["العقار والتطوير", "الصناعة والمصانع", "الزراعة والأراضي", "الصناعات الغذائية", "اللوجستيات", "التكنولوجيا", "الطاقة الإنتاجية", "السياحة والخدمات"],
+  opKicker: "التشغيل ونقل الخبرة",
+  opTitle: "نربط المشاريع بخبرات تشغيل حقيقية",
+  opParas: [
+    "تمتلك عهد البركة القدرة على ممارسة دور إضافي من خلال فرق عمل مؤهلة لإدارة ومتابعة المشاريع في قطاعات متعددة.",
+    "كما تعتمد على شبكة علاقات واسعة مع أصحاب أعمال ومصانع ومشغلين لديهم الرغبة في الدخول بعقود تشغيل محلية أو عالمية، ونقل خبرتهم إلى مواقع وأسواق جديدة.",
+    "هذا يجعل البركة بارتنرز أكثر من منصة تعريف بين طرفين؛ إنها مساحة لبناء نموذج تشغيل واستثمار قابل للتطبيق.",
+  ],
+  opCardTitle: "تشغيل، إدارة، وتوسع",
+  opCardText: "خبرات عملية قابلة للنقل إلى مشاريع وأسواق جديدة.",
+  modelKicker: "نموذج العمل",
+  modelTitle: "نموذج مرن حسب طبيعة كل فرصة",
+  modelIntro:
+    "لا نفرض قالبًا واحدًا على كل صفقة. يتم تحديد دور عهد البركة بالتفاوض بين الأطراف حسب طبيعة المشروع، حجم الدور، ومستوى الجهد المطلوب.",
+  models: [
+    { title: "أتعاب نجاح", text: "عند إتمام الاستثمار أو إغلاق الصفقة بين المستثمر وصاحب المشروع." },
+    { title: "حصة مقابل الإدارة", text: "عندما يكون لعهد البركة دور إداري أو تشغيلي أو تطويري واضح ومتفق عليه." },
+    { title: "اتفاق حسب الحالة", text: "يتم تحديد النموذج النهائي حسب حجم المشروع، المخاطر، وطبيعة مساهمة كل طرف." },
+  ],
   processKicker: "كيف نعمل",
   processTitle: "مسار واضح يحمي الأطراف ويرفع جدية الاستثمار",
-  steps: [
-    { title: "استقبال الفرصة", text: "استلام البيانات الأولية من صاحب المشروع أو الأصل." },
-    { title: "الفرز والتحقق", text: "مراجعة الجدية، الملكية، قابلية التنفيذ، والملاءمة الاستثمارية." },
-    { title: "تجهيز الملف", text: "صياغة عرض استثماري مختصر وآمن يحمي البيانات الحساسة." },
-    { title: "مطابقة المستثمر", text: "عرض الفرصة على المستثمرين أو المشغلين المناسبين حسب القطاع والدولة." },
-    { title: "التفاوض والتنظيم", text: "تنظيم العلاقة بين الأطراف وبناء نموذج الصفقة المناسب." },
-    { title: "الإدارة أو المتابعة", text: "المساهمة في الإدارة، التشغيل، أو المتابعة حسب الاتفاق النهائي." },
-  ],
+  process: ["استقبال الفرصة", "الفرز والتحقق", "تجهيز الملف", "مطابقة المستثمر", "تنظيم التفاوض", "المتابعة أو الإدارة"],
   govKicker: "السرية والحوكمة",
-  govTitle: "الثقة ليست شعارًا. الثقة نظام عمل.",
+  govTitle1: "الثقة ليست شعارًا.",
+  govTitle2: "الثقة نظام عمل.",
   govParas: [
     "نحمي بيانات أصحاب المشاريع والمستثمرين عبر عرض متدرج للمعلومات، بحيث لا يتم كشف التفاصيل الحساسة إلا بعد تحقق الجدية واعتماد المسار المناسب.",
     "كل فرصة تمر بمرحلة مراجعة وتنظيم قبل عرضها، لأن عرض الفرص الضعيفة أو غير الواضحة يضر بالمستثمر وبصاحب المشروع وبسمعة المنصة.",
@@ -124,70 +121,67 @@ const ar: AboutContent = {
 };
 
 const en: AboutContent = {
-  heroBadge: "An investment platform managed by Ahd Al-Baraka",
+  heroBadge: "Managed by Ahd Al-Baraka for Investment & Development",
   heroTitle1: "Baraka Partners",
-  heroTitle2: "A bridge for investment and operations between promising markets and international capital",
+  heroTitle2: "A cross-border investment and operations platform",
   heroIntro:
-    "A platform specialized in structuring investment opportunities, attracting investors, connecting asset and project owners with companies able to finance, operate or manage, and building executable partnership models across several countries and sectors.",
+    "We connect capital, asset owners, and operating companies with well-studied opportunities across several countries and sectors, and help turn promising projects into investment paths ready for negotiation and execution.",
   ctaOpps: "Browse opportunities",
   ctaContact: "Contact management",
-  cardKicker: "A cross-border scope",
-  cardTitle: "Opportunities, investors, operators and execution partners across multiple markets",
-  stats: [
-    ["Several countries", "Activity & sourcing scope"],
-    ["8+", "Investment sectors"],
-    ["Governance", "& graduated confidentiality"],
-    ["Management", "& project operation"],
+  heroStats: [
+    ["Several countries", "Sourcing & investment scope"],
+    ["Multiple sectors", "Real estate, industry, agriculture, logistics"],
+    ["Management & operation", "Teams, operators & expert partners"],
+    ["Confidentiality & governance", "Graduated disclosure & protection"],
   ],
-  countries: ["Turkey", "Syria", "Egypt", "Jordan", "Cyprus", "European Union"],
+  sectors: ["Real estate development", "Industry & operation", "Agriculture & production", "Logistics & trade"],
   introKicker: "About us",
   introTitle1: "We are not just an opportunity-listing platform.",
   introTitle2: "We are a platform for structuring, sourcing and operating.",
   brand: "Baraka Partners",
   intro1:
-    " is an investment and development platform operating under the umbrella of Ahd Al-Baraka for Investment & Development, aiming to turn unstructured opportunities into investment files ready for study, negotiation and execution.",
+    " is an investment and development platform managed by Ahd Al-Baraka. It structures investment opportunities, attracts investors, and connects project and asset owners with companies able to finance, manage, operate or partner.",
   intro2:
-    "We connect project and asset owners with serious investors, execution companies, operators, and holders of industrial and commercial expertise — within a framework that respects confidentiality, protects the parties, and gives each opportunity a structure suited to its nature and size.",
+    "We don't work as a traditional broker gathering random opportunities. We carry out initial screening, review the project's seriousness, organize the file, then present it to the right investor or operator in a way that preserves confidentiality and respects all parties' interests.",
   intro3:
     "Our activity is not limited to Syria — despite its importance within our focus — but extends to several promising countries and markets, with emphasis on opportunities that need capital, management, operation, or regional and international expansion.",
-  pillarsKicker: "Our role in the deal",
-  pillarsTitle: "From idea to investment, and from investment to operation",
-  pillars: [
-    { title: "Structuring opportunities", text: "We screen projects, review their seriousness, and turn preliminary data into a presentable investment file." },
-    { title: "Attracting investors", text: "We open channels with investors and companies from several countries, and match the opportunity with the right capital." },
-    { title: "Project management", text: "Through qualified teams, we can contribute to managing and following up projects across multiple sectors." },
-    { title: "Operation & partnerships", text: "We connect projects with operators, factory owners and hands-on expertise willing to expand and transfer their know-how to new locations." },
-  ],
-  marketsKicker: "An expanding international scope",
-  marketsTitle: "We work where the opportunity is, not only where the borders are",
-  marketsIntro:
+  countriesKicker: "An expanding international scope",
+  countriesTitle: "We work where the opportunity is, not only where the borders are",
+  countriesIntro:
     "Baraka Partners' work extends to multiple markets, with special interest in countries that hold growable assets and projects but need structuring, financing, management, or a professional operating partner.",
-  markets: ["Turkey", "Syria", "Egypt", "Jordan", "Cyprus", "European Union", "Arab markets", "International partners"],
-  marketDesc: "Investment, operational, or expansion-partnership opportunities depending on market and project readiness.",
-  modelKicker: "Business model",
-  modelTitle: "A flexible model suited to each project's nature",
-  modelIntro:
-    "We don't impose a single template on every deal. Each project has a different size, risk and need. The role of Ahd Al-Baraka is therefore defined through negotiation between the parties.",
-  models: [
-    { title: "Success fees", text: "In some cases, Ahd Al-Baraka charges a success fee upon completing the investment or closing the deal between investor and project owner." },
-    { title: "Equity for management or development", text: "In other cases, Ahd Al-Baraka may take an agreed stake in return for management, development, operation, structuring the partnership, or following up the project." },
-    { title: "Case-by-case agreement", text: "The final model is set between the parties according to project size, investment type, effort required, risk, and the nature of the operational or managerial role." },
+  countries: ["Turkey", "Syria", "Egypt", "Jordan", "Cyprus", "European Union", "Arab markets", "International partners"],
+  valueKicker: "Value beyond brokerage",
+  valueTitle: "From idea to investment, and from investment to operation",
+  valueCards: [
+    { title: "Structuring opportunities", text: "We turn unstructured opportunities into clear investment files, ready for study and negotiation." },
+    { title: "Attracting investors", text: "We connect projects with investors and companies able to finance, partner or expand." },
+    { title: "Project management", text: "We play an added role through qualified teams to follow up and manage projects across multiple sectors." },
+    { title: "Operation & know-how transfer", text: "We connect projects with operators, factory owners and hands-on expertise able to enter local or global operating contracts." },
   ],
-  sectorsKicker: "Multiple sectors",
-  sectorsTitle: "We work on productive, real-estate, service and operational opportunities",
-  sectors: ["Real estate & development", "Industry & factories", "Agriculture & land", "Food industries", "Logistics", "Technology", "Productive energy", "Tourism & services"],
+  opKicker: "Operation & know-how transfer",
+  opTitle: "We connect projects with real operating expertise",
+  opParas: [
+    "Ahd Al-Baraka has the capacity to play an added role through qualified teams that manage and follow up projects across multiple sectors.",
+    "It also relies on a wide network of business owners, factories and operators willing to enter local or global operating contracts and transfer their expertise to new locations and markets.",
+    "This makes Baraka Partners more than a matchmaking platform between two parties — it is a space to build an applicable operating and investment model.",
+  ],
+  opCardTitle: "Operate, manage, expand",
+  opCardText: "Practical expertise transferable to new projects and markets.",
+  modelKicker: "Business model",
+  modelTitle: "A flexible model suited to each opportunity's nature",
+  modelIntro:
+    "We don't impose a single template on every deal. Ahd Al-Baraka's role is defined through negotiation between the parties, according to the project's nature, the size of the role, and the level of effort required.",
+  models: [
+    { title: "Success fees", text: "Upon completing the investment or closing the deal between investor and project owner." },
+    { title: "Equity for management", text: "When Ahd Al-Baraka has a clear, agreed managerial, operational or development role." },
+    { title: "Case-by-case agreement", text: "The final model is set according to project size, risks, and the nature of each party's contribution." },
+  ],
   processKicker: "How we work",
   processTitle: "A clear path that protects the parties and raises investment seriousness",
-  steps: [
-    { title: "Receiving the opportunity", text: "Receiving preliminary data from the project or asset owner." },
-    { title: "Screening & verification", text: "Reviewing seriousness, ownership, feasibility, and investment suitability." },
-    { title: "Preparing the file", text: "Drafting a concise, secure investment presentation that protects sensitive data." },
-    { title: "Matching the investor", text: "Presenting the opportunity to suitable investors or operators by sector and country." },
-    { title: "Negotiation & structuring", text: "Organizing the relationship between the parties and building the right deal model." },
-    { title: "Management or follow-up", text: "Contributing to management, operation, or follow-up per the final agreement." },
-  ],
+  process: ["Receiving the opportunity", "Screening & verification", "Preparing the file", "Matching the investor", "Structuring negotiation", "Follow-up or management"],
   govKicker: "Confidentiality & governance",
-  govTitle: "Trust is not a slogan. Trust is a working system.",
+  govTitle1: "Trust is not a slogan.",
+  govTitle2: "Trust is a working system.",
   govParas: [
     "We protect the data of project owners and investors through graduated disclosure, so sensitive details are revealed only after seriousness is verified and the right path is approved.",
     "Every opportunity goes through a review and structuring stage before being presented, because presenting weak or unclear opportunities harms the investor, the project owner, and the platform's reputation.",
@@ -200,70 +194,67 @@ const en: AboutContent = {
 };
 
 const tr: AboutContent = {
-  heroBadge: "Ahd Al-Baraka tarafından yönetilen bir yatırım platformu",
+  heroBadge: "Ahd Al-Baraka Yatırım ve Geliştirme tarafından yönetilir",
   heroTitle1: "Baraka Partners",
-  heroTitle2: "Gelecek vaat eden pazarlar ile uluslararası sermaye arasında yatırım ve işletme köprüsü",
+  heroTitle2: "Sınır ötesi bir yatırım ve işletme platformu",
   heroIntro:
-    "Yatırım fırsatlarını yapılandırmada, yatırımcı çekmede, varlık ve proje sahiplerini finansman, işletme veya yönetim sağlayabilecek şirketlerle buluşturmada ve birden çok ülke ve sektörde uygulanabilir ortaklık modelleri kurmada uzmanlaşmış bir platform.",
+    "Sermayeyi, varlık sahiplerini ve işletme şirketlerini birden çok ülke ve sektörde iyi incelenmiş fırsatlarla buluşturur, gelecek vaat eden projeleri müzakereye ve uygulamaya hazır yatırım yollarına dönüştürmeye yardımcı oluruz.",
   ctaOpps: "Yatırım fırsatlarını gör",
   ctaContact: "Yönetimle iletişime geç",
-  cardKicker: "Sınır ötesi bir kapsam",
-  cardTitle: "Birden çok pazarda fırsatlar, yatırımcılar, işletmeciler ve uygulama ortakları",
-  stats: [
-    ["Birden çok ülke", "Faaliyet ve kaynak kapsamı"],
-    ["8+", "Yatırım sektörü"],
-    ["Yönetişim", "ve kademeli gizlilik"],
-    ["Yönetim", "ve proje işletmesi"],
+  heroStats: [
+    ["Birden çok ülke", "Kaynak ve yatırım kapsamı"],
+    ["Çok sayıda sektör", "Gayrimenkul, sanayi, tarım, lojistik"],
+    ["Yönetim ve işletme", "Ekipler, işletmeciler ve uzman ortaklar"],
+    ["Gizlilik ve yönetişim", "Kademeli paylaşım ve koruma"],
   ],
-  countries: ["Türkiye", "Suriye", "Mısır", "Ürdün", "Kıbrıs", "Avrupa Birliği"],
+  sectors: ["Gayrimenkul geliştirme", "Sanayi ve işletme", "Tarım ve üretim", "Lojistik ve ticaret"],
   introKicker: "Hakkımızda",
   introTitle1: "Yalnızca fırsat listeleyen bir platform değiliz.",
   introTitle2: "Yapılandırma, kaynak bulma ve işletme platformuyuz.",
   brand: "Baraka Partners",
   intro1:
-    ", Ahd Al-Baraka Yatırım ve Geliştirme çatısı altında çalışan bir yatırım ve geliştirme platformudur; düzensiz fırsatları incelemeye, müzakereye ve uygulamaya hazır yatırım dosyalarına dönüştürmeyi amaçlar.",
+    ", Ahd Al-Baraka tarafından yönetilen bir yatırım ve geliştirme platformudur. Yatırım fırsatlarını yapılandırır, yatırımcı çeker ve proje ile varlık sahiplerini finansman, yönetim, işletme veya ortaklık sağlayabilecek şirketlerle buluşturur.",
   intro2:
-    "Proje ve varlık sahiplerini; ciddi yatırımcılar, uygulama şirketleri, işletmeciler ve sınai-ticari uzmanlık sahipleriyle, gizliliğe saygı duyan, tarafları koruyan ve her fırsata niteliğine ve büyüklüğüne uygun bir yapı veren bir çerçevede buluştururuz.",
+    "Rastgele fırsatlar toplayan geleneksel bir aracı gibi çalışmayız. Ön eleme yapar, projenin ciddiyetini gözden geçirir, dosyayı düzenler ve ardından gizliliği koruyan, tüm tarafların çıkarlarına saygı gösteren bir biçimde doğru yatırımcı veya işletmeciye sunarız.",
   intro3:
     "Faaliyetimiz — odağımızdaki önemine rağmen — Suriye ile sınırlı değildir; sermaye, yönetim, işletme veya bölgesel ve uluslararası genişlemeye ihtiyaç duyan fırsatlara odaklanarak birçok umut verici ülke ve pazara uzanır.",
-  pillarsKicker: "Anlaşmadaki rolümüz",
-  pillarsTitle: "Fikirden yatırıma, yatırımdan işletmeye",
-  pillars: [
-    { title: "Fırsatları yapılandırma", text: "Projeleri eler, ciddiyetini gözden geçirir ve ön verileri sunulabilir bir yatırım dosyasına dönüştürürüz." },
-    { title: "Yatırımcı çekme", text: "Birden çok ülkeden yatırımcı ve şirketlerle kanallar açar, fırsatı doğru sermaye ile eşleştiririz." },
-    { title: "Proje yönetimi", text: "Nitelikli ekiplerle, birden çok sektörde projelerin yönetimine ve takibine katkıda bulunabiliriz." },
-    { title: "İşletme ve ortaklıklar", text: "Projeleri; genişlemek ve bilgi birikimini yeni konumlara taşımak isteyen işletmeciler, fabrika sahipleri ve saha uzmanlığıyla buluştururuz." },
-  ],
-  marketsKicker: "Genişleyen uluslararası kapsam",
-  marketsTitle: "Sadece sınırların olduğu yerde değil, fırsatın olduğu yerde çalışırız",
-  marketsIntro:
+  countriesKicker: "Genişleyen uluslararası kapsam",
+  countriesTitle: "Sadece sınırların olduğu yerde değil, fırsatın olduğu yerde çalışırız",
+  countriesIntro:
     "Baraka Partners'ın işi; büyüyebilir varlık ve projelere sahip ancak yapılandırma, finansman, yönetim veya profesyonel bir işletme ortağına ihtiyaç duyan ülkelere özel ilgiyle birçok pazara uzanır.",
-  markets: ["Türkiye", "Suriye", "Mısır", "Ürdün", "Kıbrıs", "Avrupa Birliği", "Arap pazarları", "Uluslararası ortaklar"],
-  marketDesc: "Pazar ve projenin hazırlığına göre yatırım, işletme veya genişleme ortaklığı fırsatları.",
-  modelKicker: "İş modeli",
-  modelTitle: "Her projenin niteliğine uygun esnek bir model",
-  modelIntro:
-    "Her anlaşmaya tek bir kalıp dayatmayız. Her projenin büyüklüğü, riski ve ihtiyacı farklıdır. Bu nedenle Ahd Al-Baraka'nın rolü taraflar arasında müzakereyle belirlenir.",
-  models: [
-    { title: "Başarı ücreti", text: "Bazı durumlarda Ahd Al-Baraka, yatırımın tamamlanması veya yatırımcı ile proje sahibi arasındaki anlaşmanın kapanması üzerine başarı ücreti alır." },
-    { title: "Yönetim veya geliştirme karşılığı hisse", text: "Diğer durumlarda Ahd Al-Baraka; yönetim, geliştirme, işletme, ortaklığın yapılandırılması veya projenin takibi karşılığında üzerinde anlaşılan bir hisse alabilir." },
-    { title: "Duruma göre anlaşma", text: "Nihai model; proje büyüklüğü, yatırım türü, gereken çaba, riskler ve işletme ya da yönetim rolünün niteliğine göre taraflar arasında belirlenir." },
+  countries: ["Türkiye", "Suriye", "Mısır", "Ürdün", "Kıbrıs", "Avrupa Birliği", "Arap pazarları", "Uluslararası ortaklar"],
+  valueKicker: "Aracılığın ötesinde değer",
+  valueTitle: "Fikirden yatırıma, yatırımdan işletmeye",
+  valueCards: [
+    { title: "Fırsatları yapılandırma", text: "Düzensiz fırsatları incelemeye ve müzakereye hazır, net yatırım dosyalarına dönüştürürüz." },
+    { title: "Yatırımcı çekme", text: "Projeleri; finansman, ortaklık veya genişleme sağlayabilecek yatırımcı ve şirketlerle buluştururuz." },
+    { title: "Proje yönetimi", text: "Nitelikli ekiplerle, birden çok sektörde projeleri takip etmek ve yönetmek için ek bir rol üstleniriz." },
+    { title: "İşletme ve bilgi aktarımı", text: "Projeleri; yerel veya küresel işletme sözleşmelerine girebilecek işletmeciler, fabrika sahipleri ve saha uzmanlığıyla buluştururuz." },
   ],
-  sectorsKicker: "Birden çok sektör",
-  sectorsTitle: "Üretim, gayrimenkul, hizmet ve işletme fırsatları üzerinde çalışırız",
-  sectors: ["Gayrimenkul ve geliştirme", "Sanayi ve fabrikalar", "Tarım ve arazi", "Gıda sanayileri", "Lojistik", "Teknoloji", "Üretken enerji", "Turizm ve hizmetler"],
+  opKicker: "İşletme ve bilgi aktarımı",
+  opTitle: "Projeleri gerçek işletme uzmanlığıyla buluştururuz",
+  opParas: [
+    "Ahd Al-Baraka, birden çok sektörde projeleri yöneten ve takip eden nitelikli ekipler aracılığıyla ek bir rol üstlenme kapasitesine sahiptir.",
+    "Ayrıca; yerel veya küresel işletme sözleşmelerine girmeye ve uzmanlığını yeni konum ve pazarlara taşımaya istekli iş insanları, fabrikalar ve işletmecilerden oluşan geniş bir ağa dayanır.",
+    "Bu, Baraka Partners'ı iki taraf arasında tanıştıran bir platformdan fazlası yapar — uygulanabilir bir işletme ve yatırım modeli kurma alanıdır.",
+  ],
+  opCardTitle: "İşlet, yönet, büyüt",
+  opCardText: "Yeni proje ve pazarlara aktarılabilir pratik uzmanlık.",
+  modelKicker: "İş modeli",
+  modelTitle: "Her fırsatın niteliğine uygun esnek bir model",
+  modelIntro:
+    "Her anlaşmaya tek bir kalıp dayatmayız. Ahd Al-Baraka'nın rolü; projenin niteliğine, rolün büyüklüğüne ve gereken çaba düzeyine göre taraflar arasında müzakereyle belirlenir.",
+  models: [
+    { title: "Başarı ücreti", text: "Yatırımın tamamlanması veya yatırımcı ile proje sahibi arasındaki anlaşmanın kapanması üzerine." },
+    { title: "Yönetim karşılığı hisse", text: "Ahd Al-Baraka'nın net ve üzerinde anlaşılmış bir yönetim, işletme veya geliştirme rolü olduğunda." },
+    { title: "Duruma göre anlaşma", text: "Nihai model; proje büyüklüğü, riskler ve her tarafın katkısının niteliğine göre belirlenir." },
+  ],
   processKicker: "Nasıl çalışıyoruz",
   processTitle: "Tarafları koruyan ve yatırım ciddiyetini artıran net bir süreç",
-  steps: [
-    { title: "Fırsatın alınması", text: "Proje veya varlık sahibinden ön verilerin alınması." },
-    { title: "Eleme ve doğrulama", text: "Ciddiyet, mülkiyet, uygulanabilirlik ve yatırıma uygunluğun gözden geçirilmesi." },
-    { title: "Dosyanın hazırlanması", text: "Hassas verileri koruyan, özlü ve güvenli bir yatırım sunumunun hazırlanması." },
-    { title: "Yatırımcı eşleştirme", text: "Fırsatın sektöre ve ülkeye göre uygun yatırımcı veya işletmecilere sunulması." },
-    { title: "Müzakere ve yapılandırma", text: "Taraflar arasındaki ilişkinin düzenlenmesi ve doğru anlaşma modelinin kurulması." },
-    { title: "Yönetim veya takip", text: "Nihai anlaşmaya göre yönetim, işletme veya takibe katkı." },
-  ],
+  process: ["Fırsatın alınması", "Eleme ve doğrulama", "Dosyanın hazırlanması", "Yatırımcı eşleştirme", "Müzakerenin yapılandırılması", "Takip veya yönetim"],
   govKicker: "Gizlilik ve yönetişim",
-  govTitle: "Güven bir slogan değildir. Güven bir çalışma sistemidir.",
+  govTitle1: "Güven bir slogan değildir.",
+  govTitle2: "Güven bir çalışma sistemidir.",
   govParas: [
     "Proje sahiplerinin ve yatırımcıların verilerini kademeli bilgi paylaşımıyla koruruz; hassas ayrıntılar ancak ciddiyet doğrulandıktan ve doğru yol onaylandıktan sonra açıklanır.",
     "Her fırsat sunulmadan önce bir inceleme ve yapılandırma aşamasından geçer; çünkü zayıf veya belirsiz fırsatları sunmak yatırımcıya, proje sahibine ve platformun itibarına zarar verir.",
@@ -276,70 +267,67 @@ const tr: AboutContent = {
 };
 
 const zh: AboutContent = {
-  heroBadge: "由 Ahd Al-Baraka 运营的投资平台",
+  heroBadge: "由 Ahd Al-Baraka 投资与开发运营",
   heroTitle1: "Baraka Partners",
-  heroTitle2: "连接潜力市场与国际资本的投资与运营桥梁",
+  heroTitle2: "跨境投资与运营平台",
   heroIntro:
-    "一个专注于构建投资机会、吸引投资者、将资产与项目方对接到具备融资、运营或管理能力的公司，并在多个国家和行业建立可落地合作模式的平台。",
+    "我们将资本、资产方与运营公司对接到多个国家和行业中经过研究的机会，并帮助把有潜力的项目转化为可供谈判和执行的投资路径。",
   ctaOpps: "浏览投资机会",
   ctaContact: "联系管理团队",
-  cardKicker: "跨境业务范围",
-  cardTitle: "在多个市场中的机会、投资者、运营方与执行伙伴",
-  stats: [
-    ["多个国家", "业务与招商范围"],
-    ["8+", "投资行业"],
-    ["治理", "与分级保密"],
-    ["管理", "与项目运营"],
+  heroStats: [
+    ["多个国家", "招商与投资范围"],
+    ["多个行业", "房地产、工业、农业、物流"],
+    ["管理与运营", "团队、运营方与专家伙伴"],
+    ["保密与治理", "分级披露与各方保护"],
   ],
-  countries: ["土耳其", "叙利亚", "埃及", "约旦", "塞浦路斯", "欧盟"],
+  sectors: ["房地产开发", "工业与运营", "农业与生产", "物流与贸易"],
   introKicker: "关于我们",
   introTitle1: "我们不仅是一个机会展示平台。",
   introTitle2: "我们是构建、招商与运营的平台。",
   brand: "Baraka Partners",
   intro1:
-    " 是一个在 Ahd Al-Baraka 投资与开发旗下运营的投资与开发平台，旨在将未经组织的机会转化为可供研究、谈判和执行的投资档案。",
+    " 是由 Ahd Al-Baraka 运营的投资与开发平台。我们构建投资机会、吸引投资者，并将项目与资产方对接到能够提供融资、管理、运营或合作的公司。",
   intro2:
-    "我们在尊重保密、保护各方、并依据每个机会的性质与规模赋予其合适结构的框架内，将项目与资产方对接到认真的投资者、执行公司、运营方以及具备工业和商业经验的人士。",
+    "我们并非传统中介那样收集随意的机会。我们进行初步筛选、审查项目的严肃性、组织档案，然后以维护保密、尊重各方利益的方式呈现给合适的投资者或运营方。",
   intro3:
     "我们的业务并不局限于叙利亚——尽管它在我们的重点中很重要——而是延伸到多个潜力国家和市场，重点关注需要资本、管理、运营或区域与国际扩张的机会。",
-  pillarsKicker: "我们在交易中的角色",
-  pillarsTitle: "从构想到投资，从投资到运营",
-  pillars: [
-    { title: "构建机会", text: "我们筛选项目、审查其严肃性，并将初步数据转化为可展示的投资档案。" },
-    { title: "吸引投资者", text: "我们与多个国家的投资者和公司建立渠道，并将机会与合适的资本相匹配。" },
-    { title: "项目管理", text: "通过专业团队，我们可在多个行业参与项目的管理与跟进。" },
-    { title: "运营与合作", text: "我们将项目对接到愿意扩张并将其经验带到新地点的运营方、工厂主与实战经验者。" },
-  ],
-  marketsKicker: "不断扩展的国际范围",
-  marketsTitle: "我们在有机会的地方开展业务，而不只是在有边界的地方",
-  marketsIntro:
+  countriesKicker: "不断扩展的国际范围",
+  countriesTitle: "我们在有机会的地方开展业务，而不只是在有边界的地方",
+  countriesIntro:
     "Baraka Partners 的业务延伸到多个市场，特别关注拥有可成长资产与项目、但需要组织、融资、管理或专业运营伙伴的国家。",
-  markets: ["土耳其", "叙利亚", "埃及", "约旦", "塞浦路斯", "欧盟", "阿拉伯市场", "国际合作伙伴"],
-  marketDesc: "根据市场与项目的成熟度，提供投资、运营或扩张合作机会。",
-  modelKicker: "商业模式",
-  modelTitle: "依据每个项目性质的灵活模式",
-  modelIntro:
-    "我们不对每笔交易强加单一模板。每个项目的规模、风险和需求各不相同。因此 Ahd Al-Baraka 的角色由各方协商确定。",
-  models: [
-    { title: "成功费", text: "在某些情况下，当投资完成或投资者与项目方之间的交易达成时，Ahd Al-Baraka 收取成功费。" },
-    { title: "以管理或开发换取股权", text: "在其他情况下，Ahd Al-Baraka 可以约定的股权换取管理、开发、运营、组织合作或项目跟进。" },
-    { title: "按具体情况约定", text: "最终模式由各方根据项目规模、投资类型、所需投入、风险以及运营或管理角色的性质共同确定。" },
+  countries: ["土耳其", "叙利亚", "埃及", "约旦", "塞浦路斯", "欧盟", "阿拉伯市场", "国际合作伙伴"],
+  valueKicker: "超越中介的价值",
+  valueTitle: "从构想到投资，从投资到运营",
+  valueCards: [
+    { title: "构建机会", text: "我们将未经组织的机会转化为清晰的投资档案，可供研究与谈判。" },
+    { title: "吸引投资者", text: "我们将项目对接到能够融资、合作或扩张的投资者与公司。" },
+    { title: "项目管理", text: "我们通过专业团队发挥附加作用，在多个行业跟进和管理项目。" },
+    { title: "运营与经验转移", text: "我们将项目对接到能够签订本地或全球运营合同的运营方、工厂主与实战经验者。" },
   ],
-  sectorsKicker: "多个行业",
-  sectorsTitle: "我们涉足生产、房地产、服务与运营类机会",
-  sectors: ["房地产与开发", "工业与工厂", "农业与土地", "食品工业", "物流", "科技", "生产性能源", "旅游与服务"],
+  opKicker: "运营与经验转移",
+  opTitle: "我们将项目对接到真正的运营经验",
+  opParas: [
+    "Ahd Al-Baraka 有能力通过在多个行业管理和跟进项目的专业团队发挥附加作用。",
+    "我们还依托广泛的人脉网络——愿意签订本地或全球运营合同、并将经验带到新地点和市场的企业主、工厂与运营方。",
+    "这使 Baraka Partners 不仅是双方之间的对接平台，更是构建可落地运营与投资模式的空间。",
+  ],
+  opCardTitle: "运营、管理、扩张",
+  opCardText: "可迁移到新项目与新市场的实战经验。",
+  modelKicker: "商业模式",
+  modelTitle: "依据每个机会性质的灵活模式",
+  modelIntro:
+    "我们不对每笔交易强加单一模板。Ahd Al-Baraka 的角色由各方根据项目性质、角色大小和所需投入程度协商确定。",
+  models: [
+    { title: "成功费", text: "在投资完成或投资者与项目方之间的交易达成时收取。" },
+    { title: "以管理换取股权", text: "当 Ahd Al-Baraka 拥有明确且约定的管理、运营或开发角色时。" },
+    { title: "按具体情况约定", text: "最终模式根据项目规模、风险以及各方贡献的性质确定。" },
+  ],
   processKicker: "我们如何工作",
   processTitle: "一条保护各方并提升投资严肃性的清晰路径",
-  steps: [
-    { title: "接收机会", text: "从项目或资产方接收初步数据。" },
-    { title: "筛选与核实", text: "审查严肃性、所有权、可行性和投资适配性。" },
-    { title: "准备档案", text: "拟定简明、安全且保护敏感数据的投资展示。" },
-    { title: "匹配投资者", text: "按行业和国家向合适的投资者或运营方展示机会。" },
-    { title: "谈判与构建", text: "组织各方关系并构建合适的交易模式。" },
-    { title: "管理或跟进", text: "根据最终协议参与管理、运营或跟进。" },
-  ],
+  process: ["接收机会", "筛选与核实", "准备档案", "匹配投资者", "组织谈判", "跟进或管理"],
   govKicker: "保密与治理",
-  govTitle: "信任不是口号。信任是一套工作体系。",
+  govTitle1: "信任不是口号。",
+  govTitle2: "信任是一套工作体系。",
   govParas: [
     "我们通过分级披露信息来保护项目方与投资者的数据，只有在核实严肃性并确定合适路径之后，才会披露敏感细节。",
     "每个机会在展示前都会经过审查与构建阶段，因为展示薄弱或不清晰的机会会损害投资者、项目方以及平台的声誉。",
